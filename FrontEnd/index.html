@@ -26,34 +26,28 @@
         <button onclick="joinSession()">Join Session</button>
     </div>
     <div id="createSessionPage">
-        <ul class="multi_select text">
-            <li data-value="28" class=""><a class="no_click">Action</a></li>
-            <li data-value="12" class=""><a class="no_click">Adventure</a></li>
-            <li data-value="16"><a class="no_click">Animation</a></li>
-            <li data-value="35" class=""><a class="no_click">Comedy</a></li>
-            <li data-value="80"><a class="no_click">Crime</a></li>
-            <li data-value="99" class=""><a class="no_click">Documentary</a></li>
-            <li data-value="18" class=""><a class="no_click">Drama</a></li>
-            <li data-value="10751"><a class="no_click">Family</a></li>
-            <li data-value="14"><a class="no_click">Fantasy</a></li>
-            <li data-value="36"><a class="no_click">History</a></li>
-            <li data-value="27"><a class="no_click">Horror</a></li>
-            <li data-value="10402"><a class="no_click">Music</a></li>
-            <li data-value="9648"><a class="no_click">Mystery</a></li>
-          
-            <li data-value="10749"><a class="no_click">Romance</a></li>
-          
-            <li data-value="878"><a class="no_click">Science Fiction</a></li>
-          
-            <li data-value="10770"><a class="no_click">TV Movie</a></li>
-          
-            <li data-value="53"><a class="no_click">Thriller</a></li>
-          
-            <li data-value="10752"><a class="no_click">War</a></li>
-          
-            <li data-value="37"><a class="no_click">Western</a></li>
-          
-        </ul>
+        <div id="multiButtonGroup">
+            <h2>Please select categories:</h2>
+            <button id="28" class="genreButton">Action</button>
+            <button id="12" class="genreButton">Adventure</button>
+            <button id="16" class="genreButton">Animation</button>
+            <button id="35" class="genreButton">Comedy</button>
+            <button id="80" class="genreButton">Crime</button>
+            <button id="99" class="genreButton">Documentary</button>
+            <button id="18" class="genreButton">Drama</button>
+            <button id="10751" class="genreButton">Family</button>
+            <button id="14" class="genreButton">Fantasy</button>
+            <button id="36" class="genreButton">History</button>
+            <button id="27" class="genreButton">Horror</button>
+            <button id="10402" class="genreButton">Music</button>
+            <button id="9648" class="genreButton">Mystery</button>
+            <button id="10749" class="genreButton">Romance</button>
+            <button id="878" class="genreButton">Science Fiction</button>
+            <button id="10770" class="genreButton">TV Movie</button>
+            <button id="53" class="genreButton">Thriller</button>
+            <button id="10752" class="genreButton">War</button>
+            <button id="37" class="genreButton">Western</button>
+        </div>
     </div>
     <style>
         #joinSession {
@@ -66,21 +60,54 @@
     </style>
 </body>
 <script>
+    store = window.localStorage;
     function joiningPage() {
         document.getElementById("initialButtons").style.display = "none";
-        console.log("clocked");
         document.getElementById("joinSession").style.display = "block";
     }
     function joinSession() {
-        const input_id = document.getElementById("sessionId").value; 
-        checkSessionValidity(input_id);
+        const input_id = document.getElementById("sessionId").value;
         document.getElementById("loading").style.display = "block";
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://localhost:5001/tinder-netflix/us-central1/sessionValid?id=${input_id}`, true);
+        // If specified, responseType must be empty string or "text"
+        // xhr.responseType = 'text';
+        xhr.onload = function () {
+            if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200) {
+                    store.setItem('SwipeFlix_sessionId',input_id);
+                    document.getElementById("loading").style.display = "none";
+                    window.location.href = "http://127.0.0.1:5500/FrontEnd/session.html";
+                }
+                else{
+                    alert("cannot Join");
+                    document.getElementById("loading").style.display = "none";
+                }
+            }
+        };
+
+        xhr.send(null);
     }
     function createSessionPage() {
         document.getElementById("initialButtons").style.display = "none";
-        console.log("clocked");
         document.getElementById("createSessionPage").style.display = "block";
     }
+
+        var header = document.getElementById("multiButtonGroup");
+        var btns = header.getElementsByClassName("genreButton");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener("click", function() {
+                // var current = document.getElementsByClassName("active");
+                if(this.className.includes("active")){
+                    this.className= this.className.replace(" active", "");
+                }
+                else{
+                this.className += " active";
+                console.log(this.id)    
+            }
+            });
+        }
 </script>
 
 </html>

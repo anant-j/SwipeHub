@@ -192,3 +192,18 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.genreButton{
+  border-radius: 30px;
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+
+.active{
+  background-color: lightblue;
+}
+
+#multiButtonGroup{
+  position: relative;
+  margin:auto;
+}

@@ -8,6 +8,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
   // Grab the text parameter.
   const id = req.query.id.toUpperCase();
   const usersRef = admin.firestore().collection("sessions").doc(id);
@@ -24,6 +25,7 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
 });
 
 exports.createSession = functions.https.onRequest(async (req, res) => {
+res.set('Access-Control-Allow-Origin', '*');
   const id = await generateSessionId();
   const username = "something";
   const categories = "10751|36|10402|878|53";
@@ -50,7 +52,8 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   };
 
   await admin.firestore().collection("sessions").doc(id).set(data);
-  res.status(200).send({"Session":{id},"data":dataSet});
+  res.status(200).send("Done");
+//   res.status(200).send({"Session":id,"data":dataSet});
 });
 
 async function generateMovieList(lang, genres) {
