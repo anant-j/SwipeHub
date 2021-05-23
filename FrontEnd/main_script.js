@@ -35,7 +35,7 @@ function joinSession() {
       if (xhr.status === 200) {
         store.setItem("SwipeFlix_sessionId", input_id);
         document.getElementById("loading").style.display = "none";
-        window.location.href = "/session.html";
+        window.location.href = "./session.html";
       } else {
         alert("cannot Join");
         document.getElementById("loading").style.display = "none";
@@ -81,7 +81,7 @@ function createSession() {
           JSON.parse(xhr.responseText)["sessionId"]
         );
         document.getElementById("loading").style.display = "none";
-        window.location.href = "/session.html";
+        window.location.href = "./session.html";
       } else {
         alert("cannot Create Session");
         document.getElementById("loading").style.display = "none";
@@ -96,7 +96,7 @@ function createSession() {
 function openSessionPage(){
     const sessionId = localStorage.getItem("SwipeFlix_sessionId");
     if (sessionId != null) {
-        window.location.href = "/session.html";
+        window.location.href = "./session.html";
     }
     else{
         alert("Please create or join a session first");

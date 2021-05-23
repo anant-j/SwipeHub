@@ -10,7 +10,7 @@ const sessionId = localStorage.getItem("SwipeFlix_sessionId");
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 
 if (sessionId === null) {
-  window.location.href = "/index.html";
+  window.location.href = "./index.html";
 }
 
 document.getElementById("sessionId_placeholder").innerHTML = `Session ID: <b>${sessionId}</b>`;
@@ -202,7 +202,7 @@ function joinSession() {
       } else {
         alert("Cannot load the session");
         storage.removeItem("SwipeFlix_sessionId");
-        window.location.href = "/index.html";
+        window.location.href = "./index.html";
         // document.getElementById("loading").style.display = "none";
       }
     }
@@ -210,7 +210,7 @@ function joinSession() {
   xhr.ontimeout = function (e) {
     alert("Cannot load the session");
     storage.removeItem("SwipeFlix_sessionId");
-    window.location.href = "/index.html";
+    window.location.href = "./index.html";
     // XMLHttpRequest timed out. Do something here.
   };
   
