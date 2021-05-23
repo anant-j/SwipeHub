@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Swipeflix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+    <div id="loading" class="loader"></div>
+    <div id="initialButtons">
+        <button onclick="joiningPage()">
+            Join Session
+        </button>
+        <button onclick="createSessionPage()">
+            Create Session
+        </button>
+    </div>
+    <div id="joinSession">
+        <input id="sessionId"></input>
+        <button onclick="joinSession()">Join Session</button>
+    </div>
+    <div id="createSessionPage">
+        <ul class="multi_select text">
+            <li data-value="28" class=""><a class="no_click">Action</a></li>
+            <li data-value="12" class=""><a class="no_click">Adventure</a></li>
+            <li data-value="16"><a class="no_click">Animation</a></li>
+            <li data-value="35" class=""><a class="no_click">Comedy</a></li>
+            <li data-value="80"><a class="no_click">Crime</a></li>
+            <li data-value="99" class=""><a class="no_click">Documentary</a></li>
+            <li data-value="18" class=""><a class="no_click">Drama</a></li>
+            <li data-value="10751"><a class="no_click">Family</a></li>
+            <li data-value="14"><a class="no_click">Fantasy</a></li>
+            <li data-value="36"><a class="no_click">History</a></li>
+            <li data-value="27"><a class="no_click">Horror</a></li>
+            <li data-value="10402"><a class="no_click">Music</a></li>
+            <li data-value="9648"><a class="no_click">Mystery</a></li>
+          
+            <li data-value="10749"><a class="no_click">Romance</a></li>
+          
+            <li data-value="878"><a class="no_click">Science Fiction</a></li>
+          
+            <li data-value="10770"><a class="no_click">TV Movie</a></li>
+          
+            <li data-value="53"><a class="no_click">Thriller</a></li>
+          
+            <li data-value="10752"><a class="no_click">War</a></li>
+          
+            <li data-value="37"><a class="no_click">Western</a></li>
+          
+        </ul>
+    </div>
+    <style>
+        #joinSession {
+            display: none
+        }
+
+        #createSessionPage {
+            display: none
+        }
+    </style>
+</body>
+<script>
+    function joiningPage() {
+        document.getElementById("initialButtons").style.display = "none";
+        console.log("clocked");
+        document.getElementById("joinSession").style.display = "block";
+    }
+    function joinSession() {
+        const input_id = document.getElementById("sessionId").value; 
+        checkSessionValidity(input_id);
+        document.getElementById("loading").style.display = "block";
+    }
+    function createSessionPage() {
+        document.getElementById("initialButtons").style.display = "none";
+        console.log("clocked");
+        document.getElementById("createSessionPage").style.display = "block";
+    }
+</script>
+
+</html>
