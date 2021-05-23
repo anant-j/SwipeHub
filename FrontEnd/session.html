@@ -10,37 +10,13 @@
 <body>
 <!-- partial:index.partial.html -->
 <div class="tinder">
+  <div id="loading" class="loader"></div>
   <div class="tinder--status">
     <i class="fa fa-remove"></i>
     <i class="fa fa-heart"></i>
   </div>
 
-  <div class="tinder--cards">
-    <div class="tinder--card">
-      <img src="https://placeimg.com/600/300/people">
-      <h3>Demo card 1</h3>
-      <p>This is a demo for Tinder like swipe cards</p>
-    </div>
-    <div class="tinder--card">
-      <img src="https://placeimg.com/600/300/animals">
-      <h3>Demo card 2</h3>
-      <p>This is a demo for Tinder like swipe cards</p>
-    </div>
-    <div class="tinder--card">
-      <img src="https://placeimg.com/600/300/nature">
-      <h3>Demo card 3</h3>
-      <p>This is a demo for Tinder like swipe cards</p>
-    </div>
-    <div class="tinder--card">
-      <img src="https://placeimg.com/600/300/tech">
-      <h3>Demo card 4</h3>
-      <p>This is a demo for Tinder like swipe cards</p>
-    </div>
-    <div class="tinder--card">
-      <img src="https://placeimg.com/600/300/arch">
-      <h3>Demo card 5</h3>
-      <p>This is a demo for Tinder like swipe cards</p>
-    </div>
+  <div class="tinder--cards" id="outerCardBody">
   </div>
 
   <div class="tinder--buttons">
@@ -49,7 +25,53 @@
   </div>
 </div>
 <!-- partial -->
-  <script src='https://hammerjs.github.io/dist/hammer.min.js'></script><script  src="./script.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js" integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script  src="./script.js"></script>
+  <script>
+function addCard(imgurl, title, text, mediaId) {
+  var div = document.createElement('div');
+  div.id = mediaId;
+  div.innerHTML = `<img id="img${mediaId}"src="${imgurl}">
+    <h3>${title}</h3>
+    <p>${text}</p>`;
+  div.className = 'tinder--card';
+  div.onclick = function() {
+    if(document.getElementById(`img${mediaId}`).style.display != 'none') {
+    document.getElementById(`img${mediaId}`).style.display = 'none';}
+    else{
+    document.getElementById(`img${mediaId}`).style.display = 'inline';}
+  }
+  document.getElementById("outerCardBody").appendChild(div);
+  initCards();
+  hammertime_each(document.getElementById(mediaId));
+}
+  </script>
+  <script>
+    document.getElementById("loading").style.display = "block";
+    storage = window.localStorage;
+    const sessionId=localStorage.getItem('SwipeFlix_sessionId');
+    var xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://localhost:5001/tinder-netflix/us-central1/joinSession?id=${sessionId}`, true);
+        // If specified, responseType must be empty string or "text"
+        // xhr.responseType = 'text';
+        xhr.onload = function () {
+            if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200) {
+                  const data = JSON.parse(xhr.responseText)
+                  for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        addCard(data[key]["poster"],data[key]["title"],data[key]["description"],key)
+                    }
+                }
+                    document.getElementById("loading").style.display = "none";
+                }
+                else{
+                    alert("cannot Join");
+                    document.getElementById("loading").style.display = "none";
+                }
+            }
+        };
+        xhr.send(null);
+  </script>
 </body>
 </html>

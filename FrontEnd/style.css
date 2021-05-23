@@ -4,6 +4,11 @@
   margin: 0;
 }
 
+@font-face{
+  font-family: "tfont";
+  src: url("GothamRounded-Book.otf") format("opentype");
+}
+
 body {
   /* background: #CCFBFE; */
   overflow: hidden;
@@ -94,6 +99,8 @@ body {
   height: 70vh;
   background: #FFFFFF;
   padding-bottom: 40px;
+  /* margin-bottom: 30px; */
+  border: 1px solid gold;
   border-radius: 8px;
   overflow: hidden;
   position: absolute;
@@ -110,20 +117,25 @@ body {
 }
 
 .tinder--card img {
-  max-width: 100%;
+  /* width: auto; */
+  /* width:20vw; */
+  max-width: 50%;
+  display: inline;
   pointer-events: none;
 }
 
 .tinder--card h3 {
-  margin-top: 32px;
-  font-size: 32px;
+  font-family: tfont;
+  margin-top: 5px;
+  font-size: 25px;
   padding: 0 16px;
   pointer-events: none;
 }
 
 .tinder--card p {
-  margin-top: 24px;
-  font-size: 20px;
+  font-family: tfont;
+  margin-top: 5px;
+  font-size: auto;
   padding: 0 16px;
   pointer-events: none;
 }

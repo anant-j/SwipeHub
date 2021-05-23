@@ -56,6 +56,26 @@ res.set('Access-Control-Allow-Origin', '*');
 //   res.status(200).send({"Session":id,"data":dataSet});
 });
 
+
+exports.joinSession = functions.https.onRequest(async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    // Grab the text parameter.
+    const id = req.query.id.toUpperCase();
+    const usersRef = admin.firestore().collection("sessions").doc(id);
+    usersRef.get().then((docSnapshot) => {
+      if (docSnapshot.exists) {
+        usersRef.onSnapshot((doc) => {
+          // do stuff with the data
+          res.status(200).send(doc.data().moviesList);
+        //   res.status(200).send("Allowed");
+        });
+      } else {
+        res.status(404).send("Session doesn't exist");
+      }
+    });
+    
+    });
+    
 async function generateMovieList(lang, genres) {
   let final = {};
   url =
