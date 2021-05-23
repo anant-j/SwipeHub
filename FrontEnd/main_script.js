@@ -10,10 +10,10 @@ function createSessionPage() {
 }
 
 function toHomePage() {
-    document.getElementById("initialButtons").style.display = "block";
-    document.getElementById("joinSession").style.display = "none";
-    document.getElementById("createSessionPage").style.display = "none";
-  }
+  document.getElementById("initialButtons").style.display = "block";
+  document.getElementById("joinSession").style.display = "none";
+  document.getElementById("createSessionPage").style.display = "none";
+}
 
 function joinSession() {
   const input_id = document.getElementById("sessionId").value;
@@ -57,33 +57,45 @@ for (var i = 0; i < btns.length; i++) {
   });
 }
 
-
 function createSession() {
-    const input_id = document.getElementById("sessionId").value;
-    document.getElementById("loading").style.display = "block";
-    document.getElementById("createSessionPage").style.display = "none"; 
-  
-    var xhr = new XMLHttpRequest();
-    xhr.open(
-      "GET",
-      `http://localhost:5001/tinder-netflix/us-central1/createSession`,
-      true
-    );
-    // If specified, responseType must be empty string or "text"
-    // xhr.responseType = 'text';
-    xhr.onload = function () {
-      if (xhr.readyState === xhr.DONE) {
-        if (xhr.status === 200) {
-          store.setItem("SwipeFlix_sessionId", JSON.parse(xhr.responseText)["sessionId"]);
-          document.getElementById("loading").style.display = "none";
-          window.location.href = "http://127.0.0.1:5500/FrontEnd/session.html";
-        } else {
-          alert("cannot Create Session");
-          document.getElementById("loading").style.display = "none";
-        }
+  const input_id = document.getElementById("sessionId").value;
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("createSessionPage").style.display = "none";
+
+  var xhr = new XMLHttpRequest();
+  xhr.open(
+    "GET",
+    `http://localhost:5001/tinder-netflix/us-central1/createSession`,
+    true
+  );
+  // If specified, responseType must be empty string or "text"
+  // xhr.responseType = 'text';
+  xhr.onload = function () {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+        store.setItem(
+          "SwipeFlix_sessionId",
+          JSON.parse(xhr.responseText)["sessionId"]
+        );
+        document.getElementById("loading").style.display = "none";
+        window.location.href = "http://127.0.0.1:5500/FrontEnd/session.html";
+      } else {
+        alert("cannot Create Session");
+        document.getElementById("loading").style.display = "none";
       }
-    };
-  
-    xhr.send(null);
-  }
-  
+    }
+  };
+
+  xhr.send(null);
+}
+
+
+function openSessionPage(){
+    const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+    if (sessionId != null) {
+        window.location.href = "http://127.0.0.1:5500/FrontEnd/session.html";
+    }
+    else{
+        alert("Please create or join a session first");
+    }      
+}

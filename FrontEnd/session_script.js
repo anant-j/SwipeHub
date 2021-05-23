@@ -6,6 +6,11 @@ var nope = document.getElementById("nope");
 var love = document.getElementById("love");
 const storage = window.localStorage;
 const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+
+if (sessionId === null) {
+  window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
+}
+
 document.getElementById("sessionId_placeholder").innerHTML = `Session ID: <b>${sessionId}</b>`;
 
 function initCards(card, index) {
@@ -138,20 +143,28 @@ function leftSwipe() {
   console.log("left" + card.id);
 }
 
-function addCard(imgurl, title, text, mediaId) {
+function addCard(imgurl, title, text, mediaId, release, adult) {
   var div = document.createElement("div");
   div.id = mediaId;
-  div.innerHTML = `<img id="img${mediaId}" src="${imgurl}">
+  let adultResult=""
+  if(adult){
+    adultResult = "🔞"
+  }
+  div.innerHTML = `<img id="img${mediaId}" src="${imgurl}"><p id="rightCard${mediaId}" class="rightCard">Released on:<br><b>${release}</b><br><br><span style="font-size:30px">${adultResult}</span></p>
     <h3 id="text${mediaId}"><u>${title}</u></h3>
     <p>${text}</p>`;
   div.className = "tinder--card";
   div.onclick = function () {
     if (document.getElementById(`img${mediaId}`).style.display != "none") {
       document.getElementById(`img${mediaId}`).style.display = "none";
-      document.getElementById(`text${mediaId}`).style.paddingTop = "60px";
+      document.getElementById(`text${mediaId}`).style.paddingTop = "20px";
+      document.getElementById(`rightCard${mediaId}`).style.float = "none";
+      document.getElementById(`rightCard${mediaId}`).style.marginRight = "0px";
     } else {
       document.getElementById(`img${mediaId}`).style.display = "inline";
+      document.getElementById(`rightCard${mediaId}`).style.float = "right";
       document.getElementById(`text${mediaId}`).style.paddingTop = "10px";
+      document.getElementById(`rightCard${mediaId}`).style.marginRight = "30px";
     }
   };
   document.getElementById("outerCardBody").appendChild(div);
@@ -177,18 +190,28 @@ function joinSession() {
               data[key]["poster"],
               data[key]["title"],
               data[key]["description"],
-              key
+              key,
+              data[key]["release_date"],
+              data[key]["adult"]
             );
           }
         }
         document.getElementById("loading").style.display = "none";
       } else {
         alert("Cannot load the session");
+        storage.removeItem("SwipeFlix_sessionId");
         window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
         // document.getElementById("loading").style.display = "none";
       }
     }
   };
+  xhr.ontimeout = function (e) {
+    alert("Cannot load the session");
+    storage.removeItem("SwipeFlix_sessionId");
+    window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
+    // XMLHttpRequest timed out. Do something here.
+  };
+  
   xhr.send(null);
 }
 
