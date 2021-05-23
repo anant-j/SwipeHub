@@ -4,6 +4,9 @@ var tinderContainer = document.querySelector(".tinder");
 var allCards = document.querySelectorAll(".tinder--card");
 var nope = document.getElementById("nope");
 var love = document.getElementById("love");
+const storage = window.localStorage;
+const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+document.getElementById("sessionId_placeholder").innerHTML = `Session ID: <b>${sessionId}</b>`;
 
 function initCards(card, index) {
   var newCards = document.querySelectorAll(".tinder--card:not(.removed)");
@@ -72,10 +75,10 @@ function hammertime_each(el) {
       var yMulti = event.deltaY / 80;
       var rotate = xMulti * yMulti;
 
-      if (event.deltaX>0){
+      if (event.deltaX > 0) {
         rightSwipe();
       }
-      if (event.deltaX<0){
+      if (event.deltaX < 0) {
         leftSwipe();
       }
       event.target.style.transform =
@@ -105,11 +108,11 @@ function createButtonListener(love) {
     if (love) {
       card.style.transform =
         "translate(" + moveOutWidth + "px, -100px) rotate(-30deg)";
-        rightSwipe();
+      rightSwipe();
     } else {
       card.style.transform =
         "translate(-" + moveOutWidth + "px, -100px) rotate(30deg)";
-        leftSwipe();
+      leftSwipe();
     }
 
     initCards();
@@ -124,13 +127,69 @@ var loveListener = createButtonListener(true);
 nope.addEventListener("click", nopeListener);
 love.addEventListener("click", loveListener);
 
-function rightSwipe(){
+function rightSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
-  const card=cards[cards.length-1];
-  console.log("right"+card.id);
+  const card = cards[cards.length - 1];
+  console.log("right" + card.id);
 }
-function leftSwipe(){
+function leftSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
-  const card=cards[cards.length-1];
-  console.log("left"+card.id);
+  const card = cards[cards.length - 1];
+  console.log("left" + card.id);
 }
+
+function addCard(imgurl, title, text, mediaId) {
+  var div = document.createElement("div");
+  div.id = mediaId;
+  div.innerHTML = `<img id="img${mediaId}" src="${imgurl}">
+    <h3 id="text${mediaId}"><u>${title}</u></h3>
+    <p>${text}</p>`;
+  div.className = "tinder--card";
+  div.onclick = function () {
+    if (document.getElementById(`img${mediaId}`).style.display != "none") {
+      document.getElementById(`img${mediaId}`).style.display = "none";
+      document.getElementById(`text${mediaId}`).style.paddingTop = "60px";
+    } else {
+      document.getElementById(`img${mediaId}`).style.display = "inline";
+      document.getElementById(`text${mediaId}`).style.paddingTop = "10px";
+    }
+  };
+  document.getElementById("outerCardBody").appendChild(div);
+  initCards();
+  hammertime_each(document.getElementById(mediaId));
+}
+
+function joinSession() {
+  document.getElementById("loading").style.display = "block";
+  var xhr = new XMLHttpRequest();
+  xhr.open(
+    "GET",
+    `http://localhost:5001/tinder-netflix/us-central1/joinSession?id=${sessionId}`,
+    true
+  );
+  xhr.onload = function () {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        for (var key in data) {
+          if (data.hasOwnProperty(key)) {
+            addCard(
+              data[key]["poster"],
+              data[key]["title"],
+              data[key]["description"],
+              key
+            );
+          }
+        }
+        document.getElementById("loading").style.display = "none";
+      } else {
+        alert("Cannot load the session");
+        window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
+        // document.getElementById("loading").style.display = "none";
+      }
+    }
+  };
+  xhr.send(null);
+}
+
+joinSession();

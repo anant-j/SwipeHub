@@ -1,7 +1,7 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require("firebase-functions");
 const axios = require("axios");
-const apiToken = "";
+const apiToken = functions.config().tmdb.key;
 
 // The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
@@ -52,8 +52,8 @@ res.set('Access-Control-Allow-Origin', '*');
   };
 
   await admin.firestore().collection("sessions").doc(id).set(data);
-  res.status(200).send("Done");
-//   res.status(200).send({"Session":id,"data":dataSet});
+  // res.status(200).send("Done");
+  res.status(200).send({"sessionId":id});
 });
 
 

@@ -1,77 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Swipeflix</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'><link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<div class="tinder">
-  <div id="loading" class="loader"></div>
-  <div class="tinder--status">
-    <i class="fa fa-remove"></i>
-    <i class="fa fa-heart"></i>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Swipeflix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./session_style.css" />
+  </head>
+  <body>
+    <div class="navbar">
+    <ul>
+      <li class="desktop"><a href="index.html">Home</a></li>
+      <li class="desktop"><a class="nav-active">Session</a></li>
+      <li style="float:right"><a id="sessionId_placeholder"></a></li>
+      <li><a>Leave Session</a></li>
+    </ul>
   </div>
-
-  <div class="tinder--cards" id="outerCardBody">
+    <div style="width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 50px;
+    left: 80vw; z-index: 10">
+    <p id="participants_placeholder"></p>
   </div>
+    <div class="tinder">
+      <div id="loading" class="loader"></div>
+      <div class="tinder--status">
+        <i class="fa fa-remove"></i>
+        <i class="fa fa-heart"></i>
+      </div>
 
-  <div class="tinder--buttons">
-    <button id="nope"><i class="fa fa-remove"></i></button>
-    <button id="love"><i class="fa fa-heart"></i></button>
-  </div>
-</div>
-<!-- partial -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js" integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script  src="./script.js"></script>
-  <script>
-function addCard(imgurl, title, text, mediaId) {
-  var div = document.createElement('div');
-  div.id = mediaId;
-  div.innerHTML = `<img id="img${mediaId}"src="${imgurl}">
-    <h3>${title}</h3>
-    <p>${text}</p>`;
-  div.className = 'tinder--card';
-  div.onclick = function() {
-    if(document.getElementById(`img${mediaId}`).style.display != 'none') {
-    document.getElementById(`img${mediaId}`).style.display = 'none';}
-    else{
-    document.getElementById(`img${mediaId}`).style.display = 'inline';}
-  }
-  document.getElementById("outerCardBody").appendChild(div);
-  initCards();
-  hammertime_each(document.getElementById(mediaId));
-}
-  </script>
-  <script>
-    document.getElementById("loading").style.display = "block";
-    storage = window.localStorage;
-    const sessionId=localStorage.getItem('SwipeFlix_sessionId');
-    var xhr = new XMLHttpRequest();
-        xhr.open('GET', `http://localhost:5001/tinder-netflix/us-central1/joinSession?id=${sessionId}`, true);
-        // If specified, responseType must be empty string or "text"
-        // xhr.responseType = 'text';
-        xhr.onload = function () {
-            if (xhr.readyState === xhr.DONE) {
-                if (xhr.status === 200) {
-                  const data = JSON.parse(xhr.responseText)
-                  for (var key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        addCard(data[key]["poster"],data[key]["title"],data[key]["description"],key)
-                    }
-                }
-                    document.getElementById("loading").style.display = "none";
-                }
-                else{
-                    alert("cannot Join");
-                    document.getElementById("loading").style.display = "none";
-                }
-            }
-        };
-        xhr.send(null);
-  </script>
-</body>
+      <div class="tinder--cards" id="outerCardBody"></div>
+
+      <div class="tinder--buttons">
+        <button id="nope"><i class="fa fa-remove"></i></button>
+        <button id="love"><i class="fa fa-heart"></i></button>
+      </div>
+    </div>
+    <!-- partial -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"
+      integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="./session_script.js"></script>
+  </body>
 </html>

@@ -8,26 +8,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
     <link rel="stylesheet" href="./style.css">
-
+    <link rel="stylesheet" href="./main_style.css">
 </head>
 
 <body>
+    <div class="navbar">
+        <ul>
+          <li class="desktop"><a class="nav-active">Home</a></li>
+          <li class="desktop"><a href="/FrontEnd/session.html">Session</a></li>
+        </ul>
+    </div>
     <div id="loading" class="loader"></div>
     <div id="initialButtons">
-        <button onclick="joiningPage()">
+        <button class="button" onclick="joiningPage()">
             Join Session
         </button>
-        <button onclick="createSessionPage()">
+        <button class="button" onclick="createSessionPage()">
             Create Session
         </button>
     </div>
     <div id="joinSession">
-        <input id="sessionId"></input>
-        <button onclick="joinSession()">Join Session</button>
+        <input class="input" id="sessionId"></input><br>
+        <button class="button" onclick="joinSession()">Join Session</button><br><br>
+        <button class="button" onclick="toHomePage()">Back
+        </button>
     </div>
     <div id="createSessionPage">
         <div id="multiButtonGroup">
-            <h2>Please select categories:</h2>
+            <input style="font-size: 16px" placeholder="Enter Email Address" type="text"></input>
+            <br>
+            <br>
+            <p style="font-size: 20px; padding-bottom: 2px;">Select Categories:</p>
             <button id="28" class="genreButton">Action</button>
             <button id="12" class="genreButton">Adventure</button>
             <button id="16" class="genreButton">Animation</button>
@@ -47,67 +58,20 @@
             <button id="53" class="genreButton">Thriller</button>
             <button id="10752" class="genreButton">War</button>
             <button id="37" class="genreButton">Western</button>
+            <br>
+            <br>
+            <p style="font-size: 20px; padding-bottom: 5px;">Select Language:</p>
+            <select style="font-size: 20px;" name="language" id="language">
+                <option value="en-US">English</option>
+                <option value="hi">Hindi</option>
+            </select>
         </div>
+        <br>
+        <button class="button" onclick="createSession()">Create</button>
+        <button class="button" onclick="toHomePage()">Back</button>
     </div>
-    <style>
-        #joinSession {
-            display: none
-        }
+    <script src="./main_script.js"></script>
 
-        #createSessionPage {
-            display: none
-        }
-    </style>
 </body>
-<script>
-    store = window.localStorage;
-    function joiningPage() {
-        document.getElementById("initialButtons").style.display = "none";
-        document.getElementById("joinSession").style.display = "block";
-    }
-    function joinSession() {
-        const input_id = document.getElementById("sessionId").value;
-        document.getElementById("loading").style.display = "block";
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', `http://localhost:5001/tinder-netflix/us-central1/sessionValid?id=${input_id}`, true);
-        // If specified, responseType must be empty string or "text"
-        // xhr.responseType = 'text';
-        xhr.onload = function () {
-            if (xhr.readyState === xhr.DONE) {
-                if (xhr.status === 200) {
-                    store.setItem('SwipeFlix_sessionId',input_id);
-                    document.getElementById("loading").style.display = "none";
-                    window.location.href = "http://127.0.0.1:5500/FrontEnd/session.html";
-                }
-                else{
-                    alert("cannot Join");
-                    document.getElementById("loading").style.display = "none";
-                }
-            }
-        };
-
-        xhr.send(null);
-    }
-    function createSessionPage() {
-        document.getElementById("initialButtons").style.display = "none";
-        document.getElementById("createSessionPage").style.display = "block";
-    }
-
-        var header = document.getElementById("multiButtonGroup");
-        var btns = header.getElementsByClassName("genreButton");
-        for (var i = 0; i < btns.length; i++) {
-            btns[i].addEventListener("click", function() {
-                // var current = document.getElementsByClassName("active");
-                if(this.className.includes("active")){
-                    this.className= this.className.replace(" active", "");
-                }
-                else{
-                this.className += " active";
-                console.log(this.id)    
-            }
-            });
-        }
-</script>
 
 </html>
