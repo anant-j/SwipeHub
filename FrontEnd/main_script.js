@@ -1,4 +1,7 @@
 store = window.localStorage;
+// const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
+const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
+
 function joiningPage() {
   document.getElementById("initialButtons").style.display = "none";
   document.getElementById("joinSession").style.display = "block";
@@ -22,7 +25,7 @@ function joinSession() {
   var xhr = new XMLHttpRequest();
   xhr.open(
     "GET",
-    `http://localhost:5001/tinder-netflix/us-central1/sessionValid?id=${input_id}`,
+    `${baseUrl}/sessionValid?id=${input_id}&user="test"`,
     true
   );
   // If specified, responseType must be empty string or "text"
@@ -65,7 +68,7 @@ function createSession() {
   var xhr = new XMLHttpRequest();
   xhr.open(
     "GET",
-    `http://localhost:5001/tinder-netflix/us-central1/createSession`,
+    `${baseUrl}/createSession`,
     true
   );
   // If specified, responseType must be empty string or "text"

@@ -6,6 +6,8 @@ var nope = document.getElementById("nope");
 var love = document.getElementById("love");
 const storage = window.localStorage;
 const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+// const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
+const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 
 if (sessionId === null) {
   window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
@@ -177,7 +179,7 @@ function joinSession() {
   var xhr = new XMLHttpRequest();
   xhr.open(
     "GET",
-    `http://localhost:5001/tinder-netflix/us-central1/joinSession?id=${sessionId}`,
+    `${baseUrl}/joinSession?id=${sessionId}&user=Test`,
     true
   );
   xhr.onload = function () {
@@ -216,3 +218,4 @@ function joinSession() {
 }
 
 joinSession();
+
