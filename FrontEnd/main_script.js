@@ -25,11 +25,7 @@ function joinSession() {
   store.setItem("SwipeFlix_userId", user_id);
 
   var xhr = new XMLHttpRequest();
-  xhr.open(
-    "GET",
-    `${baseUrl}/sessionValid?id=${input_id}`,
-    true
-  );
+  xhr.open("GET", `${baseUrl}/sessionValid?id=${input_id}`, true);
   // If specified, responseType must be empty string or "text"
   // xhr.responseType = 'text';
   xhr.onload = function () {
@@ -74,18 +70,14 @@ function createSession() {
   var categories = "";
   for (var i = 0; i < btns.length; i++) {
     // console.log(btns[i].id);
-    categories += btns[i].id + `|`
+    categories += btns[i].id + `|`;
   }
   categories = categories.substring(0, categories.length - 1);
-  const languages = document.getElementById('language').value;
+  const languages = document.getElementById("language").value;
   var params = `username=${username}&categories=${categories}&languages=${languages}`;
-  xhr.open(
-    "POST",
-    `${baseUrl}/createSession`,
-    true
-  );
+  xhr.open("POST", `${baseUrl}/createSession`, true);
 
-  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   // If specified, responseType must be empty string or "text"
   // xhr.responseType = 'text';
   xhr.onload = function () {
@@ -95,6 +87,7 @@ function createSession() {
           "SwipeFlix_sessionId",
           JSON.parse(xhr.responseText)["sessionId"]
         );
+        store.setItem("SwipeFlix_userId", user_id);
         document.getElementById("loading").style.display = "none";
         window.location.href = "./session.html";
       } else {
@@ -107,13 +100,11 @@ function createSession() {
   xhr.send(params);
 }
 
-
-function openSessionPage(){
-    const sessionId = localStorage.getItem("SwipeFlix_sessionId");
-    if (sessionId != null) {
-        window.location.href = "./session.html";
-    }
-    else{
-        alert("Please create or join a session first");
-    }      
+function openSessionPage() {
+  const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+  if (sessionId != null) {
+    window.location.href = "./session.html";
+  } else {
+    alert("Please create or join a session first");
+  }
 }
