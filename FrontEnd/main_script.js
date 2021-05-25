@@ -20,12 +20,14 @@ function toHomePage() {
 
 function joinSession() {
   const input_id = document.getElementById("sessionId").value;
+  const user_id = document.getElementById("userId").value;
   document.getElementById("loading").style.display = "block";
+  store.setItem("SwipeFlix_userId", user_id);
 
   var xhr = new XMLHttpRequest();
   xhr.open(
     "GET",
-    `${baseUrl}/sessionValid?id=${input_id}&user="test"`,
+    `${baseUrl}/sessionValid?id=${input_id}`,
     true
   );
   // If specified, responseType must be empty string or "text"
@@ -55,7 +57,7 @@ for (var i = 0; i < btns.length; i++) {
       this.className = this.className.replace(" active", "");
     } else {
       this.className += " active";
-      console.log(this.id);
+      // console.log(this.id);
     }
   });
 }
@@ -66,11 +68,24 @@ function createSession() {
   document.getElementById("createSessionPage").style.display = "none";
 
   var xhr = new XMLHttpRequest();
+  const username = document.getElementById("email").innerHTML;
+  var header = document.getElementById("multiButtonGroup");
+  var btns = header.getElementsByClassName("active");
+  var categories = "";
+  for (var i = 0; i < btns.length; i++) {
+    // console.log(btns[i].id);
+    categories += btns[i].id + `|`
+  }
+  categories = categories.substring(0, categories.length - 1);
+  const languages = document.getElementById('language').value;
+  var params = `username=${username}&categories=${categories}&languages=${languages}`;
   xhr.open(
-    "GET",
+    "POST",
     `${baseUrl}/createSession`,
     true
   );
+
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   // If specified, responseType must be empty string or "text"
   // xhr.responseType = 'text';
   xhr.onload = function () {
@@ -89,7 +104,7 @@ function createSession() {
     }
   };
 
-  xhr.send(null);
+  xhr.send(params);
 }
 
 

@@ -13,25 +13,21 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   // Grab the text parameter.
   const id = req.query.id.toUpperCase();
-  const usersRef = admin.firestore().collection("sessions").doc(id);
-  usersRef.get().then((docSnapshot) => {
-    if (docSnapshot.exists) {
-      usersRef.onSnapshot((doc) => {
-        // do stuff with the data
-        res.status(200).send("Allowed");
-      });
-    } else {
-      res.status(404).send("Session doesn't exist");
-    }
-  });
+  const usersRef = await admin.firestore().collection("sessions").doc(id).get();
+  if (!usersRef.exists) {
+    res.status(404).send("Session doesn't exist");
+  } else {
+    res.status(200).send("Allowed");
+  }
 });
 
 exports.createSession = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const id = await generateSessionId();
-  const username = "something";
-  const categories = "10751|36|10402|878|53";
-  const languages = "";
+  const username = req.body.username;
+  const categories = req.body.categories;
+  const languages = req.body.languages;
+  console.log(languages);
   const date = new Date();
   const type = "MOVIE";
   let dataSet = [];
@@ -40,7 +36,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   //   dataSet = dataSet.concat(tvdata);
   // }
   if (type === "MOVIE") {
-    dataSet = await generateMovieList("en-US", categories);
+    dataSet = await generateMovieList(languages, categories);
   }
   const data = {
     created: date,
@@ -80,7 +76,6 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         .set(data, {merge: true});
     // do stuff with the data
     res.status(200).send(doc.data().moviesList);
-    console.log("Document data:", doc.data());
   }
 });
 
@@ -92,7 +87,7 @@ async function generateMovieList(lang, genres) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&language=${lang}&with_genres=${genres}&sort_by=popularity.desc&with_watch_providers=8&watch_region=CA`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=popularity.desc&with_watch_providers=8&watch_region=CA`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {

@@ -28,14 +28,15 @@
         </button>
     </div>
     <div id="joinSession">
-        <input class="input" id="sessionId"></input><br>
+        <input class="input" placeholder="Enter session ID" id="sessionId"></input><br>
+        <input class="input" placeholder="Enter your email" id="userId"></input><br>
         <button class="button" onclick="joinSession()">Join Session</button><br><br>
         <button class="button" onclick="toHomePage()">Back
         </button>
     </div>
     <div id="createSessionPage">
         <div id="multiButtonGroup">
-            <input style="font-size: 16px" placeholder="Enter Email Address" type="text"></input>
+            <input id="email" style="font-size: 16px" placeholder="Enter Email Address" type="text"></input>
             <br>
             <br>
             <p style="font-size: 20px; padding-bottom: 2px;">Select Categories:</p>
@@ -62,7 +63,7 @@
             <br>
             <p style="font-size: 20px; padding-bottom: 5px;">Select Language:</p>
             <select style="font-size: 20px;" name="language" id="language">
-                <option value="en-US">English</option>
+                <option value="en">English</option>
                 <option value="hi">Hindi</option>
             </select>
         </div>

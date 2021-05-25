@@ -6,10 +6,11 @@ var nope = document.getElementById("nope");
 var love = document.getElementById("love");
 const storage = window.localStorage;
 const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+const userId = localStorage.getItem("SwipeFlix_userId");
 // const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 
-if (sessionId === null) {
+if (sessionId === null || userId === null) {
   window.location.href = "./index.html";
 }
 
@@ -176,10 +177,11 @@ function addCard(imgurl, title, text, mediaId, release, adult) {
 
 function joinSession() {
   document.getElementById("loading").style.display = "block";
+
   var xhr = new XMLHttpRequest();
   xhr.open(
     "GET",
-    `${baseUrl}/joinSession?id=${sessionId}&user=Test`,
+    `${baseUrl}/joinSession?id=${sessionId}&user=${userId}`,
     true
   );
   xhr.onload = function () {
