@@ -87,7 +87,7 @@ function createSession() {
           "SwipeFlix_sessionId",
           JSON.parse(xhr.responseText)["sessionId"]
         );
-        store.setItem("SwipeFlix_userId", user_id);
+        store.setItem("SwipeFlix_userId", username);
         document.getElementById("loading").style.display = "none";
         window.location.href = "./session.html";
       } else {
