@@ -9,6 +9,7 @@ const sessionId = localStorage.getItem("SwipeFlix_sessionId");
 const userId = localStorage.getItem("SwipeFlix_userId");
 // const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
+var globalHammerTime = {}
 
 if (sessionId === null || userId === null) {
   window.location.href = "./index.html";
@@ -65,7 +66,7 @@ function hammertime_each(el) {
     tinderContainer.classList.remove("tinder_nope");
 
     var moveOutWidth = document.body.clientWidth;
-    var keep = Math.abs(event.deltaX) < 80 || Math.abs(event.velocityX) < 0.5;
+    var keep = Math.abs(event.deltaX) < 50 || Math.abs(event.velocityX) < 0.4;
 
     event.target.classList.toggle("removed", !keep);
 
@@ -138,15 +139,20 @@ love.addEventListener("click", loveListener);
 function rightSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
   const card = cards[cards.length - 1];
-  console.log("right" + card.id);
+  console.log("right: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
+  document.getElementById(`${card.id}`).className = ".tinder--card removed";
+  hammertime_first_only();
 }
 function leftSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
   const card = cards[cards.length - 1];
-  console.log("left" + card.id);
+  console.log("left: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
+  // document.getElementById(`${card.id}`).style.display = "none";
+  document.getElementById(`${card.id}`).className = ".tinder--card removed";
+  hammertime_first_only();
 }
 
-function addCard(imgurl, title, text, mediaId, release, adult) {
+function addMovieCard(imgurl, title, text, mediaId, release, adult) {
   var div = document.createElement("div");
   div.id = mediaId;
   let adultResult=""
@@ -172,9 +178,32 @@ function addCard(imgurl, title, text, mediaId, release, adult) {
   };
   document.getElementById("outerCardBody").appendChild(div);
   initCards();
-  hammertime_each(document.getElementById(mediaId));
+  hammertime_first_only();
+  // hammertime_each(document.getElementById(mediaId));
 }
 
+function addLastCard(){
+  var div = document.createElement("div");
+  div.id = "-1";
+  div.innerHTML = `<h3 id="text-1"><u>Uh Oh</u></h3>
+    <p>Looks like we've run out of choices to show you for this session. <br>Swipe right to see more options or swipe left to quit the session. <br> If you are the session creator, the session will end.</p>`;
+  div.className = "tinder--card";
+  document.getElementById("outerCardBody").appendChild(div);
+  initCards();
+  hammertime_first_only(); 
+}
+
+function hammertime_first_only() {
+  var newCards = document.querySelectorAll(".tinder--card:not(.removed)");
+  var removedCards = document.getElementsByClassName(".tinder--card removed");
+  if(!(newCards.length==0) && globalHammerTime[newCards[0].id] === undefined){
+    hammertime_each(newCards[0]);
+    globalHammerTime[newCards[0].id] = true;
+  }
+  if(newCards.length==0 && (removedCards[removedCards.length-1].id != -1)){
+    addLastCard();
+  }
+}
 function joinSession() {
   document.getElementById("loading").style.display = "block";
 
@@ -190,7 +219,7 @@ function joinSession() {
         const data = JSON.parse(xhr.responseText);
         for (var key in data) {
           if (data.hasOwnProperty(key)) {
-            addCard(
+            addMovieCard(
               data[key]["poster"],
               data[key]["title"],
               data[key]["description"],

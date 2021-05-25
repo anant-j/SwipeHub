@@ -76,6 +76,10 @@
     cursor: -webkit-grab;
     cursor: grab;
   }
+
+  .removed{
+    display: none!important;
+  }
   
   .moving.tinder--card {
     transition: none;
