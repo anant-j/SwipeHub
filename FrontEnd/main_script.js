@@ -64,7 +64,7 @@ function createSession() {
   document.getElementById("createSessionPage").style.display = "none";
 
   var xhr = new XMLHttpRequest();
-  const username = document.getElementById("email").innerHTML;
+  const username = document.getElementById("email").value;
   var header = document.getElementById("multiButtonGroup");
   var btns = header.getElementsByClassName("active");
   var categories = "";
