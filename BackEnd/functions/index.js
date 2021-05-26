@@ -13,11 +13,12 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   // Grab the text parameter.
   const id = req.query.id.toUpperCase();
-  const usersRef = await admin.firestore().collection("sessions").doc(id).get();
-  if (!usersRef.exists) {
-    res.status(404).send("Session doesn't exist");
-  } else {
+  const sessionDb = admin.firestore().collection("sessions").doc(id);
+  const doc = await sessionDb.get();
+  if (doc.exists && doc.data().isValid) {
     res.status(200).send("Allowed");
+  } else {
+    res.status(404).send("Session doesn't exist");
   }
 });
 
@@ -44,6 +45,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     categories: categories,
     languages: languages,
     moviesList: dataSet,
+    isValid: true,
     likes: {},
     participants: {},
   };
@@ -59,8 +61,8 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
   const date = new Date();
   const id = req.query.id.toUpperCase();
   const userId = req.query.user.toLowerCase();
-  const usersRef = admin.firestore().collection("sessions").doc(id);
-  const doc = await usersRef.get();
+  const sessionDb = admin.firestore().collection("sessions").doc(id);
+  const doc = await sessionDb.get();
   if (!doc.exists) {
     res.status(404).send("Session doesn't exist");
   } else {
@@ -84,17 +86,17 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
   // Grab the text parameter.
   const id = req.query.id.toUpperCase();
   const userId = req.query.user.toLowerCase();
-  const usersRef = admin.firestore().collection("sessions").doc(id);
-  const doc = await usersRef.get();
+  const sessionDb = admin.firestore().collection("sessions").doc(id);
+  const doc = await sessionDb.get();
   if (!doc.exists) {
     res.status(404).send("Session doesn't exist");
   } else {
     const users = doc.data().participants;
     if (users[userId] != undefined) {
       if (userId == doc.data().creator) {
-        endSession(id);
+        await endSession(id);
       } else {
-        leaveSession(id, userId, doc.data());
+        await leaveSession(id, userId, doc.data());
       }
     } else {
       res.status(404).send("Session does not exist");
@@ -168,16 +170,13 @@ function randomSessionCode() {
  * @return {any}
  */
 async function leaveSession(sessionId, userId, sessionData) {
-  const users = sessionData.participants;
-  users[userId]["hasLeft"] = true;
-  const data = {
-    participants: users,
-  };
+  // const users = sessionData.participants;
+  delete sessionData["participants"][userId];
   await admin
       .firestore()
       .collection("sessions")
       .doc(sessionId)
-      .set(data, {merge: true});
+      .set(sessionData);
 }
 
 /**
