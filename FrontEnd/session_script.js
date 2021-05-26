@@ -163,7 +163,7 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
     <h3 id="text${mediaId}"><u>${title}</u></h3>
     <p>${text}</p>`;
   div.className = "tinder--card";
-  div.onclick = function () {
+  div.ondblclick = function () {
     if (document.getElementById(`img${mediaId}`).style.display != "none") {
       document.getElementById(`img${mediaId}`).style.display = "none";
       document.getElementById(`text${mediaId}`).style.paddingTop = "20px";
