@@ -204,6 +204,7 @@ function hammertime_first_only() {
     addLastCard();
   }
 }
+
 function joinSession() {
   document.getElementById("loading").style.display = "block";
 
@@ -216,7 +217,11 @@ function joinSession() {
   xhr.onload = function () {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
-        const data = JSON.parse(xhr.responseText);
+        const allData = JSON.parse(xhr.responseText);
+        const data = allData.movies;
+        if (allData.isCreator){
+          document.getElementById('leaveSessionBtn').innerHTML = "End Session";
+        }
         for (var key in data) {
           if (data.hasOwnProperty(key)) {
             addMovieCard(
@@ -250,3 +255,26 @@ function joinSession() {
 
 joinSession();
 
+
+function leaveSession() {
+  document.getElementById("loading").style.display = "block";
+
+  var xhr = new XMLHttpRequest();
+  xhr.open(
+    "GET",
+    `${baseUrl}/leaveSession?id=${sessionId}&user=${userId}`,
+    true
+  );
+  xhr.onload = function () {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+      }
+        // document.getElementById("loading").style.display = "none";
+    }
+  };
+  document.getElementById("loading").style.display = "none";
+  storage.removeItem("SwipeFlix_sessionId");
+  window.location.href = "./index.html"
+
+  xhr.send(null);
+}

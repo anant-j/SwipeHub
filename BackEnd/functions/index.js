@@ -75,9 +75,35 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         .doc(id)
         .set(data, {merge: true});
     // do stuff with the data
-    res.status(200).send(doc.data().moviesList);
+    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId});
   }
 });
+
+exports.leaveSession = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  // Grab the text parameter.
+  const id = req.query.id.toUpperCase();
+  const userId = req.query.user.toLowerCase();
+  const usersRef = admin.firestore().collection("sessions").doc(id);
+  const doc = await usersRef.get();
+  if (!doc.exists) {
+    res.status(404).send("Session doesn't exist");
+  } else {
+    const users = doc.data().participants;
+    if (users[userId] != undefined) {
+      if (userId == doc.data().creator) {
+        endSession(id);
+      } else {
+        leaveSession(id, userId, doc.data());
+      }
+    } else {
+      res.status(404).send("Session does not exist");
+    }
+    // do stuff with the data
+    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId});
+  }
+});
+
 
 /**
  * @param  {string} lang
@@ -133,4 +159,38 @@ function randomSessionCode() {
     result += chars[Math.floor(Math.random() * chars.length)];
   }
   return result;
+}
+
+/**
+ * @param {any} sessionId
+ * @param {any} userId
+ * @param {any} sessionData
+ * @return {any}
+ */
+async function leaveSession(sessionId, userId, sessionData) {
+  const users = sessionData.participants;
+  users[userId]["hasLeft"] = true;
+  const data = {
+    participants: users,
+  };
+  await admin
+      .firestore()
+      .collection("sessions")
+      .doc(sessionId)
+      .set(data, {merge: true});
+}
+
+/**
+ * @param {any} sessionId
+ * @return {any}
+ */
+async function endSession(sessionId) {
+  const data = {
+    isValid: false,
+  };
+  await admin
+      .firestore()
+      .collection("sessions")
+      .doc(sessionId)
+      .set(data, {merge: true});
 }
