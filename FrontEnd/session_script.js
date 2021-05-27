@@ -10,6 +10,8 @@ const userId = localStorage.getItem("SwipeFlix_userId");
 // const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 var globalHammerTime = {}
+var globalLikeBuffer = new Set();
+var totalSwipes = 0;
 
 if (sessionId === null || userId === null) {
   window.location.href = "./index.html";
@@ -139,17 +141,20 @@ love.addEventListener("click", loveListener);
 function rightSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
   const card = cards[cards.length - 1];
-  console.log("right: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
+  // console.log("right: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
   document.getElementById(`${card.id}`).className = ".tinder--card removed";
   hammertime_first_only();
+  globalLikeBuffer.add(card.id);
+  totalSwipes += 1;
 }
 function leftSwipe() {
   var cards = document.querySelectorAll(".tinder--card.removed");
   const card = cards[cards.length - 1];
-  console.log("left: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
+  // console.log("left: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
   // document.getElementById(`${card.id}`).style.display = "none";
   document.getElementById(`${card.id}`).className = ".tinder--card removed";
   hammertime_first_only();
+  totalSwipes += 1;
 }
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
@@ -235,6 +240,7 @@ function joinSession() {
           }
         }
         document.getElementById("loading").style.display = "none";
+        // poll();
       } else {
         alert("Cannot load the session");
         storage.removeItem("SwipeFlix_sessionId");
@@ -277,4 +283,33 @@ function leaveSession() {
   window.location.href = "./index.html"
 
   xhr.send(null);
+}
+
+function poll() {
+  var xhr = new XMLHttpRequest();
+  const sendBuffer = globalLikeBuffer;
+  var params = `totalSwipes=${totalSwipes}&likedList=${sendBuffer}&sessionId=${sessionId}&userId=${userId}`;
+  xhr.open(
+    "POST",
+    `${baseUrl}/polling`,
+    true
+  );
+  xhr.onload = function () {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+        const allData = JSON.parse(xhr.responseText);
+        const usersData = allData.usersData;
+        const numMatches = allData.matches; 
+        document.getElementById('matches_placeholder').innerHTML=`Number of matches: ${numMatches}`;
+      } else {
+       console.log("Polling failed");
+      }
+    }
+  };
+  // xhr.ontimeout = function (e) {
+  //   // XMLHttpRequest timed out. Do something here.
+  // };
+  
+  xhr.send(params);
+  setTimeout(poll, 5000);
 }

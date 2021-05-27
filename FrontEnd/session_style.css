@@ -152,3 +152,16 @@
     margin-right:30px;
     padding-top:10px!important;
   }
+
+  .rightBox{
+    /* width: 100%; */
+    /* height: 100vh; */
+    position: absolute;
+    padding: 20px;
+    border-radius: 10px;
+    top: 80px;
+    left: 90vw;
+    border: 1.5px solid red; 
+    z-index: 10;
+    display: none;
+  }
