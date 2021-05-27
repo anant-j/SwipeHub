@@ -163,5 +163,5 @@
     left: 90vw;
     border: 1.5px solid red; 
     z-index: 10;
-    display: none;
+    /* display: none; */
   }

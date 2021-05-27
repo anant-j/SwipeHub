@@ -106,6 +106,14 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
   }
 });
 
+exports.polling = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  const x = Math.floor((Math.random() * 10) + 1);
+  res.status(200).send({usersData: {
+    "anant": x,
+    "varun": 10,
+  }, matches: x});
+});
 
 /**
  * @param  {string} lang

@@ -240,7 +240,7 @@ function joinSession() {
           }
         }
         document.getElementById("loading").style.display = "none";
-        // poll();
+        poll();
       } else {
         alert("Cannot load the session");
         storage.removeItem("SwipeFlix_sessionId");
@@ -298,8 +298,17 @@ function poll() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         const allData = JSON.parse(xhr.responseText);
+        // console.log(allData);
         const usersData = allData.usersData;
+        console.log(usersData);
+        var resString="Users     Swipes <br>"
+        for (var key in usersData) {
+          if (usersData.hasOwnProperty(key)) {
+            resString+=`${key} => ${usersData[key]}<br>` 
+          }
+        }
         const numMatches = allData.matches; 
+        document.getElementById('userData_placeholder').innerHTML=`${resString}`;
         document.getElementById('matches_placeholder').innerHTML=`Number of matches: ${numMatches}`;
       } else {
        console.log("Polling failed");
