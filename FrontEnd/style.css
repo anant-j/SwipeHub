@@ -11,6 +11,7 @@
 
 body {
   overflow: hidden;
+  height:99vh;
   font-family: tfont;
   background-color: rgb(20, 20, 20);
   color: white;
@@ -48,12 +49,6 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-@media screen and (max-width: 480px) {
-  .desktop {
-      display: none;
-  }
-}
-
 .nav-item{
   cursor: pointer;
 }
@@ -72,4 +67,19 @@ body {
 .btn {
   outline: none !important;
   box-shadow: none !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .outer {
+    margin-top: 20px;
+    display: block;
+    }
+
+    .desktop {
+      display: none;
+  }
+
+  .body{
+    overflow: scroll;
+  }
 }
