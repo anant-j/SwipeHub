@@ -21,7 +21,7 @@ function toHomePage() {
 function joinSession() {
   const input_id = document.getElementById("sessionId").value;
   const user_id = document.getElementById("userId").value;
-  document.getElementById("loading").style.display = "block";
+  showLoader();
   store.setItem("SwipeFlix_userId", user_id);
 
   var xhr = new XMLHttpRequest();
@@ -32,16 +32,26 @@ function joinSession() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         store.setItem("SwipeFlix_sessionId", input_id);
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Join");
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
       }
     }
   };
 
   xhr.send(null);
+}
+
+function showLoader(){
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("outer_container").style.display = "none";
+}
+
+function hideLoader(){
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("outer_container").style.display = "flex";
 }
 
 var header = document.getElementById("multiButtonGroup");
@@ -60,9 +70,7 @@ for (var i = 0; i < btns.length; i++) {
 
 function createSession() {
   const input_id = document.getElementById("sessionId").value;
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("createSessionPage").style.display = "none";
-
+  showLoader();
   var xhr = new XMLHttpRequest();
   const username = document.getElementById("email").value;
   var header = document.getElementById("multiButtonGroup");
@@ -88,11 +96,11 @@ function createSession() {
           JSON.parse(xhr.responseText)["sessionId"]
         );
         store.setItem("SwipeFlix_userId", username);
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Create Session");
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
       }
     }
   };

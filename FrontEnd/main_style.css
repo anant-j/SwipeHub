@@ -13,24 +13,6 @@
 .genreButton:hover {
   cursor: pointer;
 }
-/* 
-.button {
-  border-radius: 30px;
-  padding: 5px;
-  border: 1px solid #ccc;
-} */
-
-.button:hover {
-  cursor: pointer;
-}
-
-.active {
-  background-color: lightblue;
-}
-
-.active:hover {
-  cursor: not-allowed;
-}
 
 #multiButtonGroup {
   position: relative;
@@ -39,28 +21,7 @@
   padding-right: 20px;
 }
 
-#initialButtons{
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
-}
-
 #joinSession {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
   display: none;
 }
 
@@ -77,20 +38,17 @@
   display: none;
 }
 
-#outerBody{
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
+.nav-item{
+  cursor: pointer;
 }
 
-.input{
-    font-size: 1.5em;
-    max-height: 200px;
-    margin-bottom: 30px;
+.outer{
+  display: flex; justify-content: center; align-items: center; height: 80vh;
 }
+
+.outerbtn{
+  margin-bottom:30px;
+}
+
+.btn-joinSession{
+  margin: 10px;}
