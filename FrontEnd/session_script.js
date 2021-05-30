@@ -115,15 +115,22 @@ function createButtonListener(love) {
     var card = cards[0];
 
     card.classList.add("removed");
-
     if (love) {
       card.style.transform =
         "translate(" + moveOutWidth + "px, -100px) rotate(-30deg)";
+      tinderContainer.classList.toggle("tinder_love");
       rightSwipe();
+      setTimeout(function(){
+        tinderContainer.classList.remove("tinder_love");
+    }, 1000);
     } else {
       card.style.transform =
         "translate(-" + moveOutWidth + "px, -100px) rotate(30deg)";
+      tinderContainer.classList.toggle("tinder_nope");
       leftSwipe();
+      setTimeout(function(){
+        tinderContainer.classList.remove("tinder_nope");
+    }, 1000);
     }
 
     initCards();
@@ -240,7 +247,7 @@ function joinSession() {
           }
         }
         document.getElementById("loading").style.display = "none";
-        poll();
+        // poll();
       } else {
         alert("Cannot load the session");
         storage.removeItem("Shwiper_sessionId");
