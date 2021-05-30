@@ -22,28 +22,11 @@
   display: none;
 }
 
-.nav-item{
-  cursor: pointer;
-}
-
-.outer{
-  display: flex; justify-content: center; align-items: center; height: 80vh;
-}
-
-.outerbtn{
-  margin-bottom:30px;
-}
-
-.btn {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.btn-joinSession{
+.btn-joinSession {
   margin: 10px;
 }
 
-.create_active{
+.create_active {
   background-color: red !important;
   color: white;
   border: none;

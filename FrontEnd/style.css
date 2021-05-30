@@ -53,3 +53,23 @@ body {
       display: none;
   }
 }
+
+.nav-item{
+  cursor: pointer;
+}
+
+.outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.outerbtn {
+  margin-bottom: 30px;
+}
+
+.btn {
+  outline: none !important;
+  box-shadow: none !important;
+}

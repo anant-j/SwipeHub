@@ -22,7 +22,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" href="#">Home</a>
+                <a class="nav-link active">Home</a>
               </li>
               <li class="nav-item" onclick="openSessionPage()">
                 <a class="nav-link">Session</a>
@@ -71,20 +71,18 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <button type="button" class="btn btn-joinSession btn-success" onclick="joinSession()">Submit</button>
+                    <button type="button" class="btn btn-joinSession btn-success" onclick="validate1()">Submit</button>
                     <button type="button" class="btn btn-joinSession btn-danger" onclick="toHomePage()">Back</button>
                 </div>
             </form>
 
             <script>
-                (function () {
-                    'use strict';
-                    window.addEventListener('load', function () {
+                function validate1() {
                         // Fetch all the forms we want to apply custom Bootstrap validation styles to
                         var forms = document.getElementsByClassName('join-needs-validation');
+                        console.log("called");
                         // Loop over them and prevent submission
                         var validation = Array.prototype.filter.call(forms, function (form) {
-                            form.addEventListener('submit', function (event) {
                                 if (form.checkValidity() === false) {
                                     event.preventDefault();
                                     event.stopPropagation();
@@ -93,10 +91,8 @@
                                     joinSession()
                                 }
                                 form.classList.add('was-validated');
-                            }, false);
                         });
-                    }, false);
-                })();
+                    }
             </script>
         </section>
         <section id="createSessionPage">
@@ -165,12 +161,12 @@
                 <button id="37" class="btn btn-light btn-sm genreButton" type="button">Western</button>
             </div>
             <div class="col-md-12 text-center">
-                <button class="btn btn-joinSession btn-success" type="button" onclick="validate()">Submit</button>
+                <button class="btn btn-joinSession btn-success" type="button" onclick="validate2()">Submit</button>
                 <button class="btn btn-joinSession btn-danger" type="button" onclick="toHomePage()">Back</button>
             </div>
         </form>
             <script>
-                function validate() {
+                function validate2() {
                     // Fetch all the forms we want to apply custom Bootstrap validation styles to
                     var forms = document.getElementsByClassName('create-needs-validation');
                     // Loop over them and prevent submission
