@@ -6,141 +6,180 @@
     <title>Swipeflix</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./main_style.css">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">      
-            <a class="navbar-brand">Swipeflix</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-          
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand">Swipeflix</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                  <a class="nav-link">Home</a>
+                    <a class="nav-link">Home</a>
                 </li>
                 <li class="nav-item" onclick="openSessionPage()">
-                  <a class="nav-link">Session</a>
+                    <a class="nav-link">Session</a>
                 </li>
-              </ul>
-              <!-- <ul class="navbar-nav">
+            </ul>
+            <!-- <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="#">Link</a>
                   </li>
               </ul> -->
-            </div>
-          </nav>
+        </div>
+    </nav>
     <div id="loading" class="loader"></div>
     <div class="container outer" id="outer_container">
         <section id="initialButtons">
-            <button type="button" onclick="joiningPage()" class="btn outerbtn btn-primary">Join Session</button>
-            <button type="button" onclick="createSessionPage()" class="btn outerbtn btn-success">Create Session</button>
+            <button type="button" onclick="joiningPage()" class="btn outerbtn btn-primary btn-lg">Join Session</button>
+            <button type="button" onclick="createSessionPage()" class="btn outerbtn btn-success btn-lg">Create
+                Session</button>
         </section>
         <section id="joinSession">
-            <form class="needs-validation" novalidate>
+            <form class="join-needs-validation" novalidate>
                 <div class="form-row">
-                  <div class="col-md-12 mb-3">
-                    <label for="validationCustom01">Username</label>
-                    <input type="text" class="form-control" id="userId" placeholder="Enter Username" required>
-                    <div class="valid-feedback">
-                      Looks good!
+                    <div class="col-md-12 mb-3">
+                        <label for="validationCustom01">Username</label>
+                        <input type="text" class="form-control" id="userId" placeholder="Enter Username" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a username
+                        </div>
                     </div>
-                    <div class="invalid-feedback">
-                        Please enter a username
+                </div>
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <label for="validationCustom02">Session Id</label>
+                        <input type="text" class="form-control" id="sessionId" minlength="6" maxlength="6"
+                            placeholder="Enter Session Id" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a valid 6 character session ID.
+                        </div>
                     </div>
-                  </div>
-                  </div>
-                  <div class="form-row">
-                  <div class="col-md-12 mb-3">
-                    <label for="validationCustom02">Session Id</label>
-                    <input type="text" class="form-control" id="sessionId" minlength="6" maxlength="6" placeholder="Enter Session Id" required>
-                    <div class="valid-feedback">
-                      Looks good!
-                    </div>
-                    <div class="invalid-feedback">
-                        Please enter a valid 6 character session ID.
-                    </div>
-                  </div>
                 </div>
                 <div class="col-md-12 text-center">
                     <button class="btn btn-joinSession btn-success">Submit</button>
                     <button type="button" class="btn btn-joinSession btn-danger" onclick="toHomePage()">Back</button>
                 </div>
-              </form>
-              
-              <script>
-              // Example starter JavaScript for disabling form submissions if there are invalid fields
-              (function() {
-                'use strict';
-                window.addEventListener('load', function() {
-                  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                  var forms = document.getElementsByClassName('needs-validation');
-                  // Loop over them and prevent submission
-                  var validation = Array.prototype.filter.call(forms, function(form) {
-                    form.addEventListener('submit', function(event) {
-                      if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                      }
-                      else{
-                        joinSession()
-                      }
-                      form.classList.add('was-validated');
+            </form>
+
+            <script>
+                (function () {
+                    'use strict';
+                    window.addEventListener('load', function () {
+                        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                        var forms = document.getElementsByClassName('join-needs-validation');
+                        // Loop over them and prevent submission
+                        var validation = Array.prototype.filter.call(forms, function (form) {
+                            form.addEventListener('submit', function (event) {
+                                if (form.checkValidity() === false) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                }
+                                else {
+                                    joinSession()
+                                }
+                                form.classList.add('was-validated');
+                            }, false);
+                        });
                     }, false);
-                  });
-                }, false);
-              })();
-              </script>
+                })();
+            </script>
         </section>
-    <section id="createSessionPage">
-        <div id="multiButtonGroup">
-            <input id="email" style="font-size: 16px" placeholder="Enter Email Address" type="text"></input>
-            <br>
-            <br>
-            <p style="font-size: 20px; padding-bottom: 2px;">Select Categories:</p>
-            <button id="28" class="genreButton">Action</button>
-            <button id="12" class="genreButton">Adventure</button>
-            <button id="16" class="genreButton">Animation</button>
-            <button id="35" class="genreButton">Comedy</button>
-            <button id="80" class="genreButton">Crime</button>
-            <button id="99" class="genreButton">Documentary</button>
-            <button id="18" class="genreButton">Drama</button>
-            <button id="10751" class="genreButton">Family</button>
-            <button id="14" class="genreButton">Fantasy</button>
-            <button id="36" class="genreButton">History</button>
-            <button id="27" class="genreButton">Horror</button>
-            <button id="10402" class="genreButton">Music</button>
-            <button id="9648" class="genreButton">Mystery</button>
-            <button id="10749" class="genreButton">Romance</button>
-            <button id="878" class="genreButton">Science Fiction</button>
-            <button id="10770" class="genreButton">TV Movie</button>
-            <button id="53" class="genreButton">Thriller</button>
-            <button id="10752" class="genreButton">War</button>
-            <button id="37" class="genreButton">Western</button>
-            <br>
-            <br>
-            <p style="font-size: 20px; padding-bottom: 5px;">Select Language:</p>
-            <select style="font-size: 20px;" name="language" id="language">
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-            </select>
-        </div>
-        <br>
-        <button class="button" onclick="createSession()">Create</button>
-        <button class="button" onclick="toHomePage()">Back</button>
-    </section> 
+        <section id="createSessionPage">
+            <form class="create-needs-validation" novalidate>
+                <div class="form-row justify-content-center">
+                    <div class="col-md-4 mb-3">
+                        <label for="validationCustom03">Username</label>
+                        <input type="text" class="form-control" id="email" placeholder="Enter Username" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a username
+                        </div>
+                    </div>
+                </div>
+            
+            <div class="col-md-6 mb-3" id="multiButtonGroup">
+                <label for="multiButtonGroup">Select Categories (Optional):</label><br>
+                <button id="28" class="btn btn-light btn-sm genreButton">Action</button>
+                <button type="button" id="12" class="btn btn-light btn-sm genreButton">Adventure</button>
+                <button id="16" class="btn btn-light btn-sm genreButton">Animation</button>
+                <button id="35" class="btn btn-light btn-sm genreButton">Comedy</button>
+                <button id="80" class="btn btn-light btn-sm genreButton">Crime</button>
+                <button id="99" class="btn btn-light btn-sm genreButton">Documentary</button>
+                <button id="18" class="btn btn-light btn-sm genreButton">Drama</button>
+                <button id="10751" class="btn btn-light btn-sm genreButton">Family</button>
+                <button id="14" class="btn btn-light btn-sm genreButton">Fantasy</button>
+                <button id="36" class="btn btn-light btn-sm genreButton">History</button>
+                <button id="27" class="btn btn-light btn-sm genreButton">Horror</button>
+                <button id="10402" class="btn btn-light btn-sm genreButton">Music</button>
+                <button id="9648" class="btn btn-light btn-sm genreButton">Mystery</button>
+                <button id="10749" class="btn btn-light btn-sm genreButton">Romance</button>
+                <button id="878" class="btn btn-light btn-sm genreButton">Science Fiction</button>
+                <button id="10770" class="btn btn-light btn-sm genreButton">TV Movie</button>
+                <button id="53" class="btn btn-light btn-sm genreButton">Thriller</button>
+                <button id="10752" class="btn btn-light btn-sm genreButton">War</button>
+                <button id="37" class="btn btn-light btn-sm genreButton">Western</button>
+            </div>
+            <div class="col-md-12 text-center">
+                <button class="btn btn-joinSession btn-success" type="submit" onclick="validate()">Submit</button>
+                <button class="btn btn-joinSession btn-danger" onclick="toHomePage()">Back</button>
+            </div>
+        </form>
+            <script>
+                function validate() {
+                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                    var forms = document.getElementsByClassName('create-needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function (form) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        else {
+                            createSession()
+                        }
+                        form.classList.add('was-validated');
+                    });
+                }
+            </script>
+            
+                <!-- <p style="font-size: 20px; padding-bottom: 5px;">Select Language:</p>
+                <select style="font-size: 20px;" name="language" id="language">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                </select> -->
+      
+        </section>
     </div>
-    
+
     <script src="./main_script.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
 </body>
 
 </html>

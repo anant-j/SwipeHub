@@ -60,9 +60,9 @@ for (var i = 0; i < btns.length; i++) {
   btns[i].addEventListener("click", function () {
     // var current = document.getElementsByClassName("active");
     if (this.className.includes("active")) {
-      this.className = this.className.replace(" active", "");
+      this.className = this.className.replace(" create_active", "");
     } else {
-      this.className += " active";
+      this.className += " create_active";
       // console.log(this.id);
     }
   });
