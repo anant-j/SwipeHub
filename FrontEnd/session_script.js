@@ -5,8 +5,8 @@ var allCards = document.querySelectorAll(".tinder--card");
 var nope = document.getElementById("nope");
 var love = document.getElementById("love");
 const storage = window.localStorage;
-const sessionId = localStorage.getItem("SwipeFlix_sessionId");
-const userId = localStorage.getItem("SwipeFlix_userId");
+const sessionId = localStorage.getItem("Shwiper_sessionId");
+const userId = localStorage.getItem("Shwiper_userId");
 // const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 var globalHammerTime = {}
@@ -243,7 +243,7 @@ function joinSession() {
         poll();
       } else {
         alert("Cannot load the session");
-        storage.removeItem("SwipeFlix_sessionId");
+        storage.removeItem("Shwiper_sessionId");
         window.location.href = "./index.html";
         // document.getElementById("loading").style.display = "none";
       }
@@ -251,7 +251,7 @@ function joinSession() {
   };
   xhr.ontimeout = function (e) {
     alert("Cannot load the session");
-    storage.removeItem("SwipeFlix_sessionId");
+    storage.removeItem("Shwiper_sessionId");
     window.location.href = "./index.html";
     // XMLHttpRequest timed out. Do something here.
   };
@@ -279,7 +279,7 @@ function leaveSession() {
     }
   };
   document.getElementById("loading").style.display = "none";
-  storage.removeItem("SwipeFlix_sessionId");
+  storage.removeItem("Shwiper_sessionId");
   window.location.href = "./index.html"
 
   xhr.send(null);

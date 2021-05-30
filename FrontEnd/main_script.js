@@ -22,7 +22,7 @@ function joinSession() {
   const input_id = document.getElementById("sessionId").value;
   const user_id = document.getElementById("userId").value;
   showLoader();
-  store.setItem("SwipeFlix_userId", user_id);
+  store.setItem("Shwiper_userId", user_id);
 
   var xhr = new XMLHttpRequest();
   xhr.open("GET", `${baseUrl}/sessionValid?id=${input_id}`, true);
@@ -31,7 +31,7 @@ function joinSession() {
   xhr.onload = function () {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
-        store.setItem("SwipeFlix_sessionId", input_id);
+        store.setItem("Shwiper_sessionId", input_id);
         hideLoader();
         window.location.href = "./session.html";
       } else {
@@ -69,6 +69,7 @@ for (var i = 0; i < btns.length; i++) {
 }
 
 function createSession() {
+  console.log("creating session");
   const input_id = document.getElementById("sessionId").value;
   showLoader();
   var xhr = new XMLHttpRequest();
@@ -92,10 +93,10 @@ function createSession() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         store.setItem(
-          "SwipeFlix_sessionId",
+          "Shwiper_sessionId",
           JSON.parse(xhr.responseText)["sessionId"]
         );
-        store.setItem("SwipeFlix_userId", username);
+        store.setItem("Shwiper_userId", username);
         hideLoader();
         window.location.href = "./session.html";
       } else {
@@ -109,7 +110,7 @@ function createSession() {
 }
 
 function openSessionPage() {
-  const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+  const sessionId = localStorage.getItem("Shwiper_sessionId");
   if (sessionId != null) {
     window.location.href = "./session.html";
   } else {
