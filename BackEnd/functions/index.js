@@ -28,17 +28,34 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   const username = req.body.username;
   const categories = req.body.categories;
   const languages = req.body.languages;
-  console.log(languages);
+  const platform = req.body.platform;
+  const region = req.body.region;
   const date = new Date();
-  const type = "MOVIE";
+  const movie = req.body.type;
+  const order = req.body.order;
+  let sortby="";
   let dataSet = [];
-  // if (type === "TV") {
-  //   const tvdata = await generateTvList("en-US", categories);
-  //   dataSet = dataSet.concat(tvdata);
-  // }
-  if (type === "MOVIE") {
-    dataSet = await generateMovieList(languages, categories);
+  if (movie === "true") {
+    if (order == "Popularity") {
+      sortby = "popularity.desc";
+    } else if (order == "Release") {
+      sortby = "release_date.desc";
+    } else if (order == "Revenue") {
+      sortby = "revenue.desc";
+    }
+    dataSet = await generateMovieList(languages, categories, platform, region, sortby);
   }
+  if (movie != "true") {
+    if (order == "Popularity") {
+      sortby = "popularity.desc";
+    } else if (order == "Release") {
+      sortby = "first_air_date.desc";
+    } else if (order == "Revenue") {
+      sortby = "popularity.desc";
+    }
+    dataSet = await generateTVList(languages, categories, platform, region, sortby);
+  }
+
   const data = {
     created: date,
     creator: username,
@@ -118,12 +135,15 @@ exports.polling = functions.https.onRequest(async (req, res) => {
 /**
  * @param  {string} lang
  * @param  {string} genres
- */
-async function generateMovieList(lang, genres) {
+ * @param  {string} platform
+ * @param  {string} region
+ * @param  {string} sort
+*/
+async function generateMovieList(lang, genres, platform, region, sort) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=popularity.desc&with_watch_providers=8&watch_region=CA`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_watch_providers=${platform}&watch_region=${region}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
@@ -134,6 +154,33 @@ async function generateMovieList(lang, genres) {
       "http://image.tmdb.org/t/p/original" + data[i]["poster_path"];
     tempDict["release_date"] = data[i]["release_date"];
     tempDict["adult"] = data[i]["adult"];
+    final[data[i]["id"]] = tempDict;
+  }
+  return final;
+}
+
+/**
+ * @param  {string} lang
+ * @param  {string} genres
+ * @param  {string} platform
+ * @param  {string} region
+ * @param  {string} sort
+*/
+async function generateTVList(lang, genres, platform, region, sort) {
+  const final = {};
+  const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
+  const resp = await axios.get(
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}`,
+  );
+  const data = resp.data.results;
+  for (let i = 0; i < data.length; i++) {
+    const tempDict = {};
+    tempDict["title"] = data[i]["original_name"];
+    tempDict["description"] = data[i]["overview"];
+    tempDict["poster"] =
+      "http://image.tmdb.org/t/p/original" + data[i]["poster_path"];
+    tempDict["release_date"] = data[i]["first_air_date"];
+    tempDict["adult"] = false;
     final[data[i]["id"]] = tempDict;
   }
   return final;

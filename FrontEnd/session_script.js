@@ -329,3 +329,14 @@ function poll() {
   xhr.send(params);
   setTimeout(poll, 5000);
 }
+
+
+function copyUserIdToClipboard() {
+  navigator.clipboard.writeText(userId);
+  alert("User ID Copied")
+}
+
+function copySessionIdToClipboard() {
+  navigator.clipboard.writeText(sessionId);
+  alert("Session ID Copied")
+}

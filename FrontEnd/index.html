@@ -35,982 +35,1020 @@
         </div>
     </nav>
     <div id="loading" class="loader"></div>
-
-    <div class="container outer" id="outer_container">
-
-        <section id="initialButtons">
-            <div class="text" style="text-align: center;">
-                <h1>Shwiper</h1>
-                <h1>
-                    <span class="word wisteria">1|Create</span>
-                    <span class="word belize">2|Share</span>
-                    <span class="word pomegranate">3|Select</span>
-                    <span class="word green">4|Match</span>
-                    <span class="word midnight">5|Watch</span>
-                </h1>
-            </div>
-            <br>
-            <br><br>
-            <button type="button" onclick="joiningPage()" class="btn outerbtn btn-primary btn-lg">Join Session</button>
-            <button type="button" onclick="createSessionPage()" class="btn outerbtn btn-info btn-lg">Create
-                Session</button>
-        </section>
-        <section id="joinSession">
-            <form class="join-needs-validation" novalidate>
-                <div class="form-row">
-                    <div class="col mb-3">
-                        <label for="validationCustom01">Username</label>
-                        <input type="text" class="form-control" id="userId" placeholder="Enter Username" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                        <div class="invalid-feedback">
-                            Please enter a username
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="alert alert-success alert-dismissible fade hidden mt-3" id="successAlertBox" role="alert">
+            <p>Content</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-primary alert-dismissible fade hidden mt-3" id="successAlertBox" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade hidden mt-3" id="successAlertBox" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-warning alert-dismissible fade hidden mt-3" id="successAlertBox" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="outer" id="outer_container">
+            <section id="initialButtons">
+                <div class="text" style="text-align: center;">
+                    <h1>Shwiper</h1>
+                    <h1>
+                        <span class="word wisteria">1|Create</span>
+                        <span class="word belize">2|Share</span>
+                        <span class="word pomegranate">3|Select</span>
+                        <span class="word green">4|Match</span>
+                        <span class="word midnight">5|Watch</span>
+                    </h1>
                 </div>
-                <div class="form-row">
-                    <div class="col align-self-center mb-3">
-                        <label for="validationCustom02">Session Id</label>
-                        <input type="text" class="form-control" id="sessionId" minlength="6" maxlength="6"
-                            placeholder="Enter Session Id" width="300" required>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                        <div class="invalid-feedback">
-                            Please enter a valid 6 character session ID.
+                <br>
+                <br><br>
+                <button type="button" onclick="joiningPage()" class="btn outerbtn btn-primary btn-lg">Join
+                    Session</button>
+                <button type="button" onclick="createSessionPage()" class="btn outerbtn btn-info btn-lg">Create
+                    Session</button>
+            </section>
+            <section id="joinSession">
+                <form class="join-needs-validation" novalidate>
+                    <div class="form-row">
+                        <div class="col mb-3">
+                            <label for="validationCustom01">Username</label>
+                            <input type="text" class="form-control" id="userId" placeholder="Enter Username" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a username
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="button" class="btn btn-joinSession btn-success" onclick="validate1()">Submit</button>
-                    <button type="button" class="btn btn-joinSession btn-danger" onclick="toHomePage()">Back</button>
-                </div>
-            </form>
+                    <div class="form-row">
+                        <div class="col align-self-center mb-3">
+                            <label for="validationCustom02">Session Id</label>
+                            <input type="text" class="form-control" id="sessionId" minlength="6" maxlength="6"
+                                placeholder="Enter Session Id" width="300" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a valid 6 character session ID.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button type="button" class="btn btn-joinSession btn-success"
+                            onclick="validate1()">Submit</button>
+                        <button type="button" class="btn btn-joinSession btn-danger"
+                            onclick="toHomePage()">Back</button>
+                    </div>
+                </form>
 
-            <script>
-                function validate1() {
-                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                    var forms = document.getElementsByClassName('join-needs-validation');
-                    // Loop over them and prevent submission
-                    var validation = Array.prototype.filter.call(forms, function (form) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        else {
-                            joinSession()
-                        }
-                        form.classList.add('was-validated');
-                    });
-                }
-            </script>
-        </section>
-        <section id="createSessionPage">
-            <form class="create-needs-validation" novalidate>
-                <div class="row row-cols-md-auto justify-content-center align-items-center">
-                    <div class="col-6 mb-3">
-                        <label for="validationCustom03">Username</label>
-                        <input type="text" class="form-control" id="email" placeholder="Enter Username" required>
-                        <div class="valid-feedback">
-                            Looks good!
+                <script>
+                    function validate1() {
+                        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                        var forms = document.getElementsByClassName('join-needs-validation');
+                        // Loop over them and prevent submission
+                        var validation = Array.prototype.filter.call(forms, function (form) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            else {
+                                joinSession()
+                            }
+                            form.classList.add('was-validated');
+                        });
+                    }
+                </script>
+            </section>
+            <section id="createSessionPage">
+                <form class="create-needs-validation" novalidate>
+                    <div class="row row-cols-md-auto justify-content-center align-items-center">
+                        <div class="col-6 mb-3">
+                            <label for="validationCustom03">Username</label>
+                            <input type="text" class="form-control" id="email" placeholder="Enter Username" required>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a username
+                            </div>
                         </div>
-                        <div class="invalid-feedback">
-                            Please enter a username
+                        <div class="col-3 mb-3">
+                            <label for="validationCustom03">Language</label>
+                            <select class="form-select" id="language" aria-label="Language Selection">
+                                <option value="en">English</option>
+                                <option value="ab">Abkhazian</option>
+                                <option value="aa">Afar</option>
+                                <option value="af">Afrikaans</option>
+                                <option value="ak">Akan</option>
+                                <option value="sq">Albanian</option>
+                                <option value="am">Amharic</option>
+                                <option value="ar">Arabic</option>
+                                <option value="an">Aragonese</option>
+                                <option value="hy">Armenian</option>
+                                <option value="as">Assamese</option>
+                                <option value="av">Avaric</option>
+                                <option value="ae">Avestan</option>
+                                <option value="ay">Aymara</option>
+                                <option value="az">Azerbaijani</option>
+                                <option value="bm">Bambara</option>
+                                <option value="ba">Bashkir</option>
+                                <option value="eu">Basque</option>
+                                <option value="be">Belarusian</option>
+                                <option value="bn">Bengali</option>
+                                <option value="bi">Bislama</option>
+                                <option value="bs">Bosnian</option>
+                                <option value="br">Breton</option>
+                                <option value="bg">Bulgarian</option>
+                                <option value="my">Burmese</option>
+                                <option value="cn">Cantonese</option>
+                                <option value="ca">Catalan</option>
+                                <option value="ch">Chamorro</option>
+                                <option value="ce">Chechen</option>
+                                <option value="ny">Chichewa; Nyanja</option>
+                                <option value="cv">Chuvash</option>
+                                <option value="kw">Cornish</option>
+                                <option value="co">Corsican</option>
+                                <option value="cr">Cree</option>
+                                <option value="hr">Croatian</option>
+                                <option value="cs">Czech</option>
+                                <option value="da">Danish</option>
+                                <option value="dv">Divehi</option>
+                                <option value="nl">Dutch</option>
+                                <option value="dz">Dzongkha</option>
+                                <option value="eo">Esperanto</option>
+                                <option value="et">Estonian</option>
+                                <option value="ee">Ewe</option>
+                                <option value="fo">Faroese</option>
+                                <option value="fj">Fijian</option>
+                                <option value="fi">Finnish</option>
+                                <option value="fr">French</option>
+                                <option value="fy">Frisian</option>
+                                <option value="ff">Fulah</option>
+                                <option value="gd">Gaelic</option>
+                                <option value="gl">Galician</option>
+                                <option value="lg">Ganda</option>
+                                <option value="ka">Georgian</option>
+                                <option value="de">German</option>
+                                <option value="el">Greek</option>
+                                <option value="gn">Guarani</option>
+                                <option value="gu">Gujarati</option>
+                                <option value="ht">Haitian; Haitian Creole</option>
+                                <option value="ha">Hausa</option>
+                                <option value="he">Hebrew</option>
+                                <option value="hz">Herero</option>
+                                <option value="hi">Hindi</option>
+                                <option value="ho">Hiri Motu</option>
+                                <option value="hu">Hungarian</option>
+                                <option value="is">Icelandic</option>
+                                <option value="io">Ido</option>
+                                <option value="ig">Igbo</option>
+                                <option value="id">Indonesian</option>
+                                <option value="ia">Interlingua</option>
+                                <option value="ie">Interlingue</option>
+                                <option value="iu">Inuktitut</option>
+                                <option value="ik">Inupiaq</option>
+                                <option value="ga">Irish</option>
+                                <option value="it">Italian</option>
+                                <option value="ja">Japanese</option>
+                                <option value="jv">Javanese</option>
+                                <option value="kl">Kalaallisut</option>
+                                <option value="kn">Kannada</option>
+                                <option value="kr">Kanuri</option>
+                                <option value="ks">Kashmiri</option>
+                                <option value="kk">Kazakh</option>
+                                <option value="km">Khmer</option>
+                                <option value="ki">Kikuyu</option>
+                                <option value="rw">Kinyarwanda</option>
+                                <option value="ky">Kirghiz</option>
+                                <option value="kv">Komi</option>
+                                <option value="kg">Kongo</option>
+                                <option value="ko">Korean</option>
+                                <option value="kj">Kuanyama</option>
+                                <option value="ku">Kurdish</option>
+                                <option value="lo">Lao</option>
+                                <option value="la">Latin</option>
+                                <option value="lv">Latvian</option>
+                                <option value="lb">Letzeburgesch</option>
+                                <option value="li">Limburgish</option>
+                                <option value="ln">Lingala</option>
+                                <option value="lt">Lithuanian</option>
+                                <option value="lu">Luba-Katanga</option>
+                                <option value="mk">Macedonian</option>
+                                <option value="mg">Malagasy</option>
+                                <option value="ms">Malay</option>
+                                <option value="ml">Malayalam</option>
+                                <option value="mt">Maltese</option>
+                                <option value="zh">Mandarin</option>
+                                <option value="gv">Manx</option>
+                                <option value="mi">Maori</option>
+                                <option value="mr">Marathi</option>
+                                <option value="mh">Marshall</option>
+                                <option value="mo">Moldavian</option>
+                                <option value="mn">Mongolian</option>
+                                <option value="na">Nauru</option>
+                                <option value="nv">Navajo</option>
+                                <option value="nd">Ndebele</option>
+                                <option value="nd">Ndebele</option>
+                                <option value="ng">Ndonga</option>
+                                <option value="ne">Nepali</option>
+                                <option value="se">Northern Sami</option>
+                                <option value="no">Norwegian</option>
+                                <option value="nb">Norwegian Bokmål</option>
+                                <option value="nn">Norwegian Nynorsk</option>
+                                <option value="oc">Occitan</option>
+                                <option value="oj">Ojibwa</option>
+                                <option value="or">Oriya</option>
+                                <option value="om">Oromo</option>
+                                <option value="os">Ossetian; Ossetic</option>
+                                <option value="pi">Pali</option>
+                                <option value="fa">Persian</option>
+                                <option value="pl">Polish</option>
+                                <option value="pt">Portuguese</option>
+                                <option value="pa">Punjabi</option>
+                                <option value="ps">Pushto</option>
+                                <option value="qu">Quechua</option>
+                                <option value="rm">Raeto-Romance</option>
+                                <option value="ro">Romanian</option>
+                                <option value="rn">Rundi</option>
+                                <option value="ru">Russian</option>
+                                <option value="sm">Samoan</option>
+                                <option value="sg">Sango</option>
+                                <option value="sa">Sanskrit</option>
+                                <option value="sc">Sardinian</option>
+                                <option value="sr">Serbian</option>
+                                <option value="sh">Serbo-Croatian</option>
+                                <option value="sn">Shona</option>
+                                <option value="sd">Sindhi</option>
+                                <option value="si">Sinhalese</option>
+                                <option value="cu">Slavic</option>
+                                <option value="sk">Slovak</option>
+                                <option value="sl">Slovenian</option>
+                                <option value="so">Somali</option>
+                                <option value="st">Sotho</option>
+                                <option value="es">Spanish</option>
+                                <option value="su">Sundanese</option>
+                                <option value="sw">Swahili</option>
+                                <option value="ss">Swati</option>
+                                <option value="sv">Swedish</option>
+                                <option value="tl">Tagalog</option>
+                                <option value="ty">Tahitian</option>
+                                <option value="tg">Tajik</option>
+                                <option value="ta">Tamil</option>
+                                <option value="tt">Tatar</option>
+                                <option value="te">Telugu</option>
+                                <option value="th">Thai</option>
+                                <option value="bo">Tibetan</option>
+                                <option value="ti">Tigrinya</option>
+                                <option value="to">Tonga</option>
+                                <option value="ts">Tsonga</option>
+                                <option value="tn">Tswana</option>
+                                <option value="tr">Turkish</option>
+                                <option value="tk">Turkmen</option>
+                                <option value="tw">Twi</option>
+                                <option value="ug">Uighur</option>
+                                <option value="uk">Ukrainian</option>
+                                <option value="ur">Urdu</option>
+                                <option value="uz">Uzbek</option>
+                                <option value="ve">Venda</option>
+                                <option value="vi">Vietnamese</option>
+                                <option value="vo">Volapük</option>
+                                <option value="wa">Walloon</option>
+                                <option value="cy">Welsh</option>
+                                <option value="wo">Wolof</option>
+                                <option value="xh">Xhosa</option>
+                                <option value="ii">Yi</option>
+                                <option value="yi">Yiddish</option>
+                                <option value="yo">Yoruba</option>
+                                <option value="za">Zhuang</option>
+                                <option value="zu">Zulu</option>
+                            </select>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-3 mb-3">
-                        <label for="validationCustom03">Language</label>
-                        <select class="form-select" id="language" aria-label="Language Selection">
-                            <option value="en">English</option>
-                            <option value="ab">Abkhazian</option>
-                            <option value="aa">Afar</option>
-                            <option value="af">Afrikaans</option>
-                            <option value="ak">Akan</option>
-                            <option value="sq">Albanian</option>
-                            <option value="am">Amharic</option>
-                            <option value="ar">Arabic</option>
-                            <option value="an">Aragonese</option>
-                            <option value="hy">Armenian</option>
-                            <option value="as">Assamese</option>
-                            <option value="av">Avaric</option>
-                            <option value="ae">Avestan</option>
-                            <option value="ay">Aymara</option>
-                            <option value="az">Azerbaijani</option>
-                            <option value="bm">Bambara</option>
-                            <option value="ba">Bashkir</option>
-                            <option value="eu">Basque</option>
-                            <option value="be">Belarusian</option>
-                            <option value="bn">Bengali</option>
-                            <option value="bi">Bislama</option>
-                            <option value="bs">Bosnian</option>
-                            <option value="br">Breton</option>
-                            <option value="bg">Bulgarian</option>
-                            <option value="my">Burmese</option>
-                            <option value="cn">Cantonese</option>
-                            <option value="ca">Catalan</option>
-                            <option value="ch">Chamorro</option>
-                            <option value="ce">Chechen</option>
-                            <option value="ny">Chichewa; Nyanja</option>
-                            <option value="cv">Chuvash</option>
-                            <option value="kw">Cornish</option>
-                            <option value="co">Corsican</option>
-                            <option value="cr">Cree</option>
-                            <option value="hr">Croatian</option>
-                            <option value="cs">Czech</option>
-                            <option value="da">Danish</option>
-                            <option value="dv">Divehi</option>
-                            <option value="nl">Dutch</option>
-                            <option value="dz">Dzongkha</option>
-                            <option value="eo">Esperanto</option>
-                            <option value="et">Estonian</option>
-                            <option value="ee">Ewe</option>
-                            <option value="fo">Faroese</option>
-                            <option value="fj">Fijian</option>
-                            <option value="fi">Finnish</option>
-                            <option value="fr">French</option>
-                            <option value="fy">Frisian</option>
-                            <option value="ff">Fulah</option>
-                            <option value="gd">Gaelic</option>
-                            <option value="gl">Galician</option>
-                            <option value="lg">Ganda</option>
-                            <option value="ka">Georgian</option>
-                            <option value="de">German</option>
-                            <option value="el">Greek</option>
-                            <option value="gn">Guarani</option>
-                            <option value="gu">Gujarati</option>
-                            <option value="ht">Haitian; Haitian Creole</option>
-                            <option value="ha">Hausa</option>
-                            <option value="he">Hebrew</option>
-                            <option value="hz">Herero</option>
-                            <option value="hi">Hindi</option>
-                            <option value="ho">Hiri Motu</option>
-                            <option value="hu">Hungarian</option>
-                            <option value="is">Icelandic</option>
-                            <option value="io">Ido</option>
-                            <option value="ig">Igbo</option>
-                            <option value="id">Indonesian</option>
-                            <option value="ia">Interlingua</option>
-                            <option value="ie">Interlingue</option>
-                            <option value="iu">Inuktitut</option>
-                            <option value="ik">Inupiaq</option>
-                            <option value="ga">Irish</option>
-                            <option value="it">Italian</option>
-                            <option value="ja">Japanese</option>
-                            <option value="jv">Javanese</option>
-                            <option value="kl">Kalaallisut</option>
-                            <option value="kn">Kannada</option>
-                            <option value="kr">Kanuri</option>
-                            <option value="ks">Kashmiri</option>
-                            <option value="kk">Kazakh</option>
-                            <option value="km">Khmer</option>
-                            <option value="ki">Kikuyu</option>
-                            <option value="rw">Kinyarwanda</option>
-                            <option value="ky">Kirghiz</option>
-                            <option value="kv">Komi</option>
-                            <option value="kg">Kongo</option>
-                            <option value="ko">Korean</option>
-                            <option value="kj">Kuanyama</option>
-                            <option value="ku">Kurdish</option>
-                            <option value="lo">Lao</option>
-                            <option value="la">Latin</option>
-                            <option value="lv">Latvian</option>
-                            <option value="lb">Letzeburgesch</option>
-                            <option value="li">Limburgish</option>
-                            <option value="ln">Lingala</option>
-                            <option value="lt">Lithuanian</option>
-                            <option value="lu">Luba-Katanga</option>
-                            <option value="mk">Macedonian</option>
-                            <option value="mg">Malagasy</option>
-                            <option value="ms">Malay</option>
-                            <option value="ml">Malayalam</option>
-                            <option value="mt">Maltese</option>
-                            <option value="zh">Mandarin</option>
-                            <option value="gv">Manx</option>
-                            <option value="mi">Maori</option>
-                            <option value="mr">Marathi</option>
-                            <option value="mh">Marshall</option>
-                            <option value="mo">Moldavian</option>
-                            <option value="mn">Mongolian</option>
-                            <option value="na">Nauru</option>
-                            <option value="nv">Navajo</option>
-                            <option value="nd">Ndebele</option>
-                            <option value="nd">Ndebele</option>
-                            <option value="ng">Ndonga</option>
-                            <option value="ne">Nepali</option>
-                            <option value="se">Northern Sami</option>
-                            <option value="no">Norwegian</option>
-                            <option value="nb">Norwegian Bokmål</option>
-                            <option value="nn">Norwegian Nynorsk</option>
-                            <option value="oc">Occitan</option>
-                            <option value="oj">Ojibwa</option>
-                            <option value="or">Oriya</option>
-                            <option value="om">Oromo</option>
-                            <option value="os">Ossetian; Ossetic</option>
-                            <option value="pi">Pali</option>
-                            <option value="fa">Persian</option>
-                            <option value="pl">Polish</option>
-                            <option value="pt">Portuguese</option>
-                            <option value="pa">Punjabi</option>
-                            <option value="ps">Pushto</option>
-                            <option value="qu">Quechua</option>
-                            <option value="rm">Raeto-Romance</option>
-                            <option value="ro">Romanian</option>
-                            <option value="rn">Rundi</option>
-                            <option value="ru">Russian</option>
-                            <option value="sm">Samoan</option>
-                            <option value="sg">Sango</option>
-                            <option value="sa">Sanskrit</option>
-                            <option value="sc">Sardinian</option>
-                            <option value="sr">Serbian</option>
-                            <option value="sh">Serbo-Croatian</option>
-                            <option value="sn">Shona</option>
-                            <option value="sd">Sindhi</option>
-                            <option value="si">Sinhalese</option>
-                            <option value="cu">Slavic</option>
-                            <option value="sk">Slovak</option>
-                            <option value="sl">Slovenian</option>
-                            <option value="so">Somali</option>
-                            <option value="st">Sotho</option>
-                            <option value="es">Spanish</option>
-                            <option value="su">Sundanese</option>
-                            <option value="sw">Swahili</option>
-                            <option value="ss">Swati</option>
-                            <option value="sv">Swedish</option>
-                            <option value="tl">Tagalog</option>
-                            <option value="ty">Tahitian</option>
-                            <option value="tg">Tajik</option>
-                            <option value="ta">Tamil</option>
-                            <option value="tt">Tatar</option>
-                            <option value="te">Telugu</option>
-                            <option value="th">Thai</option>
-                            <option value="bo">Tibetan</option>
-                            <option value="ti">Tigrinya</option>
-                            <option value="to">Tonga</option>
-                            <option value="ts">Tsonga</option>
-                            <option value="tn">Tswana</option>
-                            <option value="tr">Turkish</option>
-                            <option value="tk">Turkmen</option>
-                            <option value="tw">Twi</option>
-                            <option value="ug">Uighur</option>
-                            <option value="uk">Ukrainian</option>
-                            <option value="ur">Urdu</option>
-                            <option value="uz">Uzbek</option>
-                            <option value="ve">Venda</option>
-                            <option value="vi">Vietnamese</option>
-                            <option value="vo">Volapük</option>
-                            <option value="wa">Walloon</option>
-                            <option value="cy">Welsh</option>
-                            <option value="wo">Wolof</option>
-                            <option value="xh">Xhosa</option>
-                            <option value="ii">Yi</option>
-                            <option value="yi">Yiddish</option>
-                            <option value="yo">Yoruba</option>
-                            <option value="za">Zhuang</option>
-                            <option value="zu">Zulu</option>
-                        </select>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                        <div class="invalid-feedback">
-                            Please select a valid language from the list
-                        </div>
-                    </div>
                     </div>
                     <div class="row row-cols-md-auto justify-content-center align-items-center">
-                    <div class="col-3 mb-3">
-                        <label for="validationCustom03">Platform</label>
-                        <select class="form-select" aria-label="Platform Selection">
-                            <option value="8">Netflix</option>
-                            <option value="9">Amazon Prime Video</option>
-                            <option value="246">7plus</option>
-                            <option value="528">AMC Plus</option>
-                            <option value="352">AMC on Demand</option>
-                            <option value="529">ARROW</option>
-                            <option value="87">Acorn TV</option>
-                            <option value="196">AcornTV Amazon Channel</option>
-                            <option value="547">Alamo on Demand</option>
-                            <option value="103">All 4</option>
-                            <option value="33">Alleskino</option>
-                            <option value="319">Alt Balaji</option>
-                            <option value="533">Amazon Arthaus Channel</option>
-                            <option value="116">Amediateka</option>
-                            <option value="195">Animax Plus Amazon Channel</option>
-                            <option value="415">Anime Digital Networks</option>
-                            <option value="327">Anime On Demand</option>
-                            <option value="350">Apple TV Plus</option>
-                            <option value="2">Apple iTunes</option>
-                            <option value="534">Argo</option>
-                            <option value="234">Arte</option>
-                            <option value="481">ArthouseCNMA</option>
-                            <option value="514">AsianCrush</option>
-                            <option value="62">Atres Player</option>
-                            <option value="397">BBC America</option>
-                            <option value="285">BBC Player Amazon Channel</option>
-                            <option value="38">BBC iPlayer</option>
-                            <option value="224">BFI Player</option>
-                            <option value="287">BFI Player Amazon Channel</option>
-                            <option value="385">BINGE</option>
-                            <option value="59">Bbox VOD</option>
-                            <option value="311">Be TV Go</option>
-                            <option value="448">Beamafilm</option>
-                            <option value="447">Belas Artes à La Carte</option>
-                            <option value="465">Believe</option>
-                            <option value="343">Bet+ Amazon Channel</option>
-                            <option value="466">Bioskop Online</option>
-                            <option value="67">Blim</option>
-                            <option value="423">Blockbuster</option>
-                            <option value="124">Bookmyshow</option>
-                            <option value="248">Boomerang</option>
-                            <option value="288">Boomerang Amazon Channel</option>
-                            <option value="54">BoxOffice</option>
-                            <option value="380">BritBox</option>
-                            <option value="197">BritBox Amazon Channel</option>
-                            <option value="554">BroadwayHD</option>
-                            <option value="77">C More</option>
-                            <option value="314">CBC Gem</option>
-                            <option value="78">CBS</option>
-                            <option value="495">CGood TV</option>
-                            <option value="491">CINE</option>
-                            <option value="543">CONTAR</option>
-                            <option value="428">CONtv</option>
-                            <option value="326">CTV</option>
-                            <option value="58">Canal VOD</option>
-                            <option value="381">Canal+</option>
-                            <option value="159">Catchplay</option>
-                            <option value="438">Chai Flicks</option>
-                            <option value="40">Chili</option>
-                            <option value="496">Cineasterna</option>
-                            <option value="324">Cinemas a la Demande</option>
-                            <option value="289">Cinemax Amazon Channel</option>
-                            <option value="140">Cineplex</option>
-                            <option value="558">Cinépolis KLIC</option>
-                            <option value="167">Claro video</option>
-                            <option value="445">Classix</option>
-                            <option value="469">Club Illico</option>
-                            <option value="497">Comhem Play</option>
-                            <option value="12">Crackle</option>
-                            <option value="230">Crave</option>
-                            <option value="231">Crave Plus</option>
-                            <option value="305">Crave Starz</option>
-                            <option value="258">Criterion Channel</option>
-                            <option value="190">Curiosity Stream</option>
-                            <option value="189">Curzon Home Cinema</option>
-                            <option value="358">DIRECTV</option>
-                            <option value="467">DIRECTV GO</option>
-                            <option value="475">DOCSVILLE</option>
-                            <option value="355">Darkmatter TV</option>
-                            <option value="219">Das Erste Mediathek</option>
-                            <option value="444">Dekkoo</option>
-                            <option value="390">Disney Plus</option>
-                            <option value="569">DocAlliance Films</option>
-                            <option value="357">DocPlay</option>
-                            <option value="536">Dogwoof On Demand</option>
-                            <option value="254">Dove Channel</option>
-                            <option value="435">Draken Films</option>
-                            <option value="476">EPIC ON</option>
-                            <option value="540">Elisa Viihde</option>
-                            <option value="178">EntertainTV</option>
-                            <option value="34">Epix</option>
-                            <option value="218">Eros Now</option>
-                            <option value="471">FILMRISE</option>
-                            <option value="123">FXNow</option>
-                            <option value="105">FandangoNOW</option>
-                            <option value="25">Fandor</option>
-                            <option value="199">Fandor Amazon Channel</option>
-                            <option value="436">Fetch TV</option>
-                            <option value="579">Film Movement Plus</option>
-                            <option value="396">Film1</option>
-                            <option value="63">Filmin</option>
-                            <option value="66">Filmin Latino</option>
-                            <option value="64">Filmin Plus</option>
-                            <option value="138">Filmo TV</option>
-                            <option value="560">Filmoteket</option>
-                            <option value="443">Filmstriben</option>
-                            <option value="480">Filmtastic</option>
-                            <option value="334">Filmtastic Amazon Channel</option>
-                            <option value="559">Filmzie</option>
-                            <option value="142">Flimmit</option>
-                            <option value="432">Flix Premiere</option>
-                            <option value="331">FlixFling</option>
-                            <option value="393">FlixOlé</option>
-                            <option value="229">Fox Play</option>
-                            <option value="228">Fox Premium</option>
-                            <option value="134">Foxtel Now</option>
-                            <option value="211">Freeform</option>
-                            <option value="269">Funimation Now</option>
-                            <option value="477">GOSPEL PLAY</option>
-                            <option value="86">GYAO</option>
-                            <option value="449">Global TV</option>
-                            <option value="307">Globo Play</option>
-                            <option value="373">Go3</option>
-                            <option value="3">Google Play Movies</option>
-                            <option value="100">GuideDoc</option>
-                            <option value="118">HBO</option>
-                            <option value="425">HBO Go</option>
-                            <option value="384">HBO Max</option>
-                            <option value="27">HBO Now</option>
-                            <option value="200">HBO Now Amazon Channel</option>
-                            <option value="271">HBO Portugal</option>
-                            <option value="281">Hallmark Movies</option>
-                            <option value="290">Hallmark Movies Now Amazon Channel</option>
-                            <option value="417">Here TV</option>
-                            <option value="503">Hi-YAH</option>
-                            <option value="430">HiDive</option>
-                            <option value="478">History Play</option>
-                            <option value="268">History Vault</option>
-                            <option value="315">Hoichoi</option>
-                            <option value="164">Hollystar</option>
-                            <option value="182">Hollywood Suite</option>
-                            <option value="479">Home of Horror</option>
-                            <option value="212">Hoopla</option>
-                            <option value="250">Horizon</option>
-                            <option value="460">Horrify</option>
-                            <option value="122">Hotstar</option>
-                            <option value="15">Hulu</option>
-                            <option value="437">Hungama Play</option>
-                            <option value="548">IFFR Unleashed</option>
-                            <option value="492">ILLICO</option>
-                            <option value="238">IMDb TV</option>
-                            <option value="549">IPLA</option>
-                            <option value="41">ITV Player</option>
-                            <option value="368">IndieFlix</option>
-                            <option value="110">Infinity</option>
-                            <option value="113">Ivi</option>
-                            <option value="220">Jio Cinema</option>
-                            <option value="304">Joyn</option>
-                            <option value="421">Joyn Plus</option>
-                            <option value="563">KPN</option>
-                            <option value="191">Kanopy</option>
-                            <option value="349">Kino on Demand</option>
-                            <option value="573">KinoPop</option>
-                            <option value="463">Kirjastokino</option>
-                            <option value="89">Kividoo</option>
-                            <option value="576">Klik Film</option>
-                            <option value="525">Knowledge Network</option>
-                            <option value="575">KoreaOnDemand</option>
-                            <option value="310">La Cinetek</option>
-                            <option value="518">La Toile</option>
-                            <option value="275">Laugh Out Loud</option>
-                            <option value="544">Libreflix</option>
-                            <option value="157">Lifetime</option>
-                            <option value="284">Lifetime Movie Club</option>
-                            <option value="561">Lionsgate Play</option>
-                            <option value="47">Looke</option>
-                            <option value="483">MAX Stream</option>
-                            <option value="515">MX Player</option>
-                            <option value="291">MZ Choice Amazon Channel</option>
-                            <option value="551">Magellan TV</option>
-                            <option value="259">Magnolia Selects</option>
-                            <option value="482">ManoramaMax</option>
-                            <option value="139">Max Go</option>
-                            <option value="6">Maxdome</option>
-                            <option value="359">Mediaset Play</option>
-                            <option value="242">Meo</option>
-                            <option value="68">Microsoft Store</option>
-                            <option value="456">Mitele </option>
-                            <option value="562">MovieSaints</option>
-                            <option value="339">Movistar Play</option>
-                            <option value="149">Movistar Plus</option>
-                            <option value="11">Mubi</option>
-                            <option value="201">Mubi Amazon Channel</option>
-                            <option value="333">My5</option>
-                            <option value="441">NFB</option>
-                            <option value="472">NLZIET</option>
-                            <option value="484">NOW</option>
-                            <option value="360">NPO Start</option>
-                            <option value="442">NRK TV</option>
-                            <option value="96">Naver Store</option>
-                            <option value="273">Neon TV</option>
-                            <option value="19">NetMovies</option>
-                            <option value="175">Netflix Kids</option>
-                            <option value="28">Netzkino</option>
-                            <option value="261">Nickhits Amazon Channel</option>
-                            <option value="455">Night Flight Plus</option>
-                            <option value="516">Noovo</option>
-                            <option value="39">Now TV</option>
-                            <option value="308">O2 TV</option>
-                            <option value="56">OCS Go</option>
-                            <option value="433">OVID</option>
-                            <option value="574">Oi Play</option>
-                            <option value="115">Okko</option>
-                            <option value="499">Oldflix</option>
-                            <option value="61">Orange VOD</option>
-                            <option value="434">OzFlix</option>
-                            <option value="209">PBS</option>
-                            <option value="293">PBS Kids Amazon Channel</option>
-                            <option value="294">PBS Masterpiece Amazon Channel</option>
-                            <option value="177">Pantaflix</option>
-                            <option value="247">Pantaya</option>
-                            <option value="292">Pantaya Amazon Channel</option>
-                            <option value="531">Paramount Plus</option>
-                            <option value="71">Pathé Thuis</option>
-                            <option value="386">Peacock</option>
-                            <option value="387">Peacock Premium</option>
-                            <option value="451">Picl</option>
-                            <option value="505">Player</option>
-                            <option value="538">Plex</option>
-                            <option value="300">Pluto TV</option>
-                            <option value="241">Popcornflix</option>
-                            <option value="522">Popcorntimes</option>
-                            <option value="570">Premier</option>
-                            <option value="278">Pure Flix</option>
-                            <option value="552">QFT Player</option>
-                            <option value="274">QubitTV</option>
-                            <option value="22">Quickflix</option>
-                            <option value="24">Quickflix Store</option>
-                            <option value="461">RTBF</option>
-                            <option value="572">RTL Play</option>
-                            <option value="452">RTPplay</option>
-                            <option value="222">Rai Play</option>
-                            <option value="35">Rakuten TV</option>
-                            <option value="344">Rakuten Viki</option>
-                            <option value="279">Redbox</option>
-                            <option value="446">Retrocrush</option>
-                            <option value="473">Revry</option>
-                            <option value="338">Ruutu</option>
-                            <option value="564">SALTO</option>
-                            <option value="132">SBS On Demand</option>
-                            <option value="426">SF Anytime</option>
-                            <option value="493">SVT</option>
-                            <option value="185">Screambox</option>
-                            <option value="202">Screambox Amazon Channel</option>
-                            <option value="513">Shadowz</option>
-                            <option value="474">ShemarooMe</option>
-                            <option value="439">Shout! Factory TV</option>
-                            <option value="55">ShowMax</option>
-                            <option value="37">Showtime</option>
-                            <option value="203">Showtime Amazon Channel</option>
-                            <option value="99">Shudder</option>
-                            <option value="204">Shudder Amazon Channel</option>
-                            <option value="147">Sixplay</option>
-                            <option value="210">Sky</option>
-                            <option value="29">Sky Go</option>
-                            <option value="130">Sky Store</option>
-                            <option value="30">Sky Ticket</option>
-                            <option value="321">Sky X</option>
-                            <option value="299">Sling TV</option>
-                            <option value="237">Sony Liv</option>
-                            <option value="389">Sooner</option>
-                            <option value="521">Spamflix</option>
-                            <option value="486">Spectrum On Demand</option>
-                            <option value="545">Spuul</option>
-                            <option value="21">Stan</option>
-                            <option value="43">Starz</option>
-                            <option value="194">Starz Play Amazon Channel</option>
-                            <option value="578">Strim</option>
-                            <option value="431">SumoTV</option>
-                            <option value="309">Sun Nxt</option>
-                            <option value="143">Sundance Now</option>
-                            <option value="530">Supo Mungam Plus</option>
-                            <option value="150">SwissCom</option>
-                            <option value="215">Syfy</option>
-                            <option value="506">TBS</option>
-                            <option value="361">TCM</option>
-                            <option value="363">TNT</option>
-                            <option value="512">TNTGo</option>
-                            <option value="383">TV 2</option>
-                            <option value="298">TV Now</option>
-                            <option value="500">TVF Play</option>
-                            <option value="395">TVNZ</option>
-                            <option value="93">Talk Talk TV</option>
-                            <option value="502">Tata Sky</option>
-                            <option value="227">Telecine Play</option>
-                            <option value="553">Telia Play</option>
-                            <option value="429">Telstra TV</option>
-                            <option value="550">Tenk</option>
-                            <option value="470">The Film Detective</option>
-                            <option value="207">The Roku Channel</option>
-                            <option value="109">Timvision</option>
-                            <option value="454">Topic</option>
-                            <option value="517">TriArt Play</option>
-                            <option value="567">True Story</option>
-                            <option value="73">Tubi TV</option>
-                            <option value="391">Turk on Video</option>
-                            <option value="577">TvIgle</option>
-                            <option value="84">U-NEXT</option>
-                            <option value="322">USA Network</option>
-                            <option value="239">Universcine</option>
-                            <option value="251">Urban Movie Channel</option>
-                            <option value="457">VIX </option>
-                            <option value="370">VOD Club</option>
-                            <option value="245">VOD Poland</option>
-                            <option value="312">VRT nu</option>
-                            <option value="504">VRV</option>
-                            <option value="332">VUDU Free</option>
-                            <option value="414">VVVVID</option>
-                            <option value="494">Viafree</option>
-                            <option value="76">Viaplay</option>
-                            <option value="462">Vid Plus</option>
-                            <option value="539">Viddla</option>
-                            <option value="133">Videobuster</option>
-                            <option value="72">Videoland</option>
-                            <option value="489">Vidio</option>
-                            <option value="295">Viewster Amazon Channel</option>
-                            <option value="158">Viu</option>
-                            <option value="450">Vodacom Video Play</option>
-                            <option value="53">Volta</option>
-                            <option value="121">Voot</option>
-                            <option value="7">Vudu</option>
-                            <option value="546">WOW Presents Plus</option>
-                            <option value="260">WWE Network</option>
-                            <option value="392">Watch4</option>
-                            <option value="97">Watcha</option>
-                            <option value="171">Watchbox</option>
-                            <option value="501">Wink</option>
-                            <option value="313">Yelo Play</option>
-                            <option value="323">Yle Areena</option>
-                            <option value="192">YouTube</option>
-                            <option value="235">YouTube Free</option>
-                            <option value="188">YouTube Premium</option>
-                            <option value="255">Yupp TV</option>
-                            <option value="537">ZDF</option>
-                            <option value="286">ZDF Herzkino Amazon Channel</option>
-                            <option value="232">Zee5</option>
-                            <option value="297">Ziggo TV</option>
-                            <option value="532">aha</option>
-                            <option value="341">blutv</option>
-                            <option value="85">dTV</option>
-                            <option value="535">digital TIFF Bell Lightbox</option>
-                            <option value="542">filmfriend</option>
-                            <option value="257">fuboTV</option>
-                            <option value="468">genflix</option>
-                            <option value="511">iWantTFC</option>
-                            <option value="146">iciTouTV</option>
-                            <option value="160">iflix</option>
-                            <option value="20">maxdome Store</option>
-                            <option value="342">puhutv</option>
-                            <option value="14">realeyz</option>
-                            <option value="507">tru TV</option>
-                            <option value="488">tvo</option>
-                            <option value="556">tvzavr</option>
-                            <option value="356">wavve</option>
-                        </select>
-                        <div class="valid-feedback">
-                            Looks good!
+                        <div class="col-3 mb-3">
+                            <label for="validationCustom03">Platform</label>
+                            <select class="form-select" id="platform" aria-label="Platform Selection">
+                                <option value="8">Netflix</option>
+                                <option value="9">Amazon Prime Video</option>
+                                <option value="246">7plus</option>
+                                <option value="528">AMC Plus</option>
+                                <option value="352">AMC on Demand</option>
+                                <option value="529">ARROW</option>
+                                <option value="87">Acorn TV</option>
+                                <option value="196">AcornTV Amazon Channel</option>
+                                <option value="547">Alamo on Demand</option>
+                                <option value="103">All 4</option>
+                                <option value="33">Alleskino</option>
+                                <option value="319">Alt Balaji</option>
+                                <option value="533">Amazon Arthaus Channel</option>
+                                <option value="116">Amediateka</option>
+                                <option value="195">Animax Plus Amazon Channel</option>
+                                <option value="415">Anime Digital Networks</option>
+                                <option value="327">Anime On Demand</option>
+                                <option value="350">Apple TV Plus</option>
+                                <option value="2">Apple iTunes</option>
+                                <option value="534">Argo</option>
+                                <option value="234">Arte</option>
+                                <option value="481">ArthouseCNMA</option>
+                                <option value="514">AsianCrush</option>
+                                <option value="62">Atres Player</option>
+                                <option value="397">BBC America</option>
+                                <option value="285">BBC Player Amazon Channel</option>
+                                <option value="38">BBC iPlayer</option>
+                                <option value="224">BFI Player</option>
+                                <option value="287">BFI Player Amazon Channel</option>
+                                <option value="385">BINGE</option>
+                                <option value="59">Bbox VOD</option>
+                                <option value="311">Be TV Go</option>
+                                <option value="448">Beamafilm</option>
+                                <option value="447">Belas Artes à La Carte</option>
+                                <option value="465">Believe</option>
+                                <option value="343">Bet+ Amazon Channel</option>
+                                <option value="466">Bioskop Online</option>
+                                <option value="67">Blim</option>
+                                <option value="423">Blockbuster</option>
+                                <option value="124">Bookmyshow</option>
+                                <option value="248">Boomerang</option>
+                                <option value="288">Boomerang Amazon Channel</option>
+                                <option value="54">BoxOffice</option>
+                                <option value="380">BritBox</option>
+                                <option value="197">BritBox Amazon Channel</option>
+                                <option value="554">BroadwayHD</option>
+                                <option value="77">C More</option>
+                                <option value="314">CBC Gem</option>
+                                <option value="78">CBS</option>
+                                <option value="495">CGood TV</option>
+                                <option value="491">CINE</option>
+                                <option value="543">CONTAR</option>
+                                <option value="428">CONtv</option>
+                                <option value="326">CTV</option>
+                                <option value="58">Canal VOD</option>
+                                <option value="381">Canal+</option>
+                                <option value="159">Catchplay</option>
+                                <option value="438">Chai Flicks</option>
+                                <option value="40">Chili</option>
+                                <option value="496">Cineasterna</option>
+                                <option value="324">Cinemas a la Demande</option>
+                                <option value="289">Cinemax Amazon Channel</option>
+                                <option value="140">Cineplex</option>
+                                <option value="558">Cinépolis KLIC</option>
+                                <option value="167">Claro video</option>
+                                <option value="445">Classix</option>
+                                <option value="469">Club Illico</option>
+                                <option value="497">Comhem Play</option>
+                                <option value="12">Crackle</option>
+                                <option value="230">Crave</option>
+                                <option value="231">Crave Plus</option>
+                                <option value="305">Crave Starz</option>
+                                <option value="258">Criterion Channel</option>
+                                <option value="190">Curiosity Stream</option>
+                                <option value="189">Curzon Home Cinema</option>
+                                <option value="358">DIRECTV</option>
+                                <option value="467">DIRECTV GO</option>
+                                <option value="475">DOCSVILLE</option>
+                                <option value="355">Darkmatter TV</option>
+                                <option value="219">Das Erste Mediathek</option>
+                                <option value="444">Dekkoo</option>
+                                <option value="390">Disney Plus</option>
+                                <option value="569">DocAlliance Films</option>
+                                <option value="357">DocPlay</option>
+                                <option value="536">Dogwoof On Demand</option>
+                                <option value="254">Dove Channel</option>
+                                <option value="435">Draken Films</option>
+                                <option value="476">EPIC ON</option>
+                                <option value="540">Elisa Viihde</option>
+                                <option value="178">EntertainTV</option>
+                                <option value="34">Epix</option>
+                                <option value="218">Eros Now</option>
+                                <option value="471">FILMRISE</option>
+                                <option value="123">FXNow</option>
+                                <option value="105">FandangoNOW</option>
+                                <option value="25">Fandor</option>
+                                <option value="199">Fandor Amazon Channel</option>
+                                <option value="436">Fetch TV</option>
+                                <option value="579">Film Movement Plus</option>
+                                <option value="396">Film1</option>
+                                <option value="63">Filmin</option>
+                                <option value="66">Filmin Latino</option>
+                                <option value="64">Filmin Plus</option>
+                                <option value="138">Filmo TV</option>
+                                <option value="560">Filmoteket</option>
+                                <option value="443">Filmstriben</option>
+                                <option value="480">Filmtastic</option>
+                                <option value="334">Filmtastic Amazon Channel</option>
+                                <option value="559">Filmzie</option>
+                                <option value="142">Flimmit</option>
+                                <option value="432">Flix Premiere</option>
+                                <option value="331">FlixFling</option>
+                                <option value="393">FlixOlé</option>
+                                <option value="229">Fox Play</option>
+                                <option value="228">Fox Premium</option>
+                                <option value="134">Foxtel Now</option>
+                                <option value="211">Freeform</option>
+                                <option value="269">Funimation Now</option>
+                                <option value="477">GOSPEL PLAY</option>
+                                <option value="86">GYAO</option>
+                                <option value="449">Global TV</option>
+                                <option value="307">Globo Play</option>
+                                <option value="373">Go3</option>
+                                <option value="3">Google Play Movies</option>
+                                <option value="100">GuideDoc</option>
+                                <option value="118">HBO</option>
+                                <option value="425">HBO Go</option>
+                                <option value="384">HBO Max</option>
+                                <option value="27">HBO Now</option>
+                                <option value="200">HBO Now Amazon Channel</option>
+                                <option value="271">HBO Portugal</option>
+                                <option value="281">Hallmark Movies</option>
+                                <option value="290">Hallmark Movies Now Amazon Channel</option>
+                                <option value="417">Here TV</option>
+                                <option value="503">Hi-YAH</option>
+                                <option value="430">HiDive</option>
+                                <option value="478">History Play</option>
+                                <option value="268">History Vault</option>
+                                <option value="315">Hoichoi</option>
+                                <option value="164">Hollystar</option>
+                                <option value="182">Hollywood Suite</option>
+                                <option value="479">Home of Horror</option>
+                                <option value="212">Hoopla</option>
+                                <option value="250">Horizon</option>
+                                <option value="460">Horrify</option>
+                                <option value="122">Hotstar</option>
+                                <option value="15">Hulu</option>
+                                <option value="437">Hungama Play</option>
+                                <option value="548">IFFR Unleashed</option>
+                                <option value="492">ILLICO</option>
+                                <option value="238">IMDb TV</option>
+                                <option value="549">IPLA</option>
+                                <option value="41">ITV Player</option>
+                                <option value="368">IndieFlix</option>
+                                <option value="110">Infinity</option>
+                                <option value="113">Ivi</option>
+                                <option value="220">Jio Cinema</option>
+                                <option value="304">Joyn</option>
+                                <option value="421">Joyn Plus</option>
+                                <option value="563">KPN</option>
+                                <option value="191">Kanopy</option>
+                                <option value="349">Kino on Demand</option>
+                                <option value="573">KinoPop</option>
+                                <option value="463">Kirjastokino</option>
+                                <option value="89">Kividoo</option>
+                                <option value="576">Klik Film</option>
+                                <option value="525">Knowledge Network</option>
+                                <option value="575">KoreaOnDemand</option>
+                                <option value="310">La Cinetek</option>
+                                <option value="518">La Toile</option>
+                                <option value="275">Laugh Out Loud</option>
+                                <option value="544">Libreflix</option>
+                                <option value="157">Lifetime</option>
+                                <option value="284">Lifetime Movie Club</option>
+                                <option value="561">Lionsgate Play</option>
+                                <option value="47">Looke</option>
+                                <option value="483">MAX Stream</option>
+                                <option value="515">MX Player</option>
+                                <option value="291">MZ Choice Amazon Channel</option>
+                                <option value="551">Magellan TV</option>
+                                <option value="259">Magnolia Selects</option>
+                                <option value="482">ManoramaMax</option>
+                                <option value="139">Max Go</option>
+                                <option value="6">Maxdome</option>
+                                <option value="359">Mediaset Play</option>
+                                <option value="242">Meo</option>
+                                <option value="68">Microsoft Store</option>
+                                <option value="456">Mitele </option>
+                                <option value="562">MovieSaints</option>
+                                <option value="339">Movistar Play</option>
+                                <option value="149">Movistar Plus</option>
+                                <option value="11">Mubi</option>
+                                <option value="201">Mubi Amazon Channel</option>
+                                <option value="333">My5</option>
+                                <option value="441">NFB</option>
+                                <option value="472">NLZIET</option>
+                                <option value="484">NOW</option>
+                                <option value="360">NPO Start</option>
+                                <option value="442">NRK TV</option>
+                                <option value="96">Naver Store</option>
+                                <option value="273">Neon TV</option>
+                                <option value="19">NetMovies</option>
+                                <option value="175">Netflix Kids</option>
+                                <option value="28">Netzkino</option>
+                                <option value="261">Nickhits Amazon Channel</option>
+                                <option value="455">Night Flight Plus</option>
+                                <option value="516">Noovo</option>
+                                <option value="39">Now TV</option>
+                                <option value="308">O2 TV</option>
+                                <option value="56">OCS Go</option>
+                                <option value="433">OVID</option>
+                                <option value="574">Oi Play</option>
+                                <option value="115">Okko</option>
+                                <option value="499">Oldflix</option>
+                                <option value="61">Orange VOD</option>
+                                <option value="434">OzFlix</option>
+                                <option value="209">PBS</option>
+                                <option value="293">PBS Kids Amazon Channel</option>
+                                <option value="294">PBS Masterpiece Amazon Channel</option>
+                                <option value="177">Pantaflix</option>
+                                <option value="247">Pantaya</option>
+                                <option value="292">Pantaya Amazon Channel</option>
+                                <option value="531">Paramount Plus</option>
+                                <option value="71">Pathé Thuis</option>
+                                <option value="386">Peacock</option>
+                                <option value="387">Peacock Premium</option>
+                                <option value="451">Picl</option>
+                                <option value="505">Player</option>
+                                <option value="538">Plex</option>
+                                <option value="300">Pluto TV</option>
+                                <option value="241">Popcornflix</option>
+                                <option value="522">Popcorntimes</option>
+                                <option value="570">Premier</option>
+                                <option value="278">Pure Flix</option>
+                                <option value="552">QFT Player</option>
+                                <option value="274">QubitTV</option>
+                                <option value="22">Quickflix</option>
+                                <option value="24">Quickflix Store</option>
+                                <option value="461">RTBF</option>
+                                <option value="572">RTL Play</option>
+                                <option value="452">RTPplay</option>
+                                <option value="222">Rai Play</option>
+                                <option value="35">Rakuten TV</option>
+                                <option value="344">Rakuten Viki</option>
+                                <option value="279">Redbox</option>
+                                <option value="446">Retrocrush</option>
+                                <option value="473">Revry</option>
+                                <option value="338">Ruutu</option>
+                                <option value="564">SALTO</option>
+                                <option value="132">SBS On Demand</option>
+                                <option value="426">SF Anytime</option>
+                                <option value="493">SVT</option>
+                                <option value="185">Screambox</option>
+                                <option value="202">Screambox Amazon Channel</option>
+                                <option value="513">Shadowz</option>
+                                <option value="474">ShemarooMe</option>
+                                <option value="439">Shout! Factory TV</option>
+                                <option value="55">ShowMax</option>
+                                <option value="37">Showtime</option>
+                                <option value="203">Showtime Amazon Channel</option>
+                                <option value="99">Shudder</option>
+                                <option value="204">Shudder Amazon Channel</option>
+                                <option value="147">Sixplay</option>
+                                <option value="210">Sky</option>
+                                <option value="29">Sky Go</option>
+                                <option value="130">Sky Store</option>
+                                <option value="30">Sky Ticket</option>
+                                <option value="321">Sky X</option>
+                                <option value="299">Sling TV</option>
+                                <option value="237">Sony Liv</option>
+                                <option value="389">Sooner</option>
+                                <option value="521">Spamflix</option>
+                                <option value="486">Spectrum On Demand</option>
+                                <option value="545">Spuul</option>
+                                <option value="21">Stan</option>
+                                <option value="43">Starz</option>
+                                <option value="194">Starz Play Amazon Channel</option>
+                                <option value="578">Strim</option>
+                                <option value="431">SumoTV</option>
+                                <option value="309">Sun Nxt</option>
+                                <option value="143">Sundance Now</option>
+                                <option value="530">Supo Mungam Plus</option>
+                                <option value="150">SwissCom</option>
+                                <option value="215">Syfy</option>
+                                <option value="506">TBS</option>
+                                <option value="361">TCM</option>
+                                <option value="363">TNT</option>
+                                <option value="512">TNTGo</option>
+                                <option value="383">TV 2</option>
+                                <option value="298">TV Now</option>
+                                <option value="500">TVF Play</option>
+                                <option value="395">TVNZ</option>
+                                <option value="93">Talk Talk TV</option>
+                                <option value="502">Tata Sky</option>
+                                <option value="227">Telecine Play</option>
+                                <option value="553">Telia Play</option>
+                                <option value="429">Telstra TV</option>
+                                <option value="550">Tenk</option>
+                                <option value="470">The Film Detective</option>
+                                <option value="207">The Roku Channel</option>
+                                <option value="109">Timvision</option>
+                                <option value="454">Topic</option>
+                                <option value="517">TriArt Play</option>
+                                <option value="567">True Story</option>
+                                <option value="73">Tubi TV</option>
+                                <option value="391">Turk on Video</option>
+                                <option value="577">TvIgle</option>
+                                <option value="84">U-NEXT</option>
+                                <option value="322">USA Network</option>
+                                <option value="239">Universcine</option>
+                                <option value="251">Urban Movie Channel</option>
+                                <option value="457">VIX </option>
+                                <option value="370">VOD Club</option>
+                                <option value="245">VOD Poland</option>
+                                <option value="312">VRT nu</option>
+                                <option value="504">VRV</option>
+                                <option value="332">VUDU Free</option>
+                                <option value="414">VVVVID</option>
+                                <option value="494">Viafree</option>
+                                <option value="76">Viaplay</option>
+                                <option value="462">Vid Plus</option>
+                                <option value="539">Viddla</option>
+                                <option value="133">Videobuster</option>
+                                <option value="72">Videoland</option>
+                                <option value="489">Vidio</option>
+                                <option value="295">Viewster Amazon Channel</option>
+                                <option value="158">Viu</option>
+                                <option value="450">Vodacom Video Play</option>
+                                <option value="53">Volta</option>
+                                <option value="121">Voot</option>
+                                <option value="7">Vudu</option>
+                                <option value="546">WOW Presents Plus</option>
+                                <option value="260">WWE Network</option>
+                                <option value="392">Watch4</option>
+                                <option value="97">Watcha</option>
+                                <option value="171">Watchbox</option>
+                                <option value="501">Wink</option>
+                                <option value="313">Yelo Play</option>
+                                <option value="323">Yle Areena</option>
+                                <option value="192">YouTube</option>
+                                <option value="235">YouTube Free</option>
+                                <option value="188">YouTube Premium</option>
+                                <option value="255">Yupp TV</option>
+                                <option value="537">ZDF</option>
+                                <option value="286">ZDF Herzkino Amazon Channel</option>
+                                <option value="232">Zee5</option>
+                                <option value="297">Ziggo TV</option>
+                                <option value="532">aha</option>
+                                <option value="341">blutv</option>
+                                <option value="85">dTV</option>
+                                <option value="535">digital TIFF Bell Lightbox</option>
+                                <option value="542">filmfriend</option>
+                                <option value="257">fuboTV</option>
+                                <option value="468">genflix</option>
+                                <option value="511">iWantTFC</option>
+                                <option value="146">iciTouTV</option>
+                                <option value="160">iflix</option>
+                                <option value="20">maxdome Store</option>
+                                <option value="342">puhutv</option>
+                                <option value="14">realeyz</option>
+                                <option value="507">tru TV</option>
+                                <option value="488">tvo</option>
+                                <option value="556">tvzavr</option>
+                                <option value="356">wavve</option>
+                            </select>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
                         </div>
-                        <div class="invalid-feedback">
-                            Please select a valid platform
-                        </div>
-                    </div>
-                    <div class="col-3 mb-3">
-                        <label for="validationCustom04">Country</label>
-                        <select class="form-select" aria-label="Country Selection">
-                            <!-- <option>Select one</option> -->
-                            <option value="CA">Canada</option>
-                            <option value="US">United States of America</option>
-                            <option value="AF">Afghanistan</option>
-                            <option value="AL">Albania</option>
-                            <option value="DZ">Algeria</option>
-                            <option value="AS">American Samoa</option>
-                            <option value="AD">Andorra</option>
-                            <option value="AO">Angola</option>
-                            <option value="AI">Anguilla</option>
-                            <option value="AQ">Antarctica</option>
-                            <option value="AG">Antigua and Barbuda</option>
-                            <option value="AR">Argentina</option>
-                            <option value="AM">Armenia</option>
-                            <option value="AW">Aruba</option>
-                            <option value="AU">Australia</option>
-                            <option value="AT">Austria</option>
-                            <option value="AZ">Azerbaijan</option>
-                            <option value="BS">Bahamas</option>
-                            <option value="BH">Bahrain</option>
-                            <option value="BD">Bangladesh</option>
-                            <option value="BB">Barbados</option>
-                            <option value="BY">Belarus</option>
-                            <option value="BE">Belgium</option>
-                            <option value="BZ">Belize</option>
-                            <option value="BJ">Benin</option>
-                            <option value="BM">Bermuda</option>
-                            <option value="BT">Bhutan</option>
-                            <option value="BO">Bolivia</option>
-                            <option value="BA">Bosnia and Herzegovina</option>
-                            <option value="BW">Botswana</option>
-                            <option value="BV">Bouvet Island</option>
-                            <option value="BR">Brazil</option>
-                            <option value="IO">British Indian Ocean Territory</option>
-                            <option value="VG">British Virgin Islands</option>
-                            <option value="BN">Brunei Darussalam</option>
-                            <option value="BG">Bulgaria</option>
-                            <option value="BF">Burkina Faso</option>
-                            <option value="BI">Burundi</option>
-                            <option value="KH">Cambodia</option>
-                            <option value="CM">Cameroon</option>
-                            <option value="CV">Cape Verde</option>
-                            <option value="KY">Cayman Islands</option>
-                            <option value="CF">Central African Republic</option>
-                            <option value="TD">Chad</option>
-                            <option value="CL">Chile</option>
-                            <option value="CN">China</option>
-                            <option value="CX">Christmas Island</option>
-                            <option value="CC">Cocos Islands</option>
-                            <option value="CO">Colombia</option>
-                            <option value="KM">Comoros</option>
-                            <option value="CG">Congo</option>
-                            <option value="CG">Congo</option>
-                            <option value="CK">Cook Islands</option>
-                            <option value="CR">Costa Rica</option>
-                            <option value="CI">Cote D'Ivoire</option>
-                            <option value="HR">Croatia</option>
-                            <option value="CU">Cuba</option>
-                            <option value="CY">Cyprus</option>
-                            <option value="CZ">Czech Republic</option>
-                            <option value="XC">Czechoslovakia</option>
-                            <option value="DK">Denmark</option>
-                            <option value="DJ">Djibouti</option>
-                            <option value="DM">Dominica</option>
-                            <option value="DO">Dominican Republic</option>
-                            <option value="XG">East Germany</option>
-                            <option value="EC">Ecuador</option>
-                            <option value="EG">Egypt</option>
-                            <option value="SV">El Salvador</option>
-                            <option value="GQ">Equatorial Guinea</option>
-                            <option value="ER">Eritrea</option>
-                            <option value="EE">Estonia</option>
-                            <option value="ET">Ethiopia</option>
-                            <option value="FO">Faeroe Islands</option>
-                            <option value="FK">Falkland Islands</option>
-                            <option value="FJ">Fiji</option>
-                            <option value="FI">Finland</option>
-                            <option value="FR">France</option>
-                            <option value="GF">French Guiana</option>
-                            <option value="PF">French Polynesia</option>
-                            <option value="TF">French Southern Territories</option>
-                            <option value="GA">Gabon</option>
-                            <option value="GM">Gambia</option>
-                            <option value="GE">Georgia</option>
-                            <option value="DE">Germany</option>
-                            <option value="GH">Ghana</option>
-                            <option value="GI">Gibraltar</option>
-                            <option value="GR">Greece</option>
-                            <option value="GL">Greenland</option>
-                            <option value="GD">Grenada</option>
-                            <option value="GP">Guadaloupe</option>
-                            <option value="GU">Guam</option>
-                            <option value="GT">Guatemala</option>
-                            <option value="GN">Guinea</option>
-                            <option value="GW">Guinea-Bissau</option>
-                            <option value="GY">Guyana</option>
-                            <option value="HT">Haiti</option>
-                            <option value="HM">Heard and McDonald Islands</option>
-                            <option value="VA">Holy See</option>
-                            <option value="HN">Honduras</option>
-                            <option value="HK">Hong Kong</option>
-                            <option value="HU">Hungary</option>
-                            <option value="IS">Iceland</option>
-                            <option value="IN">India</option>
-                            <option value="ID">Indonesia</option>
-                            <option value="IR">Iran</option>
-                            <option value="IQ">Iraq</option>
-                            <option value="IE">Ireland</option>
-                            <option value="IL">Israel</option>
-                            <option value="IT">Italy</option>
-                            <option value="JM">Jamaica</option>
-                            <option value="JP">Japan</option>
-                            <option value="JO">Jordan</option>
-                            <option value="KZ">Kazakhstan</option>
-                            <option value="KE">Kenya</option>
-                            <option value="KI">Kiribati</option>
-                            <option value="XK">Kosovo</option>
-                            <option value="KW">Kuwait</option>
-                            <option value="KG">Kyrgyz Republic</option>
-                            <option value="LA">Lao People's Democratic Republic</option>
-                            <option value="LV">Latvia</option>
-                            <option value="LB">Lebanon</option>
-                            <option value="LS">Lesotho</option>
-                            <option value="LR">Liberia</option>
-                            <option value="LY">Libyan Arab Jamahiriya</option>
-                            <option value="LI">Liechtenstein</option>
-                            <option value="LT">Lithuania</option>
-                            <option value="LU">Luxembourg</option>
-                            <option value="MO">Macao</option>
-                            <option value="MK">Macedonia</option>
-                            <option value="MG">Madagascar</option>
-                            <option value="MW">Malawi</option>
-                            <option value="MY">Malaysia</option>
-                            <option value="MV">Maldives</option>
-                            <option value="ML">Mali</option>
-                            <option value="MT">Malta</option>
-                            <option value="MH">Marshall Islands</option>
-                            <option value="MQ">Martinique</option>
-                            <option value="MR">Mauritania</option>
-                            <option value="MU">Mauritius</option>
-                            <option value="YT">Mayotte</option>
-                            <option value="MX">Mexico</option>
-                            <option value="FM">Micronesia</option>
-                            <option value="MD">Moldova</option>
-                            <option value="MC">Monaco</option>
-                            <option value="MN">Mongolia</option>
-                            <option value="ME">Montenegro</option>
-                            <option value="MS">Montserrat</option>
-                            <option value="MA">Morocco</option>
-                            <option value="MZ">Mozambique</option>
-                            <option value="MM">Myanmar</option>
-                            <option value="NA">Namibia</option>
-                            <option value="NR">Nauru</option>
-                            <option value="NP">Nepal</option>
-                            <option value="NL">Netherlands</option>
-                            <option value="AN">Netherlands Antilles</option>
-                            <option value="NC">New Caledonia</option>
-                            <option value="NZ">New Zealand</option>
-                            <option value="NI">Nicaragua</option>
-                            <option value="NE">Niger</option>
-                            <option value="NG">Nigeria</option>
-                            <option value="NU">Niue</option>
-                            <option value="NF">Norfolk Island</option>
-                            <option value="KP">North Korea</option>
-                            <option value="MP">Northern Mariana Islands</option>
-                            <option value="NO">Norway</option>
-                            <option value="OM">Oman</option>
-                            <option value="PK">Pakistan</option>
-                            <option value="PW">Palau</option>
-                            <option value="PS">Palestinian Territory</option>
-                            <option value="PA">Panama</option>
-                            <option value="PG">Papua New Guinea</option>
-                            <option value="PY">Paraguay</option>
-                            <option value="PE">Peru</option>
-                            <option value="PH">Philippines</option>
-                            <option value="PN">Pitcairn Island</option>
-                            <option value="PL">Poland</option>
-                            <option value="PT">Portugal</option>
-                            <option value="PR">Puerto Rico</option>
-                            <option value="QA">Qatar</option>
-                            <option value="RE">Reunion</option>
-                            <option value="RO">Romania</option>
-                            <option value="RU">Russia</option>
-                            <option value="RW">Rwanda</option>
-                            <option value="WS">Samoa</option>
-                            <option value="SM">San Marino</option>
-                            <option value="ST">Sao Tome and Principe</option>
-                            <option value="SA">Saudi Arabia</option>
-                            <option value="SN">Senegal</option>
-                            <option value="RS">Serbia</option>
-                            <option value="CS">Serbia and Montenegro</option>
-                            <option value="SC">Seychelles</option>
-                            <option value="SL">Sierra Leone</option>
-                            <option value="SG">Singapore</option>
-                            <option value="SK">Slovakia</option>
-                            <option value="SI">Slovenia</option>
-                            <option value="SB">Solomon Islands</option>
-                            <option value="SO">Somalia</option>
-                            <option value="ZA">South Africa</option>
-                            <option value="GS">South Georgia and the South Sandwich Islands</option>
-                            <option value="KR">South Korea</option>
-                            <option value="SS">South Sudan</option>
-                            <option value="SU">Soviet Union</option>
-                            <option value="ES">Spain</option>
-                            <option value="LK">Sri Lanka</option>
-                            <option value="SH">St. Helena</option>
-                            <option value="KN">St. Kitts and Nevis</option>
-                            <option value="LC">St. Lucia</option>
-                            <option value="PM">St. Pierre and Miquelon</option>
-                            <option value="VC">St. Vincent and the Grenadines</option>
-                            <option value="SD">Sudan</option>
-                            <option value="SR">Suriname</option>
-                            <option value="SJ">Svalbard & Jan Mayen Islands</option>
-                            <option value="SZ">Swaziland</option>
-                            <option value="SE">Sweden</option>
-                            <option value="CH">Switzerland</option>
-                            <option value="SY">Syrian Arab Republic</option>
-                            <option value="TW">Taiwan</option>
-                            <option value="TJ">Tajikistan</option>
-                            <option value="TZ">Tanzania</option>
-                            <option value="TH">Thailand</option>
-                            <option value="TL">Timor-Leste</option>
-                            <option value="TG">Togo</option>
-                            <option value="TK">Tokelau</option>
-                            <option value="TO">Tonga</option>
-                            <option value="TT">Trinidad and Tobago</option>
-                            <option value="TN">Tunisia</option>
-                            <option value="TR">Turkey</option>
-                            <option value="TM">Turkmenistan</option>
-                            <option value="TC">Turks and Caicos Islands</option>
-                            <option value="TV">Tuvalu</option>
-                            <option value="VI">US Virgin Islands</option>
-                            <option value="UG">Uganda</option>
-                            <option value="UA">Ukraine</option>
-                            <option value="AE">United Arab Emirates</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="UM">United States Minor Outlying Islands</option>
-                            <option value="UY">Uruguay</option>
-                            <option value="UZ">Uzbekistan</option>
-                            <option value="VU">Vanuatu</option>
-                            <option value="VE">Venezuela</option>
-                            <option value="VN">Vietnam</option>
-                            <option value="WF">Wallis and Futuna Islands</option>
-                            <option value="EH">Western Sahara</option>
-                            <option value="YE">Yemen</option>
-                            <option value="YU">Yugoslavia</option>
-                            <option value="ZM">Zambia</option>
-                            <option value="ZW">Zimbabwe</option>
-                            <!-- <option value="3">Three</option> -->
-                        </select>
-                        <div class="valid-feedback">
-                            Looks good!
-                        </div>
-                        <div class="invalid-feedback">
-                            Please select a valid country
+                        <div class="col-3 mb-3">
+                            <label for="validationCustom04">Country</label>
+                            <select class="form-select" id="region" aria-label="Country Selection">
+                                <!-- <option>Select one</option> -->
+                                <option value="CA">Canada</option>
+                                <option value="US">United States of America</option>
+                                <option value="AF">Afghanistan</option>
+                                <option value="AL">Albania</option>
+                                <option value="DZ">Algeria</option>
+                                <option value="AS">American Samoa</option>
+                                <option value="AD">Andorra</option>
+                                <option value="AO">Angola</option>
+                                <option value="AI">Anguilla</option>
+                                <option value="AQ">Antarctica</option>
+                                <option value="AG">Antigua and Barbuda</option>
+                                <option value="AR">Argentina</option>
+                                <option value="AM">Armenia</option>
+                                <option value="AW">Aruba</option>
+                                <option value="AU">Australia</option>
+                                <option value="AT">Austria</option>
+                                <option value="AZ">Azerbaijan</option>
+                                <option value="BS">Bahamas</option>
+                                <option value="BH">Bahrain</option>
+                                <option value="BD">Bangladesh</option>
+                                <option value="BB">Barbados</option>
+                                <option value="BY">Belarus</option>
+                                <option value="BE">Belgium</option>
+                                <option value="BZ">Belize</option>
+                                <option value="BJ">Benin</option>
+                                <option value="BM">Bermuda</option>
+                                <option value="BT">Bhutan</option>
+                                <option value="BO">Bolivia</option>
+                                <option value="BA">Bosnia and Herzegovina</option>
+                                <option value="BW">Botswana</option>
+                                <option value="BV">Bouvet Island</option>
+                                <option value="BR">Brazil</option>
+                                <option value="IO">British Indian Ocean Territory</option>
+                                <option value="VG">British Virgin Islands</option>
+                                <option value="BN">Brunei Darussalam</option>
+                                <option value="BG">Bulgaria</option>
+                                <option value="BF">Burkina Faso</option>
+                                <option value="BI">Burundi</option>
+                                <option value="KH">Cambodia</option>
+                                <option value="CM">Cameroon</option>
+                                <option value="CV">Cape Verde</option>
+                                <option value="KY">Cayman Islands</option>
+                                <option value="CF">Central African Republic</option>
+                                <option value="TD">Chad</option>
+                                <option value="CL">Chile</option>
+                                <option value="CN">China</option>
+                                <option value="CX">Christmas Island</option>
+                                <option value="CC">Cocos Islands</option>
+                                <option value="CO">Colombia</option>
+                                <option value="KM">Comoros</option>
+                                <option value="CG">Congo</option>
+                                <option value="CG">Congo</option>
+                                <option value="CK">Cook Islands</option>
+                                <option value="CR">Costa Rica</option>
+                                <option value="CI">Cote D'Ivoire</option>
+                                <option value="HR">Croatia</option>
+                                <option value="CU">Cuba</option>
+                                <option value="CY">Cyprus</option>
+                                <option value="CZ">Czech Republic</option>
+                                <option value="XC">Czechoslovakia</option>
+                                <option value="DK">Denmark</option>
+                                <option value="DJ">Djibouti</option>
+                                <option value="DM">Dominica</option>
+                                <option value="DO">Dominican Republic</option>
+                                <option value="XG">East Germany</option>
+                                <option value="EC">Ecuador</option>
+                                <option value="EG">Egypt</option>
+                                <option value="SV">El Salvador</option>
+                                <option value="GQ">Equatorial Guinea</option>
+                                <option value="ER">Eritrea</option>
+                                <option value="EE">Estonia</option>
+                                <option value="ET">Ethiopia</option>
+                                <option value="FO">Faeroe Islands</option>
+                                <option value="FK">Falkland Islands</option>
+                                <option value="FJ">Fiji</option>
+                                <option value="FI">Finland</option>
+                                <option value="FR">France</option>
+                                <option value="GF">French Guiana</option>
+                                <option value="PF">French Polynesia</option>
+                                <option value="TF">French Southern Territories</option>
+                                <option value="GA">Gabon</option>
+                                <option value="GM">Gambia</option>
+                                <option value="GE">Georgia</option>
+                                <option value="DE">Germany</option>
+                                <option value="GH">Ghana</option>
+                                <option value="GI">Gibraltar</option>
+                                <option value="GR">Greece</option>
+                                <option value="GL">Greenland</option>
+                                <option value="GD">Grenada</option>
+                                <option value="GP">Guadaloupe</option>
+                                <option value="GU">Guam</option>
+                                <option value="GT">Guatemala</option>
+                                <option value="GN">Guinea</option>
+                                <option value="GW">Guinea-Bissau</option>
+                                <option value="GY">Guyana</option>
+                                <option value="HT">Haiti</option>
+                                <option value="HM">Heard and McDonald Islands</option>
+                                <option value="VA">Holy See</option>
+                                <option value="HN">Honduras</option>
+                                <option value="HK">Hong Kong</option>
+                                <option value="HU">Hungary</option>
+                                <option value="IS">Iceland</option>
+                                <option value="IN">India</option>
+                                <option value="ID">Indonesia</option>
+                                <option value="IR">Iran</option>
+                                <option value="IQ">Iraq</option>
+                                <option value="IE">Ireland</option>
+                                <option value="IL">Israel</option>
+                                <option value="IT">Italy</option>
+                                <option value="JM">Jamaica</option>
+                                <option value="JP">Japan</option>
+                                <option value="JO">Jordan</option>
+                                <option value="KZ">Kazakhstan</option>
+                                <option value="KE">Kenya</option>
+                                <option value="KI">Kiribati</option>
+                                <option value="XK">Kosovo</option>
+                                <option value="KW">Kuwait</option>
+                                <option value="KG">Kyrgyz Republic</option>
+                                <option value="LA">Lao People's Democratic Republic</option>
+                                <option value="LV">Latvia</option>
+                                <option value="LB">Lebanon</option>
+                                <option value="LS">Lesotho</option>
+                                <option value="LR">Liberia</option>
+                                <option value="LY">Libyan Arab Jamahiriya</option>
+                                <option value="LI">Liechtenstein</option>
+                                <option value="LT">Lithuania</option>
+                                <option value="LU">Luxembourg</option>
+                                <option value="MO">Macao</option>
+                                <option value="MK">Macedonia</option>
+                                <option value="MG">Madagascar</option>
+                                <option value="MW">Malawi</option>
+                                <option value="MY">Malaysia</option>
+                                <option value="MV">Maldives</option>
+                                <option value="ML">Mali</option>
+                                <option value="MT">Malta</option>
+                                <option value="MH">Marshall Islands</option>
+                                <option value="MQ">Martinique</option>
+                                <option value="MR">Mauritania</option>
+                                <option value="MU">Mauritius</option>
+                                <option value="YT">Mayotte</option>
+                                <option value="MX">Mexico</option>
+                                <option value="FM">Micronesia</option>
+                                <option value="MD">Moldova</option>
+                                <option value="MC">Monaco</option>
+                                <option value="MN">Mongolia</option>
+                                <option value="ME">Montenegro</option>
+                                <option value="MS">Montserrat</option>
+                                <option value="MA">Morocco</option>
+                                <option value="MZ">Mozambique</option>
+                                <option value="MM">Myanmar</option>
+                                <option value="NA">Namibia</option>
+                                <option value="NR">Nauru</option>
+                                <option value="NP">Nepal</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="AN">Netherlands Antilles</option>
+                                <option value="NC">New Caledonia</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="NI">Nicaragua</option>
+                                <option value="NE">Niger</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="NU">Niue</option>
+                                <option value="NF">Norfolk Island</option>
+                                <option value="KP">North Korea</option>
+                                <option value="MP">Northern Mariana Islands</option>
+                                <option value="NO">Norway</option>
+                                <option value="OM">Oman</option>
+                                <option value="PK">Pakistan</option>
+                                <option value="PW">Palau</option>
+                                <option value="PS">Palestinian Territory</option>
+                                <option value="PA">Panama</option>
+                                <option value="PG">Papua New Guinea</option>
+                                <option value="PY">Paraguay</option>
+                                <option value="PE">Peru</option>
+                                <option value="PH">Philippines</option>
+                                <option value="PN">Pitcairn Island</option>
+                                <option value="PL">Poland</option>
+                                <option value="PT">Portugal</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="QA">Qatar</option>
+                                <option value="RE">Reunion</option>
+                                <option value="RO">Romania</option>
+                                <option value="RU">Russia</option>
+                                <option value="RW">Rwanda</option>
+                                <option value="WS">Samoa</option>
+                                <option value="SM">San Marino</option>
+                                <option value="ST">Sao Tome and Principe</option>
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="SN">Senegal</option>
+                                <option value="RS">Serbia</option>
+                                <option value="CS">Serbia and Montenegro</option>
+                                <option value="SC">Seychelles</option>
+                                <option value="SL">Sierra Leone</option>
+                                <option value="SG">Singapore</option>
+                                <option value="SK">Slovakia</option>
+                                <option value="SI">Slovenia</option>
+                                <option value="SB">Solomon Islands</option>
+                                <option value="SO">Somalia</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="GS">South Georgia and the South Sandwich Islands</option>
+                                <option value="KR">South Korea</option>
+                                <option value="SS">South Sudan</option>
+                                <option value="SU">Soviet Union</option>
+                                <option value="ES">Spain</option>
+                                <option value="LK">Sri Lanka</option>
+                                <option value="SH">St. Helena</option>
+                                <option value="KN">St. Kitts and Nevis</option>
+                                <option value="LC">St. Lucia</option>
+                                <option value="PM">St. Pierre and Miquelon</option>
+                                <option value="VC">St. Vincent and the Grenadines</option>
+                                <option value="SD">Sudan</option>
+                                <option value="SR">Suriname</option>
+                                <option value="SJ">Svalbard & Jan Mayen Islands</option>
+                                <option value="SZ">Swaziland</option>
+                                <option value="SE">Sweden</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="SY">Syrian Arab Republic</option>
+                                <option value="TW">Taiwan</option>
+                                <option value="TJ">Tajikistan</option>
+                                <option value="TZ">Tanzania</option>
+                                <option value="TH">Thailand</option>
+                                <option value="TL">Timor-Leste</option>
+                                <option value="TG">Togo</option>
+                                <option value="TK">Tokelau</option>
+                                <option value="TO">Tonga</option>
+                                <option value="TT">Trinidad and Tobago</option>
+                                <option value="TN">Tunisia</option>
+                                <option value="TR">Turkey</option>
+                                <option value="TM">Turkmenistan</option>
+                                <option value="TC">Turks and Caicos Islands</option>
+                                <option value="TV">Tuvalu</option>
+                                <option value="VI">US Virgin Islands</option>
+                                <option value="UG">Uganda</option>
+                                <option value="UA">Ukraine</option>
+                                <option value="AE">United Arab Emirates</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="UM">United States Minor Outlying Islands</option>
+                                <option value="UY">Uruguay</option>
+                                <option value="UZ">Uzbekistan</option>
+                                <option value="VU">Vanuatu</option>
+                                <option value="VE">Venezuela</option>
+                                <option value="VN">Vietnam</option>
+                                <option value="WF">Wallis and Futuna Islands</option>
+                                <option value="EH">Western Sahara</option>
+                                <option value="YE">Yemen</option>
+                                <option value="YU">Yugoslavia</option>
+                                <option value="ZM">Zambia</option>
+                                <option value="ZW">Zimbabwe</option>
+                                <!-- <option value="3">Three</option> -->
+                            </select>
+                            <div class="valid-feedback">
+                                Looks good!
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-8 mb-3" id="multiButtonGroup">
-                    <label for="multiButtonGroup">Select Categories (Optional):</label>
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" checked>
-                        <label class="btn btn-outline-info btn-sm" for="btnradio1">Combination of selected
-                            categories</label>
+                    <div class="col-lg-8 mb-3" id="multiButtonGroup">
+                        <label for="multiButtonGroup">Select Categories (Optional):</label>
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" checked>
+                            <label class="btn btn-outline-info btn-sm" for="btnradio1">Combination of selected
+                                categories</label>
 
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
-                        <label class="btn btn-outline-info btn-sm" for="btnradio2">Mix from selected categories</label>
-                    </div><br>
-                    <br>
-                    <button id="28" class="btn btn-light btn-sm genreButton" type="button">Action</button>
-                    <button type="button" id="12" class="btn btn-light btn-sm genreButton"
-                        type="button">Adventure</button>
-                    <button id="16" class="btn btn-light btn-sm genreButton" type="button">Animation</button>
-                    <button id="35" class="btn btn-light btn-sm genreButton" type="button">Comedy</button>
-                    <button id="80" class="btn btn-light btn-sm genreButton" type="button">Crime</button>
-                    <button id="99" class="btn btn-light btn-sm genreButton" type="button">Documentary</button>
-                    <button id="18" class="btn btn-light btn-sm genreButton" type="button">Drama</button>
-                    <button id="10751" class="btn btn-light btn-sm genreButton" type="button">Family</button>
-                    <button id="14" class="btn btn-light btn-sm genreButton" type="button">Fantasy</button>
-                    <button id="36" class="btn btn-light btn-sm genreButton" type="button">History</button>
-                    <button id="27" class="btn btn-light btn-sm genreButton" type="button">Horror</button>
-                    <button id="10402" class="btn btn-light btn-sm genreButton" type="button">Music</button>
-                    <button id="9648" class="btn btn-light btn-sm genreButton" type="button">Mystery</button>
-                    <button id="10749" class="btn btn-light btn-sm genreButton" type="button">Romance</button>
-                    <button id="878" class="btn btn-light btn-sm genreButton" type="button">Science Fiction</button>
-                    <button id="10770" class="btn btn-light btn-sm genreButton" type="button">TV Movie</button>
-                    <button id="53" class="btn btn-light btn-sm genreButton" type="button">Thriller</button>
-                    <button id="10752" class="btn btn-light btn-sm genreButton" type="button">War</button>
-                    <button id="37" class="btn btn-light btn-sm genreButton" type="button">Western</button>
-                <!-- </div> -->
-                </div>
-                <div class="col-md-12 text-center">
-                    <button class="btn btn-joinSession btn-success" type="button" onclick="validate2()">Submit</button>
-                    <button class="btn btn-joinSession btn-danger" type="button" onclick="toHomePage()">Back</button>
-                </div>
-            </form>
-            <script>
-                function validate2() {
-                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                    var forms = document.getElementsByClassName('create-needs-validation');
-                    // Loop over them and prevent submission
-                    var validation = Array.prototype.filter.call(forms, function (form) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        else {
-                            createSession()
-                        }
-                        form.classList.add('was-validated');
-                    });
-                }
-            </script>
-        </section>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                            <label class="btn btn-outline-info btn-sm" for="btnradio2">Mix from selected
+                                categories</label>
+                        </div><br>
+                        <br>
+                        <button id="28" class="btn btn-light btn-sm genreButton" type="button">Action</button>
+                        <button type="button" id="12" class="btn btn-light btn-sm genreButton"
+                            type="button">Adventure</button>
+                        <button id="16" class="btn btn-light btn-sm genreButton" type="button">Animation</button>
+                        <button id="35" class="btn btn-light btn-sm genreButton" type="button">Comedy</button>
+                        <button id="80" class="btn btn-light btn-sm genreButton" type="button">Crime</button>
+                        <button id="99" class="btn btn-light btn-sm genreButton" type="button">Documentary</button>
+                        <button id="18" class="btn btn-light btn-sm genreButton" type="button">Drama</button>
+                        <button id="10751" class="btn btn-light btn-sm genreButton" type="button">Family</button>
+                        <button id="14" class="btn btn-light btn-sm genreButton" type="button">Fantasy</button>
+                        <button id="36" class="btn btn-light btn-sm genreButton" type="button">History</button>
+                        <button id="27" class="btn btn-light btn-sm genreButton" type="button">Horror</button>
+                        <button id="10402" class="btn btn-light btn-sm genreButton" type="button">Music</button>
+                        <button id="9648" class="btn btn-light btn-sm genreButton" type="button">Mystery</button>
+                        <button id="10749" class="btn btn-light btn-sm genreButton" type="button">Romance</button>
+                        <button id="878" class="btn btn-light btn-sm genreButton" type="button">Science Fiction</button>
+                        <button id="10770" class="btn btn-light btn-sm genreButton" type="button">TV Movie</button>
+                        <button id="53" class="btn btn-light btn-sm genreButton" type="button">Thriller</button>
+                        <button id="10752" class="btn btn-light btn-sm genreButton" type="button">War</button>
+                        <button id="37" class="btn btn-light btn-sm genreButton" type="button">Western</button>
+                        <!-- </div> -->
+                    </div>
+
+                    <div class="row row-cols-md-auto justify-content-center align-items-center">
+                        <div class="col-3 form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                                checked>
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                Movie
+                            </label>
+                        </div>
+                        <div class="col-3 form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                TV
+                            </label>
+                        </div>
+                        |
+                        <div class="col-3 mb-3">
+                            <label for="validationCustom04">Sort</label>
+                            <select class="form-select" id="sort_by" aria-label="Sort Selection">
+                                <option selected value="Release">Release Date</option>
+                                <option value="Popularity">Popularity</option>
+                                <option value="Revenue">Revenue</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button class="btn btn-joinSession btn-success" type="button" onclick="validate2()">Create
+                            Session</button>
+                        <button class="btn btn-joinSession btn-danger" type="button"
+                            onclick="toHomePage()">Back</button>
+                    </div>
+                </form>
+                <script>
+                    function validate2() {
+                        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                        var forms = document.getElementsByClassName('create-needs-validation');
+                        // Loop over them and prevent submission
+                        var validation = Array.prototype.filter.call(forms, function (form) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            else {
+                                createSession()
+                            }
+                            form.classList.add('was-validated');
+                        });
+                    }
+                </script>
+            </section>
+        </div>
     </div>
 
     <script src="./main_script.js"></script>
