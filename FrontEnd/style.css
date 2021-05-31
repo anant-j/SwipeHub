@@ -91,3 +91,7 @@ body {
 .hidden {
   display: none;
 }
+
+.w-15{
+  min-width: 15%!important;
+}
