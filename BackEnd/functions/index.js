@@ -39,7 +39,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     if (order == "Popularity") {
       sortby = "popularity.desc";
     } else if (order == "Release") {
-      sortby = "release_date.desc";
+      sortby = "primary_release_date.desc";
     } else if (order == "Revenue") {
       sortby = "revenue.desc";
     }
@@ -143,7 +143,7 @@ async function generateMovieList(lang, genres, platform, region, sort) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_watch_providers=${platform}&watch_region=${region}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
@@ -159,6 +159,7 @@ async function generateMovieList(lang, genres, platform, region, sort) {
   return final;
 }
 
+
 /**
  * @param  {string} lang
  * @param  {string} genres
@@ -170,7 +171,7 @@ async function generateTVList(lang, genres, platform, region, sort) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {

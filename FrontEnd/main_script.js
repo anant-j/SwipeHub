@@ -190,32 +190,3 @@ function splitLetters(word) {
 
 changeWord();
 setInterval(changeWord, 4000);
-
-function disableTVOptions(){
-  document.getElementById("platform").disabled = true;
-  document.getElementById("platform").style.opacity = 0.5;
-  document.getElementById("region").disabled = true;
-  document.getElementById("region").style.opacity = 0.5;  
-}
-
-function enableMovieOptions(){
-  document.getElementById("platform").disabled = false;
-  document.getElementById("platform").style.opacity = 1;
-  document.getElementById("region").disabled = false;
-  document.getElementById("region").style.opacity = 1;
-}
-
-if(document.getElementById("flexRadioDefault2").checked){
-  disableTVOptions()
-}
-if(document.getElementById("flexRadioDefault1").checked){
-  enableMovieOptions()
-}
-
-document.getElementById("flexRadioDefault2").addEventListener("click", function() {
-  disableTVOptions()
-});
-
-document.getElementById("flexRadioDefault1").addEventListener("click", function() {
-  enableMovieOptions()
-});
