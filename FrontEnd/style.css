@@ -4,14 +4,14 @@
   margin: 0;
 } */
 
-@font-face{
+@font-face {
   font-family: "tfont";
   src: url("GothamRounded-Book.otf") format("opentype");
 }
 
 body {
-  overflow: hidden;
-  height:99vh;
+  overflow-x: hidden;
+  height: 99vh;
   font-family: tfont;
   background-color: rgb(20, 20, 20);
   color: white;
@@ -40,16 +40,24 @@ body {
 
 /* Safari */
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.nav-item{
+.nav-item {
   cursor: pointer;
 }
 
@@ -73,17 +81,13 @@ body {
   .outer {
     margin-top: 20px;
     display: block;
-    }
-
-    .desktop {
-      display: none;
   }
 
-  .body{
-    overflow: scroll;
+  .desktop {
+    display: none;
   }
 }
 
-.hidden{
+.hidden {
   display: none;
 }
