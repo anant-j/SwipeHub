@@ -5,8 +5,8 @@ var allCards = document.querySelectorAll(".tinder--card");
 var nope = document.getElementById("nope");
 var love = document.getElementById("love");
 const storage = window.localStorage;
-const sessionId = localStorage.getItem("SwipeFlix_sessionId");
-const userId = localStorage.getItem("SwipeFlix_userId");
+const sessionId = localStorage.getItem("Shwiper_sessionId");
+const userId = localStorage.getItem("Shwiper_userId");
 // const baseUrl = "http://localhost:5001/tinder-netflix/us-central1";
 const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 var globalHammerTime = {}
@@ -115,15 +115,22 @@ function createButtonListener(love) {
     var card = cards[0];
 
     card.classList.add("removed");
-
     if (love) {
       card.style.transform =
         "translate(" + moveOutWidth + "px, -100px) rotate(-30deg)";
+      tinderContainer.classList.toggle("tinder_love");
       rightSwipe();
+      setTimeout(function(){
+        tinderContainer.classList.remove("tinder_love");
+    }, 1000);
     } else {
       card.style.transform =
         "translate(-" + moveOutWidth + "px, -100px) rotate(30deg)";
+      tinderContainer.classList.toggle("tinder_nope");
       leftSwipe();
+      setTimeout(function(){
+        tinderContainer.classList.remove("tinder_nope");
+    }, 1000);
     }
 
     initCards();
@@ -240,10 +247,10 @@ function joinSession() {
           }
         }
         document.getElementById("loading").style.display = "none";
-        poll();
+        // poll();
       } else {
         alert("Cannot load the session");
-        storage.removeItem("SwipeFlix_sessionId");
+        storage.removeItem("Shwiper_sessionId");
         window.location.href = "./index.html";
         // document.getElementById("loading").style.display = "none";
       }
@@ -251,7 +258,7 @@ function joinSession() {
   };
   xhr.ontimeout = function (e) {
     alert("Cannot load the session");
-    storage.removeItem("SwipeFlix_sessionId");
+    storage.removeItem("Shwiper_sessionId");
     window.location.href = "./index.html";
     // XMLHttpRequest timed out. Do something here.
   };
@@ -279,7 +286,7 @@ function leaveSession() {
     }
   };
   document.getElementById("loading").style.display = "none";
-  storage.removeItem("SwipeFlix_sessionId");
+  storage.removeItem("Shwiper_sessionId");
   window.location.href = "./index.html"
 
   xhr.send(null);
@@ -321,4 +328,15 @@ function poll() {
   
   xhr.send(params);
   setTimeout(poll, 5000);
+}
+
+
+function copyUserIdToClipboard() {
+  navigator.clipboard.writeText(userId);
+  alert("User ID Copied")
+}
+
+function copySessionIdToClipboard() {
+  navigator.clipboard.writeText(sessionId);
+  alert("Session ID Copied")
 }

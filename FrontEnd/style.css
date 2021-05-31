@@ -1,21 +1,20 @@
-*, *:before, *:after {
+/* *, *:before, *:after {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-}
+} */
 
-@font-face{
+@font-face {
   font-family: "tfont";
   src: url("GothamRounded-Book.otf") format("opentype");
 }
 
 body {
-  /* background: #CCFBFE; */
-  overflow: hidden;
-  font-family: sans-serif;
+  overflow-x: hidden;
+  height: 99vh;
+  font-family: tfont;
   background-color: rgb(20, 20, 20);
   color: white;
-  /* height:100vh; */
 }
 
 .loader {
@@ -41,71 +40,64 @@ body {
 
 /* Safari */
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.button{
-  align-items: center;
-  box-sizing: center;
-  max-height: 100px;
-  justify-content: center;
-  padding: 5px;
-  position: relative;
-  max-width: 200px;
-  font-size: 1.3em;
-  font-weight: 400;
-  text-align: center;
-  color: rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-
-.navbar ul {
-  list-style-type: none!important;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333;
-}
-
-.navbar li {
-  float: left;
-}
-
-.navbar li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none!important;
-}
-
-/* Change the link color to #111 (black) on hover */
-.navbar li:hover {
-  background-color: #111;
+.nav-item {
   cursor: pointer;
 }
 
-#sessionId_placeholder:hover{
-  background-color: #333;
-  cursor: default;
+.outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
 }
 
-.nav-active{
-  background-color: #E50914;
+.outerbtn {
+  margin-bottom: 30px;
 }
 
-@media screen and (max-width: 480px) {
-  .desktop {
-      display: none;
+.btn {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .outer {
+    margin-top: 20px;
+    display: block;
   }
+
+
+  #initialButtons{
+    padding-top: 20vh;
+    /* margin-bottom: -30vh; */
+  }
+
+  .desktop {
+    display: none;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.w-15{
+  min-width: 15%!important;
 }

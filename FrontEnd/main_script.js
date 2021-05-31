@@ -21,8 +21,8 @@ function toHomePage() {
 function joinSession() {
   const input_id = document.getElementById("sessionId").value;
   const user_id = document.getElementById("userId").value;
-  document.getElementById("loading").style.display = "block";
-  store.setItem("SwipeFlix_userId", user_id);
+  showLoader();
+  store.setItem("Shwiper_userId", user_id);
 
   var xhr = new XMLHttpRequest();
   xhr.open("GET", `${baseUrl}/sessionValid?id=${input_id}`, true);
@@ -31,12 +31,12 @@ function joinSession() {
   xhr.onload = function () {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
-        store.setItem("SwipeFlix_sessionId", input_id);
-        document.getElementById("loading").style.display = "none";
+        store.setItem("Shwiper_sessionId", input_id);
+        hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Join");
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
       }
     }
   };
@@ -44,37 +44,60 @@ function joinSession() {
   xhr.send(null);
 }
 
+function showLoader() {
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("outer_container").style.display = "none";
+}
+
+function hideLoader() {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("outer_container").style.display = "flex";
+}
+
 var header = document.getElementById("multiButtonGroup");
 var btns = header.getElementsByClassName("genreButton");
 for (var i = 0; i < btns.length; i++) {
   btns[i].addEventListener("click", function () {
     // var current = document.getElementsByClassName("active");
-    if (this.className.includes("active")) {
-      this.className = this.className.replace(" active", "");
+    if (this.className.includes("create_active")) {
+      this.className = this.className.replace(" create_active", "");
     } else {
-      this.className += " active";
+      this.className += " create_active";
       // console.log(this.id);
     }
   });
 }
 
 function createSession() {
-  const input_id = document.getElementById("sessionId").value;
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("createSessionPage").style.display = "none";
-
+  console.log("creating session");
+  showLoader();
   var xhr = new XMLHttpRequest();
   const username = document.getElementById("email").value;
   var header = document.getElementById("multiButtonGroup");
-  var btns = header.getElementsByClassName("active");
+  var btns = header.getElementsByClassName("create_active");
+  var mix = true;
+  var movie = true;
+  if (document.getElementById("btnradio1").checked) {
+    mix = false;
+  }
+  if (document.getElementById("flexRadioDefault2").checked) {
+    movie = false;
+  }
   var categories = "";
   for (var i = 0; i < btns.length; i++) {
-    // console.log(btns[i].id);
-    categories += btns[i].id + `|`;
+    if (mix) {
+      categories += btns[i].id + `|`;
+    }
+    else {
+      categories += btns[i].id + `,`;
+    }
   }
   categories = categories.substring(0, categories.length - 1);
   const languages = document.getElementById("language").value;
-  var params = `username=${username}&categories=${categories}&languages=${languages}`;
+  const platform = document.getElementById("platform").value;
+  const order = document.getElementById("sort_by").value;
+  const region = document.getElementById("region").value;
+  var params = `username=${username}&categories=${categories}&languages=${languages}&platform=${platform}&region=${region}&type=${movie}&order=${order}`;
   xhr.open("POST", `${baseUrl}/createSession`, true);
 
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -84,15 +107,15 @@ function createSession() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         store.setItem(
-          "SwipeFlix_sessionId",
+          "Shwiper_sessionId",
           JSON.parse(xhr.responseText)["sessionId"]
         );
-        store.setItem("SwipeFlix_userId", username);
-        document.getElementById("loading").style.display = "none";
+        store.setItem("Shwiper_userId", username);
+        hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Create Session");
-        document.getElementById("loading").style.display = "none";
+        hideLoader();
       }
     }
   };
@@ -101,10 +124,98 @@ function createSession() {
 }
 
 function openSessionPage() {
-  const sessionId = localStorage.getItem("SwipeFlix_sessionId");
+  const sessionId = localStorage.getItem("Shwiper_sessionId");
   if (sessionId != null) {
     window.location.href = "./session.html";
   } else {
     alert("Please create or join a session first");
   }
 }
+
+var words = document.getElementsByClassName('word');
+var wordArray = [];
+var currentWord = 0;
+
+words[currentWord].style.opacity = 1;
+for (var i = 0; i < words.length; i++) {
+  splitLetters(words[i]);
+}
+
+function changeWord() {
+  let isInitialVisible = document.getElementById("initialButtons").style.display != "none";
+  if (!isInitialVisible) {
+    return;
+  }
+  var cw = wordArray[currentWord];
+  var nw = currentWord == words.length - 1 ? wordArray[0] : wordArray[currentWord + 1];
+  for (var i = 0; i < cw.length; i++) {
+    animateLetterOut(cw, i);
+  }
+
+  for (var i = 0; i < nw.length; i++) {
+    nw[i].className = 'letter behind';
+    nw[0].parentElement.style.opacity = 1;
+    animateLetterIn(nw, i);
+  }
+
+  currentWord = (currentWord == wordArray.length - 1) ? 0 : currentWord + 1;
+}
+
+function animateLetterOut(cw, i) {
+  setTimeout(function () {
+    cw[i].className = 'letter out';
+  }, i * 80);
+}
+
+function animateLetterIn(nw, i) {
+  setTimeout(function () {
+    nw[i].className = 'letter in';
+  }, 340 + (i * 80));
+}
+
+function splitLetters(word) {
+  var content = word.innerHTML;
+  word.innerHTML = '';
+  var letters = [];
+  for (var i = 0; i < content.length; i++) {
+    var letter = document.createElement('span');
+    letter.className = 'letter';
+    letter.innerHTML = content.charAt(i);
+    word.appendChild(letter);
+    letters.push(letter);
+  }
+
+  wordArray.push(letters);
+}
+
+changeWord();
+setInterval(changeWord, 4000);
+
+function disableTVOptions(){
+  document.getElementById("platform").disabled = true;
+  document.getElementById("platform").style.opacity = 0.5;
+  document.getElementById("region").disabled = true;
+  document.getElementById("region").style.opacity = 0.5;  
+}
+
+function enableMovieOptions(){
+  document.getElementById("platform").disabled = false;
+  document.getElementById("platform").style.opacity = 1;
+  document.getElementById("region").disabled = false;
+  document.getElementById("region").style.opacity = 1;
+}
+
+if(document.getElementById("flexRadioDefault2").checked){
+  disableTVOptions()
+}
+if(document.getElementById("flexRadioDefault1").checked){
+  enableMovieOptions()
+}
+
+document.getElementById("flexRadioDefault2").addEventListener("click", function() {
+  disableTVOptions()
+});
+
+document.getElementById("flexRadioDefault1").addEventListener("click", function() {
+  enableMovieOptions()
+});

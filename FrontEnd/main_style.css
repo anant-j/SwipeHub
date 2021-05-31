@@ -1,35 +1,10 @@
 .genreButton {
   border-radius: 30px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-right: 5px;
-  padding-left: 5px;
-  border: 1px solid #ccc;
   margin: 5px 2px;
-  /* margin-bottom: 5px; */
-  font-size:16px;
 }
 
 .genreButton:hover {
   cursor: pointer;
-}
-/* 
-.button {
-  border-radius: 30px;
-  padding: 5px;
-  border: 1px solid #ccc;
-} */
-
-.button:hover {
-  cursor: pointer;
-}
-
-.active {
-  background-color: lightblue;
-}
-
-.active:hover {
-  cursor: not-allowed;
 }
 
 #multiButtonGroup {
@@ -39,58 +14,88 @@
   padding-right: 20px;
 }
 
-#initialButtons{
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
-}
-
 #joinSession {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
   display: none;
 }
 
 #createSessionPage {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 30vh;
-    right: 0;
-    text-align: center;
   display: none;
 }
 
-#outerBody{
-    width: 100%;
-    height: 100%;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    top: 50vh;
-    right: 0;
-    text-align: center;
+.btn-joinSession {
+  margin: 10px;
 }
 
-.input{
-    font-size: 1.5em;
-    max-height: 200px;
-    margin-bottom: 30px;
+.create_active {
+  background-color: red !important;
+  color: white;
+  border: none;
+}
+
+
+.text {
+  /* position: absolute; */
+  /* width: 450px; */
+  /* left: 50%; */
+  /* margin-left: -225px; */
+  /* height: 40px;
+  top: 50%; */
+  /* margin-top: -20px; */
+  text-align: center;
+}
+
+p {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0;
+}
+
+.word {
+  position: absolute;
+  width: 40%;
+  /* text-align: center; */
+  margin-left: -20vw;
+  opacity: 0;
+}
+
+.letter {
+  display: inline-block;
+  /* position: relative; */
+  /* float: left; */
+  transform: translateZ(25px);
+  transform-origin: 50% 50% 25px;
+}
+
+.letter.out {
+  transform: rotateX(90deg);
+  transition: transform 0.32s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.letter.behind {
+  transform: rotateX(-90deg);
+}
+
+.letter.in {
+  transform: rotateX(0deg);
+  transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wisteria {
+  color: #8e44ad;
+}
+
+.belize {
+  color: #2980b9;
+}
+
+.pomegranate {
+  color: #c0392b;
+}
+
+.green {
+  color: #16a085;
+}
+
+.midnight {
+  color: #4196eb;
 }
