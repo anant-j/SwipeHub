@@ -57,28 +57,28 @@
                 <div class="text" style="text-align: center;">
                     <h1>Shwiper</h1>
                     <h1>
-                        <span class="word wisteria">1|Create</span>
-                        <span class="word belize">2|Share</span>
-                        <span class="word pomegranate">3|Select</span>
-                        <span class="word green">4|Match</span>
-                        <span class="word midnight">5|Watch</span>
+                        <span class="word wisteria">1|Share</span>
+                        <span class="word belize">2|Swipe</span>
+                        <span class="word pomegranate">3|Match</span>
+                        <!-- <span class="word green">4|Match</span>
+                        <span class="word midnight">5|Watch</span> -->
                     </h1>
                 </div>
                 <br>
                 <br><br>
                 <div class="text-align: center;">
-                <button type="button" onclick="joiningPage()" class="col-12 btn outerbtn btn-primary btn-lg">Join
-                    Session</button>
-                <button type="button" onclick="createSessionPage()" class="col-12 btn outerbtn btn-info btn-lg">Create
-                    Session</button>
+                    <button type="button" onclick="joiningPage()" class="col-12 btn outerbtn btn-primary btn-lg">Join Session</button>
+                    <button type="button" onclick="createSessionPage()"
+                        class="col-12 btn outerbtn btn-info btn-lg">Create Session</button>
                 </div>
             </section>
             <section id="joinSession">
                 <form class="join-needs-validation" novalidate>
-                    <div class="form-row">
-                        <div class="col mb-3">
-                            <label for="validationCustom01">Username</label>
-                            <input type="text" class="form-control" id="userId" placeholder="Enter Username" required>
+                    <div class="row g-3 justify-content-center align-items-center">
+                        <div class="mb-3 col-lg-8">
+                            <label for="validationCustom03">Username</label>
+                            <input type="text" class="form-control" id="email" placeholder="Enter Username"
+                                required></input>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
@@ -86,9 +86,7 @@
                                 Please enter a username
                             </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col align-self-center mb-3">
+                        <div class="mb-3 col-lg-8">
                             <label for="validationCustom02">Session Id</label>
                             <input type="text" class="form-control" id="sessionId" minlength="6" maxlength="6"
                                 placeholder="Enter Session Id" width="300" required>
@@ -100,11 +98,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 text-center">
-                        <button type="button" class="btn btn-joinSession btn-success"
-                            onclick="validate1()">Submit</button>
-                        <button type="button" class="btn btn-joinSession btn-danger"
+                    <div class="col text-center">
+                        <button type="button" class="row btn btn-lg btn-joinSession btn-danger"
                             onclick="toHomePage()">Back</button>
+                        <button type="button" class="row btn btn-lg btn-joinSession btn-success"
+                            onclick="validate1()">Submit</button>
                     </div>
                 </form>
 
@@ -131,7 +129,8 @@
                     <div class="row row-cols-md-auto justify-content-center align-items-center">
                         <div class="col mb-3 w-25">
                             <label for="validationCustom03">Username</label>
-                            <input type="text" class="form-control" id="email" placeholder="Enter Username" required></input>
+                            <input type="text" class="form-control" id="email" placeholder="Enter Username"
+                                required></input>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
@@ -966,7 +965,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-8 mb-3 mt-3" id="multiButtonGroup">
+                    <div class="col-lg-10 mb-3 mt-3" id="multiButtonGroup">
                         <label for="multiButtonGroup">Select Categories (Optional):</label>
                         <div class="btn-group" role="group">
                             <input type="radio" class="btn-check" name="btnradio" id="btnradio2" checked>
@@ -1027,10 +1026,10 @@
                         </div>
                     </div>
                     <div class="col text-center">
-                        <button class="btn btn-joinSession btn-success w-15" type="button" onclick="validate2()">Create
-                            Session</button>
-                        <button class="btn btn-joinSession btn-danger w-15" type="button"
+                        <button class="btn btn-lg btn-joinSession btn-danger w-15" type="button"
                             onclick="toHomePage()">Back</button>
+                        <button class="btn btn-lg btn-joinSession btn-success w-15" type="button" onclick="validate2()">Create
+                            Session</button>
                     </div>
                 </form>
                 <script>

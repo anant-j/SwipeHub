@@ -189,4 +189,4 @@ function splitLetters(word) {
 }
 
 changeWord();
-setInterval(changeWord, 4000);
+setInterval(changeWord, 1700);

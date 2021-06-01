@@ -12,8 +12,8 @@
 body {
   overflow-x: hidden;
   height: 99vh;
-  font-family: tfont;
-  background-color: rgb(20, 20, 20);
+  font-family: tfont!important;
+  background-color: rgb(20, 20, 20)!important;
   color: white;
 }
 
@@ -85,6 +85,11 @@ body {
 
 
   #initialButtons{
+    padding-top: 20vh;
+    /* margin-bottom: -30vh; */
+  }
+
+  #joinSession{
     padding-top: 20vh;
     /* margin-bottom: -30vh; */
   }
