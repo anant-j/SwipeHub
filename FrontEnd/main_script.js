@@ -32,7 +32,7 @@ function joinSession() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         store.setItem("Shwiper_sessionId", input_id);
-        hideLoader();
+        // hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Join");
@@ -111,7 +111,7 @@ function createSession() {
           JSON.parse(xhr.responseText)["sessionId"]
         );
         store.setItem("Shwiper_userId", username);
-        hideLoader();
+        // hideLoader();
         window.location.href = "./session.html";
       } else {
         alert("cannot Create Session");
