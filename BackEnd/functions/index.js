@@ -125,11 +125,48 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
 
 exports.polling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  const x = Math.floor((Math.random() * 10) + 1);
-  res.status(200).send({usersData: {
-    "anant": x,
-    "varun": 10,
-  }, matches: x});
+  const username = req.body.userId;
+  const sessionId = req.body.sessionId;
+  // const totalSwipes = req.body.totalSwipes;
+  let likedList = req.body.likedList;
+  console.log(likedList);
+  // .split(",")
+  const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
+  const doc = await sessionDb.get();
+  if (!doc.exists) {
+    res.status(404).send("Session doesn't exist");
+    return;
+  } else {
+    const data = doc.data();
+    const matches = new Set();
+    const active = Object.keys(doc.data().participants).length;
+    if (likedList!="") {
+      likedList = likedList.split(",");
+      likedList.forEach((element) => {
+        element = element.toString();
+        const newdata = new Set(data["likes"][element]);
+        newdata.add(username);
+        const sendBuffer = [];
+        newdata.forEach((v) => sendBuffer.push(v));
+        data["likes"][element]=sendBuffer;
+      });
+    }
+    for (const [key, value] of Object.entries(data["likes"])) {
+      if (value.length == active && active>1) {
+        matches.add(key);
+      }
+    }
+    const results = [];
+    matches.forEach((v) => results.push(v));
+    data["matches"] = results;
+    await admin
+        .firestore()
+        .collection("sessions")
+        .doc(sessionId)
+        .set(data, {merge: true});
+    res.status(200).send({"match": results});
+    return;
+  }
 });
 
 /**

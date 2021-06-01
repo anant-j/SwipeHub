@@ -12,6 +12,7 @@ const baseUrl = "https://us-central1-tinder-netflix.cloudfunctions.net";
 var globalHammerTime = {}
 var globalLikeBuffer = new Set();
 var totalSwipes = 0;
+var numMatches = 0;
 
 if (sessionId === null || userId === null) {
   window.location.href = "./index.html";
@@ -247,7 +248,7 @@ function joinSession() {
           }
         }
         document.getElementById("loading").style.display = "none";
-        // poll();
+        poll();
       } else {
         alert("Cannot load the session");
         storage.removeItem("Shwiper_sessionId");
@@ -294,29 +295,36 @@ function leaveSession() {
 
 function poll() {
   var xhr = new XMLHttpRequest();
-  const sendBuffer = globalLikeBuffer;
+  let sendBuffer = [];
+  globalLikeBuffer.forEach(v => sendBuffer.push(v));
+  console.log(sendBuffer)
   var params = `totalSwipes=${totalSwipes}&likedList=${sendBuffer}&sessionId=${sessionId}&userId=${userId}`;
+  // var params = `{userId: "jmhj"}`;
   xhr.open(
     "POST",
     `${baseUrl}/polling`,
     true
   );
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhr.onload = function () {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         const allData = JSON.parse(xhr.responseText);
-        // console.log(allData);
-        const usersData = allData.usersData;
-        console.log(usersData);
-        var resString="Users     Swipes <br>"
-        for (var key in usersData) {
-          if (usersData.hasOwnProperty(key)) {
-            resString+=`${key} => ${usersData[key]}<br>` 
-          }
+        const matchData = allData.match.length;
+        if (matchData>=1 && matchData!=numMatches){
+          alert(`Match aagaya: ${matchData}`);
+          numMatches = matchData;
         }
-        const numMatches = allData.matches; 
-        document.getElementById('userData_placeholder').innerHTML=`${resString}`;
-        document.getElementById('matches_placeholder').innerHTML=`Number of matches: ${numMatches}`;
+        // console.log(usersData);
+        // var resString="Users     Swipes <br>"
+        // for (var key in usersData) {
+        //   if (usersData.hasOwnProperty(key)) {
+        //     resString+=`${key} => ${usersData[key]}<br>` 
+        //   }
+        // }
+        // const numMatches = allData.matches; 
+        // document.getElementById('userData_placeholder').innerHTML=`${resString}`;
+        // document.getElementById('matches_placeholder').innerHTML=`Number of matches: ${numMatches}`;
       } else {
        console.log("Polling failed");
       }
