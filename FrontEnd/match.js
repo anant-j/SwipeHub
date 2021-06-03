@@ -7,8 +7,8 @@ if (sessionId === null || userId === null) {
 function addCard(movieId, imgUrl, title, description, release) {
   const div = document.createElement('div');
   div.id = movieId;
-  div.innerHTML = `<div class="card h-100 card text-center">
-  <img src="${imgUrl}" class="card-img-top" style="max-height:50vh; object-fit: contain;" alt="...">
+  div.innerHTML = `<div class="card text-white bg-dark h-100 text-center">
+  <img src="${imgUrl}" class="card-img-top" style="max-height:50vh; object-fit: contain; margin-top:30px;" alt="...">
   <div class="card-body">
     <h5 class="card-title"><b>${title}</b></h5>
     <p class="card-text">${description}</p>

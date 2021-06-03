@@ -97,6 +97,10 @@ body {
   .desktop {
     display: none;
   }
+
+  .card-img-top{
+    max-height: 45vh!important;
+  }
 }
 
 .hidden {

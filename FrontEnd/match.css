@@ -1,0 +1,8 @@
+.card-text{
+    text-align: center;
+    font-family: tfont;
+    margin-top: 5px;
+    font-size: 0.9em;
+    padding: 0 16px;
+    pointer-events: none;
+  }
