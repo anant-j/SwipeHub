@@ -3,7 +3,7 @@ const allCards = document.querySelectorAll('.tinder--card');
 const nope = document.getElementById('nope');
 const love = document.getElementById('love');
 const globalHammerTime = {};
-const globalLikeBuffer = new Set();
+let globalLikeBuffer = new Set();
 let totalSwipes = 0;
 let numMatches = 0;
 let lastSwipe = 0;
@@ -289,7 +289,7 @@ function leaveSession() {
 function poll() {
   const now = new Date();
   const seconds = (now - lastSwipe) / 1000;
-  if (seconds>10) {
+  if (seconds>45) {
     if (lastSwipe==0) {
       setTimeout(poll, 5000);
       return;
@@ -325,6 +325,8 @@ function poll() {
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }
+        console.log(globalLikeBuffer);
+        globalLikeBuffer = removeFromSet(globalLikeBuffer, sendBuffer);
       } else {
         console.log('Polling failed');
       }

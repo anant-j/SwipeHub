@@ -97,3 +97,12 @@ function openPage(inp) {
 function javascriptAbort() {
   throw new Error('This is not an error. This is just to abort javascript');
 }
+
+function removeFromSet(originalSet, toBeRemoved) {
+  const copyOfOriginal = originalSet;
+  toBeRemoved.forEach((element) => {
+    copyOfOriginal.delete(element);
+  });
+  return copyOfOriginal;
+}
+
