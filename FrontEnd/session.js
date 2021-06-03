@@ -14,9 +14,6 @@ if (sessionId === null || userId === null) {
   javascriptAbort();
 }
 
-document.getElementById('userIdPlaceholder').innerHTML = `User ID: <b>${userId}</b>`;
-document.getElementById('sessionIdPlaceholder').innerHTML = `Session ID: <b>${sessionId}</b>`;
-
 function initCards() {
   const newCards = document.querySelectorAll('.tinder--card:not(.removed)');
 
@@ -265,27 +262,6 @@ function joinSession() {
 joinSession();
 
 
-function leaveSession() {
-  showLoader();
-  const xhr = new XMLHttpRequest();
-  xhr.open(
-      'GET',
-      `${baseUrl}/leaveSession?id=${sessionId}&user=${userId}`,
-      true,
-  );
-  xhr.onload = function() {
-    if (xhr.readyState === xhr.DONE) {
-      if (xhr.status === 200) {
-      }
-    }
-  };
-  hideLoader();
-  storage.removeItem('Shwiper_sessionId');
-  document.location.href = './index.html';
-
-  xhr.send(null);
-}
-
 function poll() {
   const now = new Date();
   const seconds = (now - lastSwipe) / 1000;
@@ -325,8 +301,8 @@ function poll() {
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }
-        console.log(globalLikeBuffer);
         globalLikeBuffer = removeFromSet(globalLikeBuffer, sendBuffer);
+        console.log('polling complete');
       } else {
         console.log('Polling failed');
       }

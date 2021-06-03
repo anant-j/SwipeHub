@@ -16,7 +16,7 @@ function toHomePage() {
 
 function joinSession() {
   const sessionId = document.getElementById('sessionId').value;
-  const userId = document.getElementById('userId').value;
+  const userId = document.getElementById('joinUserId').value;
   showLoader();
 
   const xhr = new XMLHttpRequest();
@@ -46,7 +46,7 @@ function joinSession() {
 function createSession() {
   showLoader();
   const xhr = new XMLHttpRequest();
-  const username = document.getElementById('email').value;
+  const username = document.getElementById('createUserId').value;
   const languages = document.getElementById('language').value;
   const platform = document.getElementById('platform').value;
   const order = document.getElementById('sort_by').value;

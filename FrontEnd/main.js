@@ -6,6 +6,25 @@ const storage = window.localStorage;
 const sessionId = localStorage.getItem('Shwiper_sessionId');
 const userId = localStorage.getItem('Shwiper_userId');
 
+if (userId!=undefined) {
+  if (document.getElementById('userIdPlaceholder') != null) {
+    document.getElementById('userIdPlaceholder').innerHTML = `User ID: <b>${userId}</b>`;
+  }
+  if (document.getElementById('joinUserId') != null) {
+    document.getElementById('joinUserId').value = `${userId}`;
+  }
+  if (document.getElementById('createUserId') != null) {
+    document.getElementById('createUserId').value = `${userId}`;
+  }
+}
+if (sessionId!=undefined) {
+  if (document.getElementById('sessionIdPlaceholder') != null) {
+    document.getElementById('sessionIdPlaceholder').innerHTML = `Session ID: <b>${sessionId}</b>`;
+  }
+  if (document.getElementById('sessionId') != null) {
+    document.getElementById('sessionId').value = `${sessionId}`;
+  }
+}
 
 function createAlert(content, type, time) {
   type = type.toLowerCase();
@@ -81,6 +100,10 @@ function openPage(inp) {
       page='./session.html';
       break;
     case 'match':
+      if (globalLikeBuffer != undefined && globalLikeBuffer.size > 0) {
+        createAlert('please wait', 'success', 5);
+        poll();
+      }
       page='./match.html';
       break;
     default:
@@ -106,3 +129,25 @@ function removeFromSet(originalSet, toBeRemoved) {
   return copyOfOriginal;
 }
 
+
+function leaveSession() {
+  showLoader();
+  const xhr = new XMLHttpRequest();
+  xhr.open(
+      'GET',
+      `${baseUrl}/leaveSession?id=${sessionId}&user=${userId}`,
+      true,
+  );
+  xhr.onload = function() {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+      }
+    }
+  };
+  hideLoader();
+  storage.removeItem('Shwiper_sessionId');
+  storage.removeItem('Shwiper_userId');
+  document.location.href = './index.html';
+
+  xhr.send(null);
+}

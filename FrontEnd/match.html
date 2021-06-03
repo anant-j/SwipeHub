@@ -70,10 +70,20 @@
   </nav>
 
   <div class="container">
+    <div id="loading" class="loader"></div>
     <section id="alertContainer">
     </section>
-    <div class="row row-cols-1 row-cols-md-4 g-3 mt-3" id="cardHolder">
+    <section id="outer_container">
+    <div class="card mx-auto mt-3 text-center" style="max-width: 500px;" id="noCards">
+      <div class="card-body">
+        <h5 class="card-title">No matches found</h5>
+        <p class="card-text">Please swipe right on more cards for matches to appear</p>
+        <a href="#" class="btn btn-primary" onclick="openPage('session');">Start Swiping</a>
+      </div>
     </div>
+    <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3">
+    </div>
+  </section>
     <p>&nbsp;</p>
   </div>
   <script src="./main.js"></script>

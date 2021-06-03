@@ -30,7 +30,7 @@ function loadMatchData() {
       true,
   );
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  // showLoader();
+  showLoader();
   xhr.onload = function() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
@@ -42,6 +42,7 @@ function loadMatchData() {
         console.log(data);
         for (const key in data) {
           if (data.hasOwnProperty(key)) {
+            document.getElementById('noCards').style.display = 'none';
             addCard(key,
                 data[key]['poster'],
                 data[key]['title'],
@@ -50,15 +51,14 @@ function loadMatchData() {
             );
           }
         }
-        // hideLoader();
-        // poll();
       } else {
-        // alert('Cannot load the session');
+        createAlert('Cannot load the session', 'danger', 5);
         storage.removeItem('Shwiper_sessionId');
         document.location.href = './index.html';
       }
     }
   };
+  hideLoader();
   xhr.send(params);
 }
 
