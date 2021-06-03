@@ -175,3 +175,7 @@ body{
     z-index: 10;
     /* display: none; */
   }
+
+  .navP{
+    margin:0px;
+  }
