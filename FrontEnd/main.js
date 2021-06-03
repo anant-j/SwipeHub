@@ -1,7 +1,7 @@
 'use strict';
 
-const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
-// const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
+// const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
+const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
 const storage = window.localStorage;
 
 
