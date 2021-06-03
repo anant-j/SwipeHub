@@ -3,6 +3,8 @@
 // const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
 const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
 const storage = window.localStorage;
+const sessionId = localStorage.getItem('Shwiper_sessionId');
+const userId = localStorage.getItem('Shwiper_userId');
 
 
 function createAlert(content, type, time) {
@@ -71,3 +73,27 @@ function copyToClipboard(item) {
   createAlert(`${text} copied to clipboard`, 'success', 7);
 }
 
+
+function openPage(inp) {
+  let page='';
+  switch (inp) {
+    case 'session':
+      page='./session.html';
+      break;
+    case 'match':
+      page='./match.html';
+      break;
+    default:
+      page='./index.html';
+      break;
+  }
+  if (sessionId != null && userId != null) {
+    document.location.href = page;
+  } else {
+    createAlert('Please create or join a session first', 'danger', 7);
+  }
+}
+
+function javascriptAbort() {
+  throw new Error('This is not an error. This is just to abort javascript');
+}

@@ -2,8 +2,6 @@ const tinderContainer = document.querySelector('.tinder');
 const allCards = document.querySelectorAll('.tinder--card');
 const nope = document.getElementById('nope');
 const love = document.getElementById('love');
-const sessionId = localStorage.getItem('Shwiper_sessionId');
-const userId = localStorage.getItem('Shwiper_userId');
 const globalHammerTime = {};
 const globalLikeBuffer = new Set();
 let totalSwipes = 0;
@@ -12,7 +10,8 @@ let lastSwipe = 0;
 let pauseMessage = false;
 
 if (sessionId === null || userId === null) {
-  window.location.href = './index.html';
+  document.location.href = './index.html';
+  javascriptAbort();
 }
 
 document.getElementById('userIdPlaceholder').innerHTML = `User ID: <b>${userId}</b>`;
@@ -250,14 +249,14 @@ function joinSession() {
       } else {
         // alert('Cannot load the session');
         storage.removeItem('Shwiper_sessionId');
-        window.location.href = './index.html';
+        document.location.href = './index.html';
       }
     }
   };
   xhr.ontimeout = function(e) {
     // alert('Cannot load the session');
     storage.removeItem('Shwiper_sessionId');
-    window.location.href = './index.html';
+    document.location.href = './index.html';
   };
 
   xhr.send(null);
@@ -282,7 +281,7 @@ function leaveSession() {
   };
   hideLoader();
   storage.removeItem('Shwiper_sessionId');
-  window.location.href = './index.html';
+  document.location.href = './index.html';
 
   xhr.send(null);
 }
@@ -290,7 +289,7 @@ function leaveSession() {
 function poll() {
   const now = new Date();
   const seconds = (now - lastSwipe) / 1000;
-  if (seconds>45) {
+  if (seconds>10) {
     if (lastSwipe==0) {
       setTimeout(poll, 5000);
       return;
@@ -301,6 +300,9 @@ function poll() {
     }
     setTimeout(poll, 5000);
     return;
+  }
+  if (pauseMessage) {
+    createAlert('Session resumed', 'success', 3.5);
   }
   pauseMessage = false;
   const xhr = new XMLHttpRequest();

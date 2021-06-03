@@ -26,7 +26,7 @@ function joinSession() {
       if (xhr.status === 200) {
         storage.setItem('Shwiper_sessionId', sessionId);
         storage.setItem('Shwiper_userId', userId);
-        window.location.href = './session.html';
+        document.location.href = './session.html';
         return;
       }
       if (xhr.status === 404) {
@@ -79,7 +79,7 @@ function createSession() {
       if (xhr.status === 200) {
         storage.setItem('Shwiper_sessionId', JSON.parse(xhr.responseText)['sessionId']);
         storage.setItem('Shwiper_userId', username);
-        window.location.href = './session.html';
+        document.location.href = './session.html';
       } else {
         createAlert('The session could not be created. Please try again later', 'danger', 7);
         hideLoader();
@@ -88,15 +88,6 @@ function createSession() {
     }
   };
   xhr.send(params);
-}
-
-function openSessionPage() {
-  const sessionId = localStorage.getItem('Shwiper_sessionId');
-  if (sessionId != null) {
-    window.location.href = './session.html';
-  } else {
-    createAlert('Please create or join a session first', 'info', 7);
-  }
 }
 
 const words = document.getElementsByClassName('word');
