@@ -167,6 +167,31 @@ exports.polling = functions.https.onRequest(async (req, res) => {
   }
 });
 
+exports.matchPolling = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  const username = req.body.userId;
+  const sessionId = req.body.sessionId;
+  const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
+  const doc = await sessionDb.get();
+  if (!doc.exists) {
+    res.status(404).send("Session doesn't exist");
+    return;
+  } else {
+    const data = doc.data();
+    const matches = data.matches;
+    // console.log(matches);
+    const movieData = {};
+    for (let index = 0; index < matches.length; index++) {
+      const element = matches[index];
+      movieData[element] = data.moviesList[element];
+    }
+    console.log(movieData);
+    res.status(200).send({movies: movieData, isCreator: doc.data().creator == username});
+  }
+  return;
+});
+
+
 /**
  * @param  {string} lang
  * @param  {string} genres

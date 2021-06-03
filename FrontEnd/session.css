@@ -101,6 +101,7 @@ body{
     /* width: auto; */
     /* width:20vw; */
     max-width: 50%;
+    object-fit: contain;
     display: inline;
     pointer-events: none;
   }
@@ -174,8 +175,4 @@ body{
     border: 1.5px solid red; 
     z-index: 10;
     /* display: none; */
-  }
-
-  .navP{
-    margin:0px;
   }
