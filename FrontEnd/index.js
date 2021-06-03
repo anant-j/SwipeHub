@@ -30,11 +30,11 @@ function joinSession() {
         return;
       }
       if (xhr.status === 404) {
-        createAlert('The session doesn not exist. Please retry with a valid Session ID.', 'danger');
+        createAlert('The session doesn not exist. Please retry with a valid Session ID.', 'danger', 7);
         hideLoader();
         return;
       } else {
-        createAlert('The session could not be joined. Please try again later.', 'danger');
+        createAlert('The session could not be joined. Please try again later.', 'danger', 7);
         hideLoader();
       }
     }
@@ -81,7 +81,7 @@ function createSession() {
         storage.setItem('Shwiper_userId', username);
         window.location.href = './session.html';
       } else {
-        createAlert('The session could not be created. Please try again later', 'danger');
+        createAlert('The session could not be created. Please try again later', 'danger', 7);
         hideLoader();
         return;
       }
@@ -95,7 +95,7 @@ function openSessionPage() {
   if (sessionId != null) {
     window.location.href = './session.html';
   } else {
-    createAlert('Please create or join a session first', 'info');
+    createAlert('Please create or join a session first', 'info', 7);
   }
 }
 

@@ -129,8 +129,6 @@ exports.polling = functions.https.onRequest(async (req, res) => {
   const sessionId = req.body.sessionId;
   // const totalSwipes = req.body.totalSwipes;
   let likedList = req.body.likedList;
-  console.log(likedList);
-  // .split(",")
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
   const doc = await sessionDb.get();
   if (!doc.exists) {

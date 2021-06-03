@@ -8,6 +8,8 @@ const globalHammerTime = {};
 const globalLikeBuffer = new Set();
 let totalSwipes = 0;
 let numMatches = 0;
+let lastSwipe = 0;
+let pauseMessage = false;
 
 if (sessionId === null || userId === null) {
   window.location.href = './index.html';
@@ -143,22 +145,23 @@ nope.addEventListener('click', nopeListener);
 love.addEventListener('click', loveListener);
 
 function rightSwipe() {
+  const now = new Date();
   const cards = document.querySelectorAll('.tinder--card.removed');
   const card = cards[cards.length - 1];
-  // console.log("right: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
   hammertimeFirstOnly();
   globalLikeBuffer.add(card.id);
   totalSwipes += 1;
+  lastSwipe = now;
 }
 function leftSwipe() {
+  const now = new Date();
   const cards = document.querySelectorAll('.tinder--card.removed');
   const card = cards[cards.length - 1];
-  // console.log("left: " + card.id + " : " +document.getElementById(`text${card.id}`).innerText);
-  // document.getElementById(`${card.id}`).style.display = "none";
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
   hammertimeFirstOnly();
   totalSwipes += 1;
+  lastSwipe = now;
 }
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
@@ -285,12 +288,25 @@ function leaveSession() {
 }
 
 function poll() {
+  const now = new Date();
+  const seconds = (now - lastSwipe) / 1000;
+  if (seconds>45) {
+    if (lastSwipe==0) {
+      setTimeout(poll, 5000);
+      return;
+    }
+    if (!pauseMessage) {
+      createAlert('Session is paused. Swipe again to receive session updates', 'warning', 7);
+      pauseMessage = true;
+    }
+    setTimeout(poll, 5000);
+    return;
+  }
+  pauseMessage = false;
   const xhr = new XMLHttpRequest();
   const sendBuffer = [];
   globalLikeBuffer.forEach((v) => sendBuffer.push(v));
-  console.log(sendBuffer);
   const params = `totalSwipes=${totalSwipes}&likedList=${sendBuffer}&sessionId=${sessionId}&userId=${userId}`;
-  // let params = `{userId: "jmhj"}`;
   xhr.open(
       'POST',
       `${baseUrl}/polling`,
@@ -303,7 +319,7 @@ function poll() {
         const allData = JSON.parse(xhr.responseText);
         const matchData = allData.match.length;
         if (matchData>=1 && matchData!=numMatches) {
-          createAlert(`You've got: ${matchData} matches. <a href="./matches.html">Click Here to view them</a>`, 'success');
+          createAlert(`You've got: ${matchData} matches. <a href="./matches.html">Click Here to view them</a>`, 'success', 3.5);
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }

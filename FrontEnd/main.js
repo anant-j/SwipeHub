@@ -1,11 +1,11 @@
 'use strict';
 
-// const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
-const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
+const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
+// const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
 const storage = window.localStorage;
 
 
-function createAlert(content, type) {
+function createAlert(content, type, time) {
   type = type.toLowerCase();
   let svgStr='';
   switch (type) {
@@ -35,7 +35,7 @@ function createAlert(content, type) {
   div.className = `alert alert-${type} d-flex align-items-center alert-dismissible fade show mt-3`;
   div.role = 'alert';
   document.getElementById('alertContainer').appendChild(div);
-  $(`#${now}`).fadeTo(3000, 100).slideUp(500, function() {
+  $(`#${now}`).fadeTo(time*1000, 100).slideUp(500, function() {
     $(`#${now}`).slideUp(500);
     document.getElementById(`${now}`).remove();
   });
@@ -64,10 +64,10 @@ function copyToClipboard(item) {
       text = 'Session Id';
       break;
     default:
-      createAlert(`Alert occurred while copying to clipboard`, 'danger');
+      createAlert(`Alert occurred while copying to clipboard`, 'danger', 7);
           // code block
   }
   navigator.clipboard.writeText(data);
-  createAlert(`${text} copied to clipboard`, 'success');
+  createAlert(`${text} copied to clipboard`, 'success', 7);
 }
 
