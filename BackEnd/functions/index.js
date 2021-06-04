@@ -61,7 +61,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     creator: username,
     categories: categories,
     languages: languages,
-    moviesList: dataSet,
+    mediaInfo: dataSet,
     isValid: true,
     likes: {},
     participants: {},
@@ -102,7 +102,7 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         .doc(id)
         .set(data, {merge: true});
     // do stuff with the data
-    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId, totalSwipes: users[userId]["totalSwipes"]});
+    res.status(200).send({movies: doc.data().mediaInfo, isCreator: doc.data().creator == userId, totalSwipes: users[userId]["totalSwipes"]});
   }
 });
 
@@ -127,7 +127,7 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
       res.status(404).send("Session does not exist");
     }
     // do stuff with the data
-    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId});
+    res.status(200).send({movies: doc.data().mediaInfo, isCreator: doc.data().creator == userId});
   }
 });
 
@@ -197,7 +197,7 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
     const movieData = {};
     for (let index = 0; index < matches.length; index++) {
       const element = matches[index];
-      movieData[element] = data.moviesList[element];
+      movieData[element] = data.mediaInfo[element];
     }
     res.status(200).send({movies: movieData, isCreator: doc.data().creator == username});
   }
@@ -220,6 +220,10 @@ async function generateMovieList(lang, genres, platform, region, sort) {
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
+    if (!("order" in final)) {
+      final["order"]=[];
+    }
+    final["order"].push(data[i]["id"]);
     const tempDict = {};
     tempDict["title"] = data[i]["title"];
     tempDict["description"] = data[i]["overview"];

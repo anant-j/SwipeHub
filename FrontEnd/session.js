@@ -228,20 +228,20 @@ function joinSession() {
       if (xhr.status === 200) {
         const allData = JSON.parse(xhr.responseText);
         const data = allData.movies;
+        const order = allData.movies.order;
         if (allData.isCreator) {
           document.getElementById('leaveSessionBtn').innerHTML = 'End Session';
         }
-        for (const key in data) {
-          if (data.hasOwnProperty(key)) {
-            addMovieCard(
-                data[key]['poster'],
-                data[key]['title'],
-                data[key]['description'],
-                key,
-                data[key]['release_date'],
-                data[key]['adult'],
-            );
-          }
+        for (let index = 0; index < order.length; index++) {
+          const key = order[index];
+          addMovieCard(
+              data[key]['poster'],
+              data[key]['title'],
+              data[key]['description'],
+              key,
+              data[key]['release_date'],
+              data[key]['adult'],
+          );
         }
         hideLoader();
         poll();
