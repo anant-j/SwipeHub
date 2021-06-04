@@ -301,7 +301,7 @@ function poll() {
         const matchData = allData.match;
         const userData = allData.userData;
         if (matchData>=1 && matchData!=numMatches) {
-          createAlert(`You've got: ${matchData} matches. <a href="./matches.html">Click Here to view them</a>`, 'success', 3.5);
+          createAlert(`You've got: ${matchData} matches. <a onclick="openPage('match')">Click Here to view them</a>`, 'success', 3.5);
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }

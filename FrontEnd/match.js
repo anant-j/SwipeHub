@@ -5,8 +5,12 @@ if (sessionId === null || userId === null) {
 
 
 function addCard(movieId, imgUrl, title, description, release) {
+  const elem = document.getElementById(`m-${movieId}`);
+  if (elem != null) {
+    elem.remove();
+  }
   const div = document.createElement('div');
-  div.id = movieId;
+  div.id = `m-${movieId}`;
   div.innerHTML = `<div class="card text-white bg-dark h-100 text-center">
   <img src="${imgUrl}" class="card-img-top" style="max-height:50vh; object-fit: contain; margin-top:30px;" alt="...">
   <div class="card-body">
@@ -39,6 +43,7 @@ function loadMatchData() {
         if (allData.isCreator) {
           document.getElementById('leaveSessionBtn').innerHTML = 'End Session';
         }
+        const numMatches = Object.keys(data).length;
         for (const key in data) {
           if (data.hasOwnProperty(key)) {
             document.getElementById('noCards').style.display = 'none';
@@ -50,6 +55,7 @@ function loadMatchData() {
             );
           }
         }
+        document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
       } else {
         createAlert('Cannot load the session', 'danger', 5);
         storage.removeItem('Shwiper_sessionId');
@@ -61,4 +67,5 @@ function loadMatchData() {
   xhr.send(params);
 }
 
+loadMatchData();
 loadMatchData();
