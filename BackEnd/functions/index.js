@@ -91,7 +91,10 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
       return;
     }
     const users = doc.data().participants;
-    users[userId] = {joined_at: date};
+    if (!(userId in users)) {
+      users[userId] = {};
+    }
+    users[userId]["joined_at"]= date;
     if (users[userId]["totalSwipes"] == undefined) {
       users[userId]["totalSwipes"] = 0;
     }
