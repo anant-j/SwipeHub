@@ -170,7 +170,7 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
     adultResult = '🔞';
   }
   div.innerHTML = `<img id="img${mediaId}" src="${imgurl}"><p id="rightCard${mediaId}" class="rightCard">Released on:<br><b>${release}</b><br><br><span style="font-size:30px">${adultResult}</span></p>
-    <h3 id="text${mediaId}"><u>${title}</u></h3>
+    <h3 id="text${mediaId}"><b>${title}</b></h3>
     <p>${text}</p>`;
   div.className = 'tinder--card';
   div.onclick = function() {
