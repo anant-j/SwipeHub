@@ -96,6 +96,11 @@ function copyToClipboard(item) {
 function openPage(inp) {
   let page='';
   switch (inp) {
+    case 'home':
+      page='./index.html';
+      document.location.href = page;
+      return;
+      break;
     case 'session':
       page='./session.html';
       break;

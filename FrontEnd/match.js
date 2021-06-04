@@ -68,4 +68,3 @@ function loadMatchData() {
 }
 
 loadMatchData();
-loadMatchData();

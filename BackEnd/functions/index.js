@@ -15,10 +15,12 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
   const id = req.query.id.toUpperCase();
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
-  if (doc.exists && doc.data().isValid) {
+  if (isValidSession(doc)) {
     res.status(200).send("Allowed");
+    return;
   } else {
     res.status(404).send("Session doesn't exist");
+    return;
   }
 });
 
@@ -80,7 +82,7 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
   const userId = req.query.user;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
-  if (!doc.exists) {
+  if (!isValidSession(doc)) {
     res.status(404).send("Session doesn't exist");
     return;
   } else {
@@ -113,8 +115,9 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
   const userId = req.query.user;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
-  if (!doc.exists) {
+  if (!isValidSession(doc)) {
     res.status(404).send("Session doesn't exist");
+    return;
   } else {
     const users = doc.data().participants;
     if (users[userId] != undefined) {
@@ -139,7 +142,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
   let likedList = req.body.likedList;
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
   const doc = await sessionDb.get();
-  if (!doc.exists) {
+  if (!isValidSession(doc)) {
     res.status(404).send("Session doesn't exist");
     return;
   } else {
@@ -188,7 +191,7 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
   const sessionId = req.body.sessionId;
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
   const doc = await sessionDb.get();
-  if (!doc.exists) {
+  if (!isValidSession(doc)) {
     res.status(404).send("Session doesn't exist");
     return;
   } else {
@@ -325,4 +328,15 @@ async function endSession(sessionId) {
       .collection("sessions")
       .doc(sessionId)
       .set(data, {merge: true});
+}
+
+/**
+ * @param  {object} doc
+ * @return {boolean}
+ */
+function isValidSession(doc) {
+  if (doc.exists && doc.data().isValid) {
+    return true;
+  }
+  return false;
 }
