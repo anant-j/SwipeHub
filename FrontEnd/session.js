@@ -149,6 +149,7 @@ function rightSwipe() {
   globalLikeBuffer.add(card.id);
   totalSwipes += 1;
   lastSwipe = now;
+  document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
 }
 function leftSwipe() {
   const now = new Date();
@@ -158,6 +159,7 @@ function leftSwipe() {
   hammertimeFirstOnly();
   totalSwipes += 1;
   lastSwipe = now;
+  document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
 }
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
@@ -253,6 +255,7 @@ function joinSession() {
   xhr.ontimeout = function(e) {
     // alert('Cannot load the session');
     storage.removeItem('Shwiper_sessionId');
+    storage.removeItem('Shwiper_userId');
     document.location.href = './index.html';
   };
 
@@ -295,14 +298,23 @@ function poll() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         const allData = JSON.parse(xhr.responseText);
-        const matchData = allData.match.length;
+        const matchData = allData.match;
+        const userData = allData.userData;
         if (matchData>=1 && matchData!=numMatches) {
           createAlert(`You've got: ${matchData} matches. <a href="./matches.html">Click Here to view them</a>`, 'success', 3.5);
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }
+        for (const [key, value] of Object.entries(userData)) {
+          console.log(key, value);
+          if (key == userId) {
+            totalSwipes = parseInt(value);
+            document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
+          } else {
+            addUserData(key, value);
+          }
+        }
         globalLikeBuffer = removeFromSet(globalLikeBuffer, sendBuffer);
-        console.log('polling complete');
       } else {
         console.log('Polling failed');
       }
@@ -312,3 +324,24 @@ function poll() {
   xhr.send(params);
   setTimeout(poll, 5000);
 }
+
+
+function addUserData(userId, likes) {
+  const elem = document.getElementById(`d-${userId}`);
+  if (elem != null) {
+    elem.remove();
+  }
+  const divid = document.getElementById(`divider-${userId}`);
+  if (divid!=null) {
+    divid.remove();
+  }
+  const divider = document.createElement('li');
+  divider.id = `divider-${userId}`;
+  divider.innerHTML = `<hr class="dropdown-divider">`;
+  document.getElementById('sessionInfoDropdown').appendChild(divider);
+  const li = document.createElement('li');
+  li.id = `d-${userId}`;
+  li.innerHTML = `<a class="dropdown-item" id="d-a-${userId}">${userId} : ${likes}</a>`;
+  document.getElementById('sessionInfoDropdown').appendChild(li);
+}
+

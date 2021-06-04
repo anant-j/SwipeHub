@@ -33,7 +33,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   const date = new Date();
   const movie = req.body.type;
   const order = req.body.order;
-  let sortby="";
+  let sortby = "";
   let dataSet = [];
   if (movie === "true") {
     if (order == "Popularity") {
@@ -127,7 +127,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const username = req.body.userId;
   const sessionId = req.body.sessionId;
-  // const totalSwipes = req.body.totalSwipes;
+  const totalSwipes = parseInt(req.body.totalSwipes);
   let likedList = req.body.likedList;
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
   const doc = await sessionDb.get();
@@ -138,7 +138,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
     const data = doc.data();
     const matches = new Set();
     const active = Object.keys(doc.data().participants).length;
-    if (likedList!="") {
+    if (likedList != "") {
       likedList = likedList.split(",");
       likedList.forEach((element) => {
         element = element.toString();
@@ -146,23 +146,30 @@ exports.polling = functions.https.onRequest(async (req, res) => {
         newdata.add(username);
         const sendBuffer = [];
         newdata.forEach((v) => sendBuffer.push(v));
-        data["likes"][element]=sendBuffer;
+        data["likes"][element] = sendBuffer;
       });
     }
     for (const [key, value] of Object.entries(data["likes"])) {
-      if (value.length == active && active>1) {
+      if (value.length == active && active > 1) {
         matches.add(key);
       }
     }
     const results = [];
     matches.forEach((v) => results.push(v));
     data["matches"] = results;
+    if (data["participants"][username]["totalSwipes"] == undefined || totalSwipes >= data["participants"][username]["totalSwipes"]) {
+      data["participants"][username]["totalSwipes"] = totalSwipes;
+    }
+    const participantData = {};
+    for (const [key, value] of Object.entries(data["participants"])) {
+      participantData[key] = value["totalSwipes"];
+    }
     await admin
         .firestore()
         .collection("sessions")
         .doc(sessionId)
         .set(data, {merge: true});
-    res.status(200).send({"match": results});
+    res.status(200).send({"match": results.length, "userData": participantData});
     return;
   }
 });
@@ -179,13 +186,11 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
   } else {
     const data = doc.data();
     const matches = data.matches;
-    // console.log(matches);
     const movieData = {};
     for (let index = 0; index < matches.length; index++) {
       const element = matches[index];
       movieData[element] = data.moviesList[element];
     }
-    console.log(movieData);
     res.status(200).send({movies: movieData, isCreator: doc.data().creator == username});
   }
   return;

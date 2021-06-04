@@ -50,10 +50,12 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Session Info
             </a>
-            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown" id="sessionInfoDropdown">
               <li><a class="dropdown-item" id="userIdPlaceholder" onclick="copyToClipboard('userId')">User Id</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" id="sessionIdPlaceholder" onclick="copyToClipboard('sessionId')">SessionId</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" id="userSwipesPlaceholder">Your Total Swipes</a></li>
             </ul>
           </li>
           <li class="nav-item" onclick="leaveSession()"><a class="nav-link" id="leaveSessionBtn">Leave Session</a></li>

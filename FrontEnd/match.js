@@ -39,7 +39,6 @@ function loadMatchData() {
         if (allData.isCreator) {
           document.getElementById('leaveSessionBtn').innerHTML = 'End Session';
         }
-        console.log(data);
         for (const key in data) {
           if (data.hasOwnProperty(key)) {
             document.getElementById('noCards').style.display = 'none';
