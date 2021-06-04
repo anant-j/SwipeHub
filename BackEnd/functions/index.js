@@ -77,7 +77,7 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
   // Grab the text parameter.
   const date = new Date();
   const id = req.query.id.toUpperCase();
-  const userId = req.query.user.toLowerCase();
+  const userId = req.query.user;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
   if (!doc.exists) {
@@ -110,7 +110,7 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   // Grab the text parameter.
   const id = req.query.id.toUpperCase();
-  const userId = req.query.user.toLowerCase();
+  const userId = req.query.user;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
   if (!doc.exists) {
