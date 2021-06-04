@@ -306,7 +306,6 @@ function poll() {
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }
         for (const [key, value] of Object.entries(userData)) {
-          console.log(key, value);
           if (key == userId) {
             totalSwipes = parseInt(value);
             document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
