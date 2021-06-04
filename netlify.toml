@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/*"
+  to = "/frontend"
+  status = 301
+  force = true
