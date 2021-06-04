@@ -90,6 +90,9 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
     }
     const users = doc.data().participants;
     users[userId] = {joined_at: date};
+    if (users[userId]["totalSwipes"] == undefined) {
+      users[userId]["totalSwipes"] = 0;
+    }
     const data = {
       participants: users,
     };
@@ -99,7 +102,7 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         .doc(id)
         .set(data, {merge: true});
     // do stuff with the data
-    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId});
+    res.status(200).send({movies: doc.data().moviesList, isCreator: doc.data().creator == userId, totalSwipes: users[userId]["totalSwipes"]});
   }
 });
 
