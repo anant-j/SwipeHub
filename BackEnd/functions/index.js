@@ -82,7 +82,12 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
   const doc = await sessionDb.get();
   if (!doc.exists) {
     res.status(404).send("Session doesn't exist");
+    return;
   } else {
+    if (!doc.data().isValid) {
+      res.status(404).send("Session invalid");
+      return;
+    }
     const users = doc.data().participants;
     users[userId] = {joined_at: date};
     const data = {
@@ -157,7 +162,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
     const results = [];
     matches.forEach((v) => results.push(v));
     data["matches"] = results;
-    if (data["participants"][username]["totalSwipes"] == undefined || totalSwipes >= data["participants"][username]["totalSwipes"]) {
+    if (!("totalSwipes" in data["participants"][username]) || (totalSwipes >= data["participants"][username]["totalSwipes"])) {
       data["participants"][username]["totalSwipes"] = totalSwipes;
     }
     const participantData = {};

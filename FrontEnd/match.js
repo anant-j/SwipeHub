@@ -22,6 +22,7 @@ function addCard(movieId, imgUrl, title, description, release) {
 }
 
 function loadMatchData() {
+  showLoader();
   const xhr = new XMLHttpRequest();
   const params = `sessionId=${sessionId}&userId=${userId}`;
   xhr.open(
@@ -30,7 +31,6 @@ function loadMatchData() {
       true,
   );
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  showLoader();
   xhr.onload = function() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
@@ -55,9 +55,9 @@ function loadMatchData() {
         storage.removeItem('Shwiper_sessionId');
         document.location.href = './index.html';
       }
+      hideLoader();
     }
   };
-  hideLoader();
   xhr.send(params);
 }
 
