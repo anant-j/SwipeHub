@@ -86,10 +86,6 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
     res.status(404).send("Session doesn't exist");
     return;
   } else {
-    if (!doc.data().isValid) {
-      res.status(404).send("Session invalid");
-      return;
-    }
     const users = doc.data().participants;
     if (!(userId in users)) {
       users[userId] = {};
@@ -309,7 +305,17 @@ function randomSessionCode() {
  * @return {any}
  */
 async function leaveSession(sessionId, userId, sessionData) {
-  // const users = sessionData.participants;
+  for (const [key, value] of Object.entries(sessionData["likes"])) {
+    // value is the array of userIds who liked the movieId(key)
+    // {key -> [value], key -> [value]}
+    // for each key, take value, find index of user, remove that index from value, set new value to that key
+    const index = value.indexOf(userId);
+    if (index > -1) {
+      value.splice(index, 1);
+    }
+    sessionData["likes"][key] = value;
+  }
+  console.log(sessionData["likes"]);
   delete sessionData["participants"][userId];
   await admin
       .firestore()
