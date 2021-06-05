@@ -319,12 +319,14 @@ function poll() {
           }
         }
         globalLikeBuffer = removeFromSet(globalLikeBuffer, sendBuffer);
-      } else if (xhr.status === 404) {
-        createAlert('This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.', 'danger', 10);
-        setTimeout(function() {
-          openPage('home');
-        }, 4000);
-      } else {
+      }
+      // else if (xhr.status === 404) {
+      //   createAlert('This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.', 'danger', 10);
+      //   setTimeout(function() {
+      //     openPage('home');
+      //   }, 4000);
+      // }
+      else {
         console.log('Polling failed');
       }
     }
