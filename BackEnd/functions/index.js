@@ -136,7 +136,7 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
 exports.polling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const username = req.body.userId;
-  const sessionId = req.body.sessionId;
+  const sessionId = req.body.sessionId.toUpperCase();
   const totalSwipes = parseInt(req.body.totalSwipes);
   let likedList = req.body.likedList;
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
@@ -187,7 +187,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
 exports.matchPolling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const username = req.body.userId;
-  const sessionId = req.body.sessionId;
+  const sessionId = req.body.sessionId.toUpperCase();
   const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
   const doc = await sessionDb.get();
   if (!isValidSession(doc)) {
