@@ -85,7 +85,7 @@ function copyToClipboard(item) {
       text = 'Session Id';
       break;
     default:
-      createAlert(`Alert occurred while copying to clipboard`, 'danger', 7);
+      createAlert('Alert occurred while copying to clipboard', 'danger', 7);
           // code block
   }
   navigator.clipboard.writeText(data);

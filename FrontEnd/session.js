@@ -270,13 +270,14 @@ joinSession();
 
 
 function poll() {
+  // if no card was swipped
+  if (lastSwipe==0) {
+    setTimeout(poll, 5000);
+    return;
+  }
   const now = new Date();
   const seconds = (now - lastSwipe) / 1000;
   if (seconds>45) {
-    if (lastSwipe==0) {
-      setTimeout(poll, 5000);
-      return;
-    }
     if (!pauseMessage) {
       createAlert('Session is paused. Swipe again to receive session updates', 'warning', 7);
       pauseMessage = true;
