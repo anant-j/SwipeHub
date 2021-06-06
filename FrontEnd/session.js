@@ -310,6 +310,7 @@ function poll() {
           numMatches = matchData;
           document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
         }
+        clearUserData();
         for (const [key, value] of Object.entries(userData)) {
           if (key == userId) {
             totalSwipes = parseInt(value);
@@ -353,3 +354,11 @@ function addUserData(userId, likes) {
   document.getElementById('sessionInfoDropdown').appendChild(li);
 }
 
+function clearUserData() {
+  const elem = document.getElementById('sessionInfoDropdown');
+  if (elem != null) {
+    while (elem.firstChild) {
+      elem.removeChild(elem.firstChild);
+    }
+  }
+}
