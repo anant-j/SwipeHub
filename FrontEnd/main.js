@@ -6,7 +6,7 @@ const storage = window.localStorage;
 const sessionId = localStorage.getItem('Shwiper_sessionId');
 const userId = localStorage.getItem('Shwiper_userId');
 
-if (userId!=undefined) {
+if (userId != undefined) {
   if (document.getElementById('userIdPlaceholder') != null) {
     document.getElementById('userIdPlaceholder').innerHTML = `User ID: <b>${userId}</b>`;
   }
@@ -17,7 +17,7 @@ if (userId!=undefined) {
     document.getElementById('createUserId').value = `${userId}`;
   }
 }
-if (sessionId!=undefined) {
+if (sessionId != undefined) {
   if (document.getElementById('sessionIdPlaceholder') != null) {
     document.getElementById('sessionIdPlaceholder').innerHTML = `Session ID: <b>${sessionId}</b>`;
   }
@@ -28,7 +28,7 @@ if (sessionId!=undefined) {
 
 function createAlert(content, type, time) {
   type = type.toLowerCase();
-  let svgStr='';
+  let svgStr = '';
   switch (type) {
     case 'danger':
       svgStr = '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>';
@@ -45,7 +45,7 @@ function createAlert(content, type, time) {
     default:
       console.log('Error while raising alert');
       return;
-              // code block
+    // code block
   }
   const date = new Date();
   const now = date.getTime().toString();
@@ -55,8 +55,8 @@ function createAlert(content, type, time) {
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
   div.className = `alert alert-${type} d-flex align-items-center alert-dismissible fade show mt-3`;
   div.role = 'alert';
-  document.getElementById('alertContainer').appendChild(div);
-  $(`#${now}`).fadeTo(time*1000, 100).slideUp(500, function() {
+  document.getElementById('alertContainer').prepend(div);
+  $(`#${now}`).fadeTo(time * 1000, 100).slideUp(500, function() {
     $(`#${now}`).slideUp(500);
     document.getElementById(`${now}`).remove();
   });
@@ -86,7 +86,7 @@ function copyToClipboard(item) {
       break;
     default:
       createAlert('Alert occurred while copying to clipboard', 'danger', 7);
-          // code block
+    // code block
   }
   navigator.clipboard.writeText(data);
   createAlert(`${text} copied to clipboard`, 'success', 7);
@@ -94,25 +94,25 @@ function copyToClipboard(item) {
 
 
 function openPage(inp) {
-  let page='';
+  let page = '';
   switch (inp) {
     case 'home':
-      page='./index.html';
+      page = './index.html';
       document.location.href = page;
       return;
       break;
     case 'session':
-      page='./session.html';
+      page = './session.html';
       break;
     case 'match':
       if (globalLikeBuffer != undefined && globalLikeBuffer.size > 0) {
         createAlert('please wait', 'success', 5);
         poll();
       }
-      page='./match.html';
+      page = './match.html';
       break;
     default:
-      page='./index.html';
+      page = './index.html';
       break;
   }
   if (sessionId != null && userId != null) {
@@ -156,3 +156,4 @@ function leaveSession() {
 
   xhr.send(null);
 }
+
