@@ -123,4 +123,7 @@ function checkActivity() {
 document.addEventListener('keydown', checkActivity);
 document.addEventListener('mousedown', checkActivity);
 document.addEventListener('mousemove', checkActivity);
+document.addEventListener('touchstart', checkActivity);
+document.addEventListener('click', checkActivity);
+document.addEventListener('load', checkActivity);
 
