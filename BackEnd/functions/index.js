@@ -179,16 +179,16 @@ exports.polling = functions.https.onRequest(async (req, res) => {
     // if (!("totalSwipes" in data["participants"][username]) || (totalSwipes >= data["participants"][username]["totalSwipes"])) {
     //   data["participants"][username]["totalSwipes"] = totalSwipes;
     // }
-    // const participantData = {};
-    // for (const [key, value] of Object.entries(data["participants"])) {
-    //   participantData[key] = value["totalSwipes"];
-    // }
+    const participantData = {};
+    for (const [key, value] of Object.entries(data["participants"])) {
+      participantData[key] = value["totalSwipes"].length;
+    }
     await admin
         .firestore()
         .collection("sessions")
         .doc(sessionId)
         .set(data, {merge: true});
-    res.status(200).send({"match": results.length, "userData": currentSwipes.length});
+    res.status(200).send({"match": results.length, "userData": participantData});
     return;
   }
 });
