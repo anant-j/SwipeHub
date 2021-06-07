@@ -65,6 +65,62 @@ function loadMatchData() {
     }
   };
   xhr.send(params);
+  setTimeout(loadSubsequentMatchData, 10000);
+}
+
+function loadSubsequentMatchData() {
+  const diff = (new Date() - lastActivity)/1000;
+  if (lastActivity == 0 || (diff < 30)) {
+    if (paused == true) {
+      createAlert('Match Data Updates resumed', 'success', 5);
+    }
+    paused = false;
+    const xhr = new XMLHttpRequest();
+    const params = `sessionId=${sessionId}&userId=${userId}`;
+    xhr.open(
+        'POST',
+        `${baseUrl}/matchPolling`,
+        true,
+    );
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+      if (xhr.readyState === xhr.DONE) {
+        if (xhr.status === 200) {
+          const allData = JSON.parse(xhr.responseText);
+          const data = allData.movies;
+          const numMatches = Object.keys(data).length;
+          for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+              document.getElementById('noCards').style.display = 'none';
+              addCard(key,
+                  data[key]['poster'],
+                  data[key]['title'],
+                  data[key]['description'],
+                  data[key]['release_date'],
+              );
+            }
+          }
+          document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
+        }
+      }
+    };
+    xhr.send(params);
+  } else if (paused == false) {
+    createAlert('Match Data Updates are paused', 'danger', 5);
+    paused = true;
+  }
+  setTimeout(loadSubsequentMatchData, 10000);
 }
 
 loadMatchData();
+
+const timeout = false;
+let paused = false;
+let lastActivity = 0;
+function checkActivity() {
+  lastActivity = new Date();
+}
+document.addEventListener('keydown', checkActivity);
+document.addEventListener('mousedown', checkActivity);
+document.addEventListener('mousemove', checkActivity);
+
