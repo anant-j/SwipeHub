@@ -157,3 +157,10 @@ function leaveSession() {
   xhr.send(null);
 }
 
+function toArray(inp) {
+  return (Array.from(inp));
+}
+
+function toSet(inp) {
+  return (new Set(inp));
+}

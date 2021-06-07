@@ -4,6 +4,7 @@ const nope = document.getElementById('nope');
 const love = document.getElementById('love');
 const globalHammerTime = {};
 let globalLikeBuffer = new Set();
+let globalSwipesBuffer = new Set();
 let totalSwipes = 0;
 let numMatches = 0;
 let lastSwipe = 0;
@@ -147,6 +148,7 @@ function rightSwipe() {
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
   hammertimeFirstOnly();
   globalLikeBuffer.add(card.id);
+  globalSwipesBuffer.add(card.id);
   totalSwipes += 1;
   lastSwipe = now;
   document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
@@ -157,6 +159,7 @@ function leftSwipe() {
   const card = cards[cards.length - 1];
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
   hammertimeFirstOnly();
+  globalSwipesBuffer.add(card.id);
   totalSwipes += 1;
   lastSwipe = now;
   document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
@@ -231,21 +234,20 @@ function joinSession() {
         const order = allData.movies.order;
         const swipes = allData.totalSwipes;
         totalSwipes = parseInt(swipes);
+        document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
         if (allData.isCreator) {
           document.getElementById('leaveSessionBtn').innerHTML = 'End Session';
         }
-        for (let index = 0; index < order.length; index++) {
-          if ((index+1)>=totalSwipes) {
-            const key = order[index];
-            addMovieCard(
-                data[key]['poster'],
-                data[key]['title'],
-                data[key]['description'],
-                key,
-                data[key]['release_date'],
-                data[key]['adult'],
-            );
-          }
+        for (let index = totalSwipes; index < order.length; index++) {
+          const key = order[index];
+          addMovieCard(
+              data[key]['poster'],
+              data[key]['title'],
+              data[key]['description'],
+              key,
+              data[key]['release_date'],
+              data[key]['adult'],
+          );
         }
         hideLoader();
         poll();
@@ -290,9 +292,11 @@ function poll() {
   }
   pauseMessage = false;
   const xhr = new XMLHttpRequest();
-  const sendBuffer = [];
-  globalLikeBuffer.forEach((v) => sendBuffer.push(v));
-  const params = `totalSwipes=${totalSwipes}&likedList=${sendBuffer}&sessionId=${sessionId}&userId=${userId}`;
+  const tempLikeBuffer = [];
+  globalLikeBuffer.forEach((v) => tempLikeBuffer.push(v));
+  const tempSwipesBuffer = [];
+  globalSwipesBuffer.forEach((v) => tempSwipesBuffer.push(v));
+  const params = `totalSwipes=${tempSwipesBuffer}&likedList=${tempLikeBuffer}&sessionId=${sessionId}&userId=${userId}`;
   xhr.open(
       'POST',
       `${baseUrl}/polling`,
@@ -319,7 +323,8 @@ function poll() {
             addUserData(key, value);
           }
         }
-        globalLikeBuffer = removeFromSet(globalLikeBuffer, sendBuffer);
+        globalLikeBuffer = removeFromSet(globalLikeBuffer, tempLikeBuffer);
+        globalSwipesBuffer = removeFromSet(globalSwipesBuffer, tempSwipesBuffer);
       } else if (xhr.status === 404) {
         createAlert('This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.', 'danger', 10);
         setTimeout(function() {
