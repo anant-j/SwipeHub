@@ -117,13 +117,13 @@ loadMatchData();
 const timeout = false;
 let paused = false;
 let lastActivity = 0;
-function checkActivity() {
-  lastActivity = new Date();
-}
-document.addEventListener('keydown', checkActivity);
-document.addEventListener('mousedown', checkActivity);
-document.addEventListener('mousemove', checkActivity);
-document.addEventListener('touchstart', checkActivity);
-document.addEventListener('click', checkActivity);
-document.addEventListener('load', checkActivity);
+// function checkActivity() {
+//   lastActivity = new Date();
+// }
+// document.addEventListener('keydown', checkActivity);
+// document.addEventListener('mousedown', checkActivity);
+// document.addEventListener('mousemove', checkActivity);
+// document.addEventListener('touchstart', checkActivity);
+// document.addEventListener('click', checkActivity);
+// document.addEventListener('load', checkActivity);
 
