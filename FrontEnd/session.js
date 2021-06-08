@@ -146,23 +146,23 @@ function rightSwipe() {
   const cards = document.querySelectorAll('.tinder--card.removed');
   const card = cards[cards.length - 1];
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
-  hammertimeFirstOnly();
   globalLikeBuffer.add(card.id);
   globalSwipesBuffer.add(card.id);
   totalSwipes += 1;
   lastSwipe = now;
   document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
+  hammertimeFirstOnly();
 }
 function leftSwipe() {
   const now = new Date();
   const cards = document.querySelectorAll('.tinder--card.removed');
   const card = cards[cards.length - 1];
   document.getElementById(`${card.id}`).className = '.tinder--card removed';
-  hammertimeFirstOnly();
   globalSwipesBuffer.add(card.id);
   totalSwipes += 1;
   lastSwipe = now;
   document.getElementById('userSwipesPlaceholder').innerHTML = `Your Total Swipes: ${totalSwipes}`;
+  hammertimeFirstOnly();
 }
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
@@ -212,6 +212,9 @@ function hammertimeFirstOnly() {
   if (!(newCards.length==0) && globalHammerTime[newCards[0].id] === undefined) {
     hammertimeEach(newCards[0]);
     globalHammerTime[newCards[0].id] = true;
+    if (newCards.length == 5) {
+      addSubsequentCards(newCards.length + removedCards.length);
+    }
   }
   if (newCards.length==0 && (removedCards[removedCards.length-1].id != -1)) {
     addLastCard();
@@ -366,4 +369,36 @@ function clearUserData() {
       elem.removeChild(elem.firstChild);
     }
   }
+}
+
+function addSubsequentCards(totalCards) {
+  const xhr = new XMLHttpRequest();
+  xhr.open(
+      'GET',
+      `${baseUrl}/subsequentCards?id=${sessionId}&user=${userId}&totalCards=${totalCards}`,
+      true,
+  );
+  xhr.onload = function() {
+    if (xhr.readyState === xhr.DONE) {
+      if (xhr.status === 200) {
+        const allData = JSON.parse(xhr.responseText);
+        const data = allData.movies;
+        const order = allData.movies.order;
+        console.log(order);
+        for (let index = 0; index < order.length; index++) {
+          const key = order[index];
+          addMovieCard(
+              data[key]['poster'],
+              data[key]['title'],
+              data[key]['description'],
+              key,
+              data[key]['release_date'],
+              data[key]['adult'],
+          );
+        }
+      }
+    }
+  };
+
+  xhr.send(null);
 }

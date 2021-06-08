@@ -45,7 +45,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     } else if (order == "Revenue") {
       sortby = "revenue.desc";
     }
-    dataSet = await generateMovieList(languages, categories, platform, region, sortby);
+    dataSet = await generateMovieList(languages, categories, platform, region, sortby, 1);
   }
   if (movie != "true") {
     if (order == "Popularity") {
@@ -63,7 +63,11 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     creator: username,
     categories: categories,
     languages: languages,
+    platform: platform,
+    region: region,
     mediaInfo: dataSet,
+    order: sortby,
+    isMovie: movie,
     isValid: true,
     likes: {},
     participants: {},
@@ -131,6 +135,71 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
     res.status(200).send({movies: doc.data().mediaInfo, isCreator: doc.data().creator == userId});
   }
 });
+
+exports.subsequentCards = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  // Grab the text parameter.
+  const date = new Date();
+  const id = req.query.id.toUpperCase();
+  const userId = req.query.user;
+  const totalCards = req.query.totalCards;
+  const sessionDb = admin.firestore().collection("sessions").doc(id);
+  const doc = await sessionDb.get();
+  if (!isValidSession(doc)) {
+    res.status(404).send("Session doesn't exist");
+    return;
+  } else {
+    const currentMovieSize = Object.keys(doc.data().mediaInfo).length - 1;
+    const movie = doc.data().isMovie;
+    const languages = doc.data().languages;
+    const categories = doc.data().categories;
+    const platform = doc.data().platform;
+    const region = doc.data().region;
+    const sortby = doc.data().order;
+    let dataSet = {};
+    const oldDataSet = doc.data().mediaInfo;
+    if (totalCards >= currentMovieSize) {
+      console.log("Callin TBDb APi");
+      const pageNum = ((totalCards)/20) + 1;
+      if (movie === "true") {
+        dataSet = await generateMovieList(languages, categories, platform, region, sortby, pageNum);
+      }
+      if (movie != "true") {
+        dataSet = await generateTVList(languages, categories, platform, region, sortby);
+      }
+      const newOrder = dataSet["order"];
+      for (let index = 0; index < newOrder.length; index++) {
+        oldDataSet["order"].push(newOrder[index]);
+      }
+      const newDSKeys = Object.keys(dataSet);
+      for (let index = 0; index < newDSKeys.length; index++) {
+        const key = newDSKeys[index];
+        if (key != "order") {
+          oldDataSet[key] = dataSet[key];
+        }
+      }
+      const data = {
+        mediaInfo: oldDataSet,
+      };
+      await admin.firestore().collection("sessions").doc(id).set(data, {merge: true});
+    } else {
+      console.log("Getting movie data from firebase");
+      let lower = totalCards;
+      const upper = totalCards + 19;
+      const oldDSKeys = Object.keys(oldDataSet);
+      dataSet["order"] = [];
+      for (lower; lower <= upper; lower++) {
+        const key = oldDSKeys[lower];
+        if (key != "order") {
+          dataSet[key] = oldDataSet[key];
+          dataSet["order"].push(key);
+        }
+      }
+    }
+    res.status(200).send({movies: dataSet});
+  }
+});
+
 
 exports.polling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -223,11 +292,11 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
  * @param  {string} region
  * @param  {string} sort
 */
-async function generateMovieList(lang, genres, platform, region, sort) {
+async function generateMovieList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
