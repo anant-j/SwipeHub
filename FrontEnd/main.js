@@ -8,7 +8,9 @@ const userId = localStorage.getItem('Shwiper_userId');
 
 if (userId != undefined) {
   if (document.getElementById('userIdPlaceholder') != null) {
-    document.getElementById('userIdPlaceholder').innerHTML = `User ID: <b>${userId}</b>`;
+    document.getElementById(
+        'userIdPlaceholder',
+    ).innerHTML = `User ID: <b>${userId}</b>`;
   }
   if (document.getElementById('joinUserId') != null) {
     document.getElementById('joinUserId').value = `${userId}`;
@@ -19,7 +21,9 @@ if (userId != undefined) {
 }
 if (sessionId != undefined) {
   if (document.getElementById('sessionIdPlaceholder') != null) {
-    document.getElementById('sessionIdPlaceholder').innerHTML = `Session ID: <b>${sessionId}</b>`;
+    document.getElementById(
+        'sessionIdPlaceholder',
+    ).innerHTML = `Session ID: <b>${sessionId}</b>`;
   }
   if (document.getElementById('sessionId') != null) {
     document.getElementById('sessionId').value = `${sessionId}`;
@@ -31,16 +35,20 @@ function createAlert(content, type, time) {
   let svgStr = '';
   switch (type) {
     case 'danger':
-      svgStr = '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>';
+      svgStr =
+        '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>';
       break;
     case 'success':
-      svgStr = '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>';
+      svgStr =
+        '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>';
       break;
     case 'info':
-      svgStr = '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>';
+      svgStr =
+        '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>';
       break;
     case 'warning':
-      svgStr = '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>';
+      svgStr =
+        '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>';
       break;
     default:
       console.log('Error while raising alert');
@@ -56,10 +64,12 @@ function createAlert(content, type, time) {
   div.className = `alert alert-${type} d-flex align-items-center alert-dismissible fade show mt-3`;
   div.role = 'alert';
   document.getElementById('alertContainer').prepend(div);
-  $(`#${now}`).fadeTo(time * 1000, 100).slideUp(500, function() {
-    $(`#${now}`).slideUp(500);
-    document.getElementById(`${now}`).remove();
-  });
+  $(`#${now}`)
+      .fadeTo(time * 1000, 100)
+      .slideUp(500, function() {
+        $(`#${now}`).slideUp(500);
+        document.getElementById(`${now}`).remove();
+      });
 }
 
 function showLoader() {
@@ -91,7 +101,6 @@ function copyToClipboard(item) {
   navigator.clipboard.writeText(data);
   createAlert(`${text} copied to clipboard`, 'success', 7);
 }
-
 
 function openPage(inp) {
   let page = '';
@@ -134,7 +143,6 @@ function removeFromSet(originalSet, toBeRemoved) {
   return copyOfOriginal;
 }
 
-
 function leaveSession() {
   showLoader();
   const xhr = new XMLHttpRequest();
@@ -158,9 +166,9 @@ function leaveSession() {
 }
 
 function toArray(inp) {
-  return (Array.from(inp));
+  return Array.from(inp);
 }
 
 function toSet(inp) {
-  return (new Set(inp));
+  return new Set(inp);
 }
