@@ -30,11 +30,19 @@ function joinSession() {
         return;
       }
       if (xhr.status === 404) {
-        createAlert('The session doesn not exist. Please retry with a valid Session ID.', 'danger', 7);
+        createAlert(
+            'The session doesn not exist. Please retry with a valid Session ID.',
+            'danger',
+            7,
+        );
         hideLoader();
         return;
       } else {
-        createAlert('The session could not be joined. Please try again later.', 'danger', 7);
+        createAlert(
+            'The session could not be joined. Please try again later.',
+            'danger',
+            7,
+        );
         hideLoader();
       }
     }
@@ -77,11 +85,18 @@ function createSession() {
   xhr.onload = function() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
-        storage.setItem('Shwiper_sessionId', JSON.parse(xhr.responseText)['sessionId']);
+        storage.setItem(
+            'Shwiper_sessionId',
+            JSON.parse(xhr.responseText)['sessionId'],
+        );
         storage.setItem('Shwiper_userId', username);
         document.location.href = './session.html';
       } else {
-        createAlert('The session could not be created. Please try again later', 'danger', 7);
+        createAlert(
+            'The session could not be created. Please try again later',
+            'danger',
+            7,
+        );
         hideLoader();
         return;
       }
@@ -100,12 +115,14 @@ for (let i = 0; i < words.length; i++) {
 }
 
 function changeWord() {
-  const isInitialVisible = document.getElementById('initialButtons').style.display != 'none';
+  const isInitialVisible =
+    document.getElementById('initialButtons').style.display != 'none';
   if (!isInitialVisible) {
     return;
   }
   const cw = wordArray[currentWord];
-  const nw = currentWord == words.length - 1 ? wordArray[0] : wordArray[currentWord + 1];
+  const nw =
+    currentWord == words.length - 1 ? wordArray[0] : wordArray[currentWord + 1];
   for (let i = 0; i < cw.length; i++) {
     animateLetterOut(cw, i);
   }
@@ -116,7 +133,7 @@ function changeWord() {
     animateLetterIn(nw, i);
   }
 
-  currentWord = (currentWord == wordArray.length - 1) ? 0 : currentWord + 1;
+  currentWord = currentWord == wordArray.length - 1 ? 0 : currentWord + 1;
 }
 
 function animateLetterOut(cw, i) {
@@ -128,7 +145,7 @@ function animateLetterOut(cw, i) {
 function animateLetterIn(nw, i) {
   setTimeout(function() {
     nw[i].className = 'letter in';
-  }, 340 + (i * 80));
+  }, 340 + i * 80);
 }
 
 function splitLetters(word) {
@@ -148,7 +165,6 @@ function splitLetters(word) {
 
 changeWord();
 setInterval(changeWord, 1700);
-
 
 const header = document.getElementById('multiButtonGroup');
 const btns = header.getElementsByClassName('genreButton');

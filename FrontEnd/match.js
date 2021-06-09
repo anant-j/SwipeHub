@@ -3,7 +3,6 @@ if (sessionId === null || userId === null) {
   javascriptAbort();
 }
 
-
 function addCard(movieId, imgUrl, title, description, release) {
   const elem = document.getElementById(`m-${movieId}`);
   if (elem != null) {
@@ -29,11 +28,7 @@ function loadMatchData() {
   showLoader();
   const xhr = new XMLHttpRequest();
   const params = `sessionId=${sessionId}&userId=${userId}`;
-  xhr.open(
-      'POST',
-      `${baseUrl}/matchPolling`,
-      true,
-  );
+  xhr.open('POST', `${baseUrl}/matchPolling`, true);
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     if (xhr.readyState === xhr.DONE) {
@@ -47,7 +42,8 @@ function loadMatchData() {
         for (const key in data) {
           if (data.hasOwnProperty(key)) {
             document.getElementById('noCards').style.display = 'none';
-            addCard(key,
+            addCard(
+                key,
                 data[key]['poster'],
                 data[key]['title'],
                 data[key]['description'],
@@ -55,7 +51,9 @@ function loadMatchData() {
             );
           }
         }
-        document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
+        document.getElementById(
+            'matchTab',
+        ).innerHTML = `Matches (${numMatches})`;
       } else {
         createAlert('Cannot load the session', 'danger', 5);
         storage.removeItem('Shwiper_sessionId');
@@ -69,19 +67,15 @@ function loadMatchData() {
 }
 
 function loadSubsequentMatchData() {
-  const diff = (new Date() - lastActivity)/1000;
-  if (lastActivity == 0 || (diff < 30)) {
+  const diff = (new Date() - lastActivity) / 1000;
+  if (lastActivity == 0 || diff < 30) {
     if (paused == true) {
       createAlert('Match Data Updates resumed', 'success', 5);
     }
     paused = false;
     const xhr = new XMLHttpRequest();
     const params = `sessionId=${sessionId}&userId=${userId}`;
-    xhr.open(
-        'POST',
-        `${baseUrl}/matchPolling`,
-        true,
-    );
+    xhr.open('POST', `${baseUrl}/matchPolling`, true);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
       if (xhr.readyState === xhr.DONE) {
@@ -92,7 +86,8 @@ function loadSubsequentMatchData() {
           for (const key in data) {
             if (data.hasOwnProperty(key)) {
               document.getElementById('noCards').style.display = 'none';
-              addCard(key,
+              addCard(
+                  key,
                   data[key]['poster'],
                   data[key]['title'],
                   data[key]['description'],
@@ -100,7 +95,9 @@ function loadSubsequentMatchData() {
               );
             }
           }
-          document.getElementById('matchTab').innerHTML=`Matches (${numMatches})`;
+          document.getElementById(
+              'matchTab',
+          ).innerHTML = `Matches (${numMatches})`;
         }
       }
     };
@@ -116,7 +113,7 @@ loadMatchData();
 
 const timeout = false;
 let paused = false;
-let lastActivity = 0;
+const lastActivity = 0;
 // function checkActivity() {
 //   lastActivity = new Date();
 // }
@@ -126,4 +123,3 @@ let lastActivity = 0;
 // document.addEventListener('touchstart', checkActivity);
 // document.addEventListener('click', checkActivity);
 // document.addEventListener('load', checkActivity);
-
