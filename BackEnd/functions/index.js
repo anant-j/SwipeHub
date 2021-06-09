@@ -1,17 +1,12 @@
-// The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require("firebase-functions");
 const axios = require("axios");
-
-// The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
-
 const apiToken = functions.config().tmdb.key;
 // const apiToken = "";
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  // Grab the text parameter.
   const id = req.query.id.toUpperCase();
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
@@ -45,7 +40,14 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     } else if (order == "Revenue") {
       sortby = "revenue.desc";
     }
-    dataSet = await generateMovieList(languages, categories, platform, region, sortby, 1);
+    dataSet = await generateMovieList(
+        languages,
+        categories,
+        platform,
+        region,
+        sortby,
+        1,
+    );
   }
   if (movie != "true") {
     if (order == "Popularity") {
@@ -55,7 +57,13 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     } else if (order == "Revenue") {
       sortby = "popularity.desc";
     }
-    dataSet = await generateTVList(languages, categories, platform, region, sortby);
+    dataSet = await generateTVList(
+        languages,
+        categories,
+        platform,
+        region,
+        sortby,
+    );
   }
 
   const data = {
@@ -74,13 +82,11 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   };
 
   await admin.firestore().collection("sessions").doc(id).set(data);
-  // res.status(200).send("Done");
   res.status(200).send({sessionId: id});
 });
 
 exports.joinSession = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  // Grab the text parameter.
   const date = new Date();
   const id = req.query.id.toUpperCase();
   const userId = req.query.user;
@@ -94,25 +100,43 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
     if (!(userId in users)) {
       users[userId] = {};
     }
-    users[userId]["joined_at"]= date;
+    users[userId]["joined_at"] = date;
     if (users[userId]["totalSwipes"] == undefined) {
       users[userId]["totalSwipes"] = [];
     }
     const data = {
       participants: users,
     };
+    const oldMovieData = doc.data().mediaInfo;
+    const newMovieData = {order: []};
+    const totalSwipeLength = users[userId]["totalSwipes"].length;
+    const oldMovieLength = oldMovieData["order"].length;
+    let upper = totalSwipeLength + 20;
+    if (totalSwipeLength + 20 > oldMovieLength) {
+      upper = oldMovieLength;
+    }
+    for (let index = totalSwipeLength; index < upper; index++) {
+      const key = oldMovieData["order"][index];
+      newMovieData["order"].push(key);
+      newMovieData[key] = oldMovieData[key];
+    }
     await admin
         .firestore()
         .collection("sessions")
         .doc(id)
         .set(data, {merge: true});
-    res.status(200).send({movies: doc.data().mediaInfo, isCreator: doc.data().creator == userId, totalSwipes: users[userId]["totalSwipes"].length});
+    res
+        .status(200)
+        .send({
+          movies: newMovieData,
+          isCreator: doc.data().creator == userId,
+          totalSwipes: users[userId]["totalSwipes"].length,
+        });
   }
 });
 
 exports.leaveSession = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  // Grab the text parameter.
   const id = req.query.id.toUpperCase();
   const userId = req.query.user;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
@@ -131,17 +155,18 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
     } else {
       res.status(404).send("Session does not exist");
     }
-    // do stuff with the data
-    res.status(200).send({movies: doc.data().mediaInfo, isCreator: doc.data().creator == userId});
+    res
+        .status(200)
+        .send({
+          movies: doc.data().mediaInfo,
+          isCreator: doc.data().creator == userId,
+        });
   }
 });
 
 exports.subsequentCards = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  // Grab the text parameter.
-  const date = new Date();
   const id = req.query.id.toUpperCase();
-  const userId = req.query.user;
   const totalCards = req.query.totalCards;
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
@@ -159,47 +184,54 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
     let dataSet = {};
     const oldDataSet = doc.data().mediaInfo;
     if (totalCards >= currentMovieSize) {
-      console.log("Callin TBDb APi");
-      const pageNum = ((totalCards)/20) + 1;
+      const pageNum = totalCards / 20 + 1;
       if (movie === "true") {
-        dataSet = await generateMovieList(languages, categories, platform, region, sortby, pageNum);
+        dataSet = await generateMovieList(
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+            pageNum,
+        );
       }
       if (movie != "true") {
-        dataSet = await generateTVList(languages, categories, platform, region, sortby);
+        dataSet = await generateTVList(
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+        );
       }
       const newOrder = dataSet["order"];
       for (let index = 0; index < newOrder.length; index++) {
-        oldDataSet["order"].push(newOrder[index]);
-      }
-      const newDSKeys = Object.keys(dataSet);
-      for (let index = 0; index < newDSKeys.length; index++) {
-        const key = newDSKeys[index];
-        if (key != "order") {
-          oldDataSet[key] = dataSet[key];
-        }
+        const key = newOrder[index];
+        oldDataSet["order"].push(key);
+        oldDataSet[key] = dataSet[key];
       }
       const data = {
         mediaInfo: oldDataSet,
       };
-      await admin.firestore().collection("sessions").doc(id).set(data, {merge: true});
+      await admin
+          .firestore()
+          .collection("sessions")
+          .doc(id)
+          .set(data, {merge: true});
     } else {
-      console.log("Getting movie data from firebase");
       let lower = totalCards;
       const upper = totalCards + 19;
-      const oldDSKeys = Object.keys(oldDataSet);
+      const oldOrder = oldDataSet["order"];
       dataSet["order"] = [];
       for (lower; lower <= upper; lower++) {
-        const key = oldDSKeys[lower];
-        if (key != "order") {
-          dataSet[key] = oldDataSet[key];
-          dataSet["order"].push(key);
-        }
+        const key = oldOrder[lower];
+        dataSet[key] = oldDataSet[key];
+        dataSet["order"].push(key);
       }
     }
     res.status(200).send({movies: dataSet});
   }
 });
-
 
 exports.polling = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -235,7 +267,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
     const results = [];
     matches.forEach((v) => results.push(v));
     data["matches"] = results;
-    let currentSwipes = (doc.data().participants)[username]["totalSwipes"];
+    let currentSwipes = doc.data().participants[username]["totalSwipes"];
     if (totalSwipes != "") {
       totalSwipes = totalSwipes.split(",");
       currentSwipes = toSet(currentSwipes);
@@ -245,9 +277,6 @@ exports.polling = functions.https.onRequest(async (req, res) => {
       currentSwipes = toArray(currentSwipes);
     }
     data["participants"][username]["totalSwipes"] = currentSwipes;
-    // if (!("totalSwipes" in data["participants"][username]) || (totalSwipes >= data["participants"][username]["totalSwipes"])) {
-    //   data["participants"][username]["totalSwipes"] = totalSwipes;
-    // }
     const participantData = {};
     for (const [key, value] of Object.entries(data["participants"])) {
       participantData[key] = value["totalSwipes"].length;
@@ -257,7 +286,7 @@ exports.polling = functions.https.onRequest(async (req, res) => {
         .collection("sessions")
         .doc(sessionId)
         .set(data, {merge: true});
-    res.status(200).send({"match": results.length, "userData": participantData});
+    res.status(200).send({match: results.length, userData: participantData});
     return;
   }
 });
@@ -279,11 +308,12 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
       const element = matches[index];
       movieData[element] = data.mediaInfo[element];
     }
-    res.status(200).send({movies: movieData, isCreator: doc.data().creator == username});
+    res
+        .status(200)
+        .send({movies: movieData, isCreator: doc.data().creator == username});
   }
   return;
 });
-
 
 /**
  * @param  {string} lang
@@ -291,7 +321,8 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
-*/
+ * @param  {int} page
+ */
 async function generateMovieList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
@@ -301,7 +332,7 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
     if (!("order" in final)) {
-      final["order"]=[];
+      final["order"] = [];
     }
     final["order"].push(data[i]["id"]);
     const tempDict = {};
@@ -316,14 +347,13 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
   return final;
 }
 
-
 /**
  * @param  {string} lang
  * @param  {string} genres
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
-*/
+ */
 async function generateTVList(lang, genres, platform, region, sort) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
@@ -432,7 +462,7 @@ function isValidSession(doc) {
  * @return {any}
  */
 function toArray(inp) {
-  return (Array.from(inp));
+  return Array.from(inp);
 }
 
 /**
@@ -440,5 +470,5 @@ function toArray(inp) {
  * @return {any}
  */
 function toSet(inp) {
-  return (new Set(inp));
+  return new Set(inp);
 }
