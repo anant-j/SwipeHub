@@ -202,7 +202,7 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
 
 function isCardOnTop(mediaId) {
   const newCards = document.querySelectorAll('.tinder--card:not(.removed)');
-  return(newCards[0].id == mediaId);
+  return (newCards[0].id == mediaId);
 }
 function showDetails(mediaId) {
   document.getElementById(`img${mediaId}`).style.opacity = 0.2;
