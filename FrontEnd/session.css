@@ -102,7 +102,7 @@ body {
 .tinder--card div {
   /* position:fixed; */
   position: absolute;
-  top: 2vw;
+  top: 4vh;
   width: 100%;
   /* padding-top: 10%!important; */
   /* margin-bottom: -10%; */
@@ -178,9 +178,3 @@ body {
 .fa-remove {
   color: #cdd6dd;
 }
-
-/* .rightCard{
-    float: right;
-    margin-right:30px;
-    padding-top:10px!important;
-  } */
