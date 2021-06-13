@@ -171,32 +171,47 @@ function leftSwipe() {
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
   const div = document.createElement('div');
+  let isImageValid=true;
   div.id = mediaId;
-  let adultResult = '';
-  if (adult) {
-    adultResult = '🔞';
+  if (imgurl == 'http://image.tmdb.org/t/p/originalnull') {
+    isImageValid = false;
+    imgurl = 'Assets/noImage.png';
   }
-  div.innerHTML = `<img id="img${mediaId}" src="${imgurl}"><p id="rightCard${mediaId}" class="rightCard">Released on:<br><b>${release}</b><br><br><span style="font-size:30px">${adultResult}</span></p>
-    <h3 id="text${mediaId}"><b>${title}</b></h3>
-    <p>${text}</p>`;
+  div.innerHTML = `<img id="img${mediaId}" src="${imgurl}">
+    <div id="imgDiv${mediaId}">  
+    <p class="tinderRel">Released on:<br><b>${release}</b></p>
+    <h3 class="tinderH3" id="text${mediaId}"><b>${title}</b></h3>
+    <p class="tinderP">${text}</p>
+    </div>`;
   div.className = 'tinder--card';
   div.onclick = function() {
-    if (document.getElementById(`img${mediaId}`).style.display != 'none') {
-      document.getElementById(`img${mediaId}`).style.display = 'none';
-      document.getElementById(`text${mediaId}`).style.paddingTop = '20px';
-      document.getElementById(`rightCard${mediaId}`).style.float = 'none';
-      document.getElementById(`rightCard${mediaId}`).style.marginRight = '0px';
-    } else {
-      document.getElementById(`img${mediaId}`).style.display = 'inline';
-      document.getElementById(`rightCard${mediaId}`).style.float = 'right';
-      document.getElementById(`text${mediaId}`).style.paddingTop = '10px';
-      document.getElementById(`rightCard${mediaId}`).style.marginRight = '30px';
+    if (document.getElementById(`img${mediaId}`).style.opacity != 0.2 && isCardOnTop(mediaId)) {
+      showDetails(mediaId);
+    } else if (isImageValid) {
+      hideDetails(mediaId);
     }
   };
   document.getElementById('outerCardBody').appendChild(div);
+  if (!isImageValid) {
+    showDetails(mediaId);
+  }
   initCards();
   hammertimeFirstOnly();
   // hammertimeEach(document.getElementById(mediaId));
+}
+
+function isCardOnTop(mediaId) {
+  const newCards = document.querySelectorAll('.tinder--card:not(.removed)');
+  return (newCards[0].id == mediaId);
+}
+function showDetails(mediaId) {
+  document.getElementById(`img${mediaId}`).style.opacity = 0.2;
+  document.getElementById(`imgDiv${mediaId}`).style.opacity = 100;
+}
+
+function hideDetails(mediaId) {
+  document.getElementById(`img${mediaId}`).style.opacity = 1;
+  document.getElementById(`imgDiv${mediaId}`).style.opacity = 0;
 }
 
 function addLastCard() {
