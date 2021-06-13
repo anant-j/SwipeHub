@@ -65,20 +65,18 @@ body{
   
   .tinder--card {
     display: inline-block;
-    width: 90vw;
-    max-width: 400px;
-    height: 70vh;
-    /* max-height: 500px; */
+    /* width: 70vw; */
+    width: 43vh;
+    /* height: auto; */
     background: #FFFFFF;
-    padding-bottom: 40px;
-    /* margin-bottom: 30px; */
-    border: 1px solid #E50914;
+    /* padding-bottom: 40px; */
     border-radius: 8px;
     overflow: hidden;
     position: absolute;
     will-change: transform;
     transition: all 0.3s ease-in-out;
     cursor: -webkit-grab;
+    cursor: -moz-grab;
     cursor: grab;
   }
 
@@ -93,30 +91,56 @@ body{
   }
   
   .tinder--card img {
-    /* width: auto; */
-    /* width:20vw; */
-    max-width: 50%;
-    object-fit: contain;
-    display: inline;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    /* opacity: ; */
+  }
+
+  .tinder--card div {
+    /* position:fixed; */
+    position:absolute; 
+    top: 2vw;
+    width: 100%;
+    /* padding-top: 10%!important; */
+    /* margin-bottom: -10%; */
+     z-index: 3;
+     /* height: 0; */
+    opacity: 0;
     pointer-events: none;
   }
   
-  .tinder--card h3 {
+  .tinderH3 {
     text-align: center;
     font-family: tfont;
     margin-top: 5px;
-    font-size: 25px;
+    /* font-size: 25px; */
+    font-size:1.2em;
     padding: 0 16px;
     pointer-events: none;
-    color: #E50914;
+    color: #E50914 !important;
+    /* display: none; */
   }
   
-  .tinder--card p {
+  .tinderRel {
+    /* padding-top: 50px!important; */
+    width: 100%;
     text-align: center;
     font-family: tfont;
-    margin-top: 5px;
     font-size: 15px;
-    padding: 0 16px;
+    /* padding: 0 16px; */
+    pointer-events: none;
+  }
+
+  .tinderP {
+    width: 100%;
+    padding-right:10px;
+    padding-left:10px;
+    text-align: center;
+    font-family: tfont;
+    font-size: 15px;
+    /* padding: 0 16px; */
     pointer-events: none;
   }
   
@@ -154,21 +178,8 @@ body{
     color: #CDD6DD;
   }
   
-  .rightCard{
+  /* .rightCard{
     float: right;
     margin-right:30px;
     padding-top:10px!important;
-  }
-
-  .rightBox{
-    /* width: 100%; */
-    /* height: 100vh; */
-    position: absolute;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20vh;
-    left: 90vw;
-    border: 1.5px solid red; 
-    z-index: 10;
-    /* display: none; */
-  }
+  } */
