@@ -114,6 +114,14 @@ function copyToClipboard(item) {
 function createShareLink() {
   const joinLink = `${hostUrl}/?join=${sessionId}`;
   navigator.clipboard.writeText(joinLink);
+  navigator
+      .share({
+        title: 'SwipeHub Session Share',
+        text: `Come join my Swipehub session at ${joinLink}`,
+        url: joinLink,
+      })
+      .then(() => console.log('Successful share! 🎉'))
+      .catch((err) => console.error(err));
   createAlert(`Shareable link copied to clipboard.`, 'success', 7);
 }
 function openPage(inp) {
