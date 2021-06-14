@@ -6,6 +6,7 @@ const hostUrl = window.location.hostname;
 const storage = window.localStorage;
 const sessionId = localStorage.getItem('SwipeHub_sessionId');
 const userId = localStorage.getItem('SwipeHub_userId');
+const globalAlertStore = {};
 
 if (userId != undefined) {
   if (document.getElementById('userIdPlaceholder') != null) {
@@ -64,12 +65,19 @@ function createAlert(content, type, time) {
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
   div.className = `alert alert-${type} d-flex align-items-center alert-dismissible fade show mt-3`;
   div.role = 'alert';
-  document.getElementById('alertContainer').prepend(div);
+  if (globalAlertStore[content] == undefined) {
+    globalAlertStore[content] = false;
+  }
+  if (!globalAlertStore[content]) {
+    globalAlertStore[content] = true;
+    document.getElementById('alertContainer').prepend(div);
+  }
   $(`#${now}`)
       .fadeTo(time * 1000, 100)
       .slideUp(500, function() {
         $(`#${now}`).slideUp(500);
         document.getElementById(`${now}`).remove();
+        globalAlertStore[content] = false;
       });
 }
 
