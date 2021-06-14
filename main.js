@@ -117,7 +117,7 @@ function createShareLink() {
   navigator
       .share({
         title: 'SwipeHub Session Share',
-        text: `Come join my Swipehub session at ${joinLink}`,
+        text: `Come join my Swipehub session with Session Id: ${sessionId}.`,
         url: joinLink,
       })
       .then(() => console.log('Successful share! 🎉'))
