@@ -24,8 +24,8 @@ function joinSession() {
   xhr.onload = function() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
-        storage.setItem('Shwiper_sessionId', sessionId);
-        storage.setItem('Shwiper_userId', userId);
+        storage.setItem('SwipeHub_sessionId', sessionId);
+        storage.setItem('SwipeHub_userId', userId);
         document.location.href = './session.html';
         return;
       }
@@ -86,10 +86,10 @@ function createSession() {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
         storage.setItem(
-            'Shwiper_sessionId',
+            'SwipeHub_sessionId',
             JSON.parse(xhr.responseText)['sessionId'],
         );
-        storage.setItem('Shwiper_userId', username);
+        storage.setItem('SwipeHub_userId', username);
         document.location.href = './session.html';
       } else {
         createAlert(
