@@ -280,15 +280,15 @@ function joinSession() {
         poll();
       } else {
         // alert('Cannot load the session');
-        storage.removeItem('Shwiper_sessionId');
+        storage.removeItem('SwipeHub_sessionId');
         document.location.href = './index.html';
       }
     }
   };
   xhr.ontimeout = function(e) {
     // alert('Cannot load the session');
-    storage.removeItem('Shwiper_sessionId');
-    storage.removeItem('Shwiper_userId');
+    storage.removeItem('SwipeHub_sessionId');
+    storage.removeItem('SwipeHub_userId');
     document.location.href = './index.html';
   };
 

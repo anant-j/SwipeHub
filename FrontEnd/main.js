@@ -3,8 +3,8 @@
 // const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
 const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
 const storage = window.localStorage;
-const sessionId = localStorage.getItem('Shwiper_sessionId');
-const userId = localStorage.getItem('Shwiper_userId');
+const sessionId = localStorage.getItem('SwipeHub_sessionId');
+const userId = localStorage.getItem('SwipeHub_userId');
 
 if (userId != undefined) {
   if (document.getElementById('userIdPlaceholder') != null) {
@@ -158,8 +158,8 @@ function leaveSession() {
     }
   };
   hideLoader();
-  storage.removeItem('Shwiper_sessionId');
-  storage.removeItem('Shwiper_userId');
+  storage.removeItem('SwipeHub_sessionId');
+  storage.removeItem('SwipeHub_userId');
   document.location.href = './index.html';
 
   xhr.send(null);

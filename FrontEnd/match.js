@@ -56,7 +56,7 @@ function loadMatchData() {
         ).innerHTML = `Matches (${numMatches})`;
       } else {
         createAlert('Cannot load the session', 'danger', 5);
-        storage.removeItem('Shwiper_sessionId');
+        storage.removeItem('SwipeHub_sessionId');
         document.location.href = './index.html';
       }
       hideLoader();
