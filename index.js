@@ -1,3 +1,15 @@
+function joinViaLink() {
+  if (window.location.href.includes('?join=')) {
+    const id = window.location.href.split('=')[1];
+    joiningPage();
+    document.getElementById('sessionId').readOnly = true;
+    document.getElementById('sessionId').value = id;
+  }
+  // console.log(window.location.href);
+}
+
+joinViaLink();
+
 function joiningPage() {
   document.getElementById('initialButtons').style.display = 'none';
   document.getElementById('joinSession').style.display = 'block';

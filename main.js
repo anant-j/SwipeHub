@@ -2,6 +2,7 @@
 
 // const baseUrl = 'http://localhost:5001/theswipehub/us-central1';
 const baseUrl = 'https://us-central1-theswipehub.cloudfunctions.net';
+const hostUrl = window.location.hostname;
 const storage = window.localStorage;
 const sessionId = localStorage.getItem('SwipeHub_sessionId');
 const userId = localStorage.getItem('SwipeHub_userId');
@@ -102,6 +103,11 @@ function copyToClipboard(item) {
   createAlert(`${text} copied to clipboard`, 'success', 7);
 }
 
+function createShareLink() {
+  const joinLink = `${hostUrl}/?join=${sessionId}`;
+  navigator.clipboard.writeText(joinLink);
+  createAlert(`Shareable link copied to clipboard.`, 'success', 7);
+}
 function openPage(inp) {
   let page = '';
   switch (inp) {
