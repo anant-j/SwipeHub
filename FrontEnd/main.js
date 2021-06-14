@@ -1,7 +1,7 @@
 'use strict';
 
-// const baseUrl = 'http://localhost:5001/tinder-netflix/us-central1';
-const baseUrl = 'https://us-central1-tinder-netflix.cloudfunctions.net';
+// const baseUrl = 'http://localhost:5001/theswipehub/us-central1';
+const baseUrl = 'https://us-central1-theswipehub.cloudfunctions.net';
 const storage = window.localStorage;
 const sessionId = localStorage.getItem('SwipeHub_sessionId');
 const userId = localStorage.getItem('SwipeHub_userId');
