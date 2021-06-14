@@ -184,6 +184,7 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
     <p class="tinderP">${text}</p>
     </div>`;
   div.className = 'tinder--card';
+  div.style.display = 'none';
   div.onclick = function() {
     if (document.getElementById(`img${mediaId}`).style.opacity != 0.2 && isCardOnTop(mediaId)) {
       showDetails(mediaId);
@@ -195,6 +196,10 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
   if (!isImageValid) {
     showDetails(mediaId);
   }
+  const image = document.getElementById(`img${mediaId}`);
+  image.onload = function() {
+    div.style.display = 'block';
+  };
   initCards();
   hammertimeFirstOnly();
   // hammertimeEach(document.getElementById(mediaId));
