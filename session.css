@@ -101,6 +101,7 @@ body {
   max-height: 100%;
   object-fit: cover;
   pointer-events: none;
+  transition: opacity 0.4s linear;
   /* opacity: ; */
 }
 
@@ -114,6 +115,7 @@ body {
   z-index: 3;
   /* height: 0; */
   opacity: 0;
+  transition: opacity 0.4s linear;
   pointer-events: none;
 }
 
