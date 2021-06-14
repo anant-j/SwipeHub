@@ -2,7 +2,7 @@
 
 // const baseUrl = 'http://localhost:5001/theswipehub/us-central1';
 const baseUrl = 'https://us-central1-theswipehub.cloudfunctions.net';
-const hostUrl = window.location.hostname;
+const hostUrl = 'https://www.theswipehub.com';
 const storage = window.localStorage;
 const sessionId = localStorage.getItem('SwipeHub_sessionId');
 const userId = localStorage.getItem('SwipeHub_userId');
