@@ -5,7 +5,6 @@ function joinViaLink() {
     document.getElementById('sessionId').readOnly = true;
     document.getElementById('sessionId').value = id;
   }
-  // console.log(window.location.href);
 }
 
 joinViaLink();
