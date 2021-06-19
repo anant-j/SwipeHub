@@ -63,6 +63,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
         platform,
         region,
         sortby,
+        1,
     );
   }
 
@@ -167,7 +168,7 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
 exports.subsequentCards = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const id = req.query.id.toUpperCase();
-  const totalCards = req.query.totalCards;
+  const totalCards = parseInt(req.query.totalCards);
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
   if (!isValidSession(doc)) {
@@ -202,6 +203,7 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
             platform,
             region,
             sortby,
+            pageNum,
         );
       }
       const newOrder = dataSet["order"];
@@ -354,15 +356,19 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
  * @param  {string} region
  * @param  {string} sort
  */
-async function generateTVList(lang, genres, platform, region, sort) {
+async function generateTVList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
     const tempDict = {};
+    if (!("order" in final)) {
+      final["order"] = [];
+    }
+    final["order"].push(data[i]["id"]);
     tempDict["title"] = data[i]["original_name"];
     tempDict["description"] = data[i]["overview"];
     tempDict["poster"] =
