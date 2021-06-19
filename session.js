@@ -170,6 +170,7 @@ function leftSwipe() {
 }
 
 function addMovieCard(imgurl, title, text, mediaId, release, adult) {
+  showLoader();
   const div = document.createElement('div');
   let isImageValid=true;
   div.id = mediaId;
@@ -199,6 +200,7 @@ function addMovieCard(imgurl, title, text, mediaId, release, adult) {
   const image = document.getElementById(`img${mediaId}`);
   image.onload = function() {
     div.style.display = 'block';
+    hideLoader();
   };
   initCards();
   hammertimeFirstOnly();
@@ -281,7 +283,7 @@ function joinSession() {
               data[key]['adult'],
           );
         }
-        hideLoader();
+        // hideLoader();
         poll();
       } else {
         // alert('Cannot load the session');
@@ -427,7 +429,6 @@ function addSubsequentCards(totalCards) {
         const allData = JSON.parse(xhr.responseText);
         const data = allData.movies;
         const order = allData.movies.order;
-        console.log(order);
         for (let index = 0; index < order.length; index++) {
           const key = order[index];
           addMovieCard(
