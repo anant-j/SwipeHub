@@ -41,12 +41,12 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
       sortby = "revenue.desc";
     }
     dataSet = await generateMovieList(
-      languages,
-      categories,
-      platform,
-      region,
-      sortby,
-      1
+        languages,
+        categories,
+        platform,
+        region,
+        sortby,
+        1,
     );
   }
   if (movie != "true") {
@@ -58,12 +58,12 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
       sortby = "popularity.desc";
     }
     dataSet = await generateTVList(
-      languages,
-      categories,
-      platform,
-      region,
-      sortby,
-      1
+        languages,
+        categories,
+        platform,
+        region,
+        sortby,
+        1,
     );
   }
 
@@ -83,7 +83,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
   };
 
   await admin.firestore().collection("sessions").doc(id).set(data);
-  res.status(200).send({ sessionId: id });
+  res.status(200).send({sessionId: id});
 });
 
 exports.joinSession = functions.https.onRequest(async (req, res) => {
@@ -109,7 +109,7 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
       participants: users,
     };
     const oldMovieData = doc.data().mediaInfo;
-    const newMovieData = { order: [] };
+    const newMovieData = {order: []};
     const totalSwipeLength = users[userId]["totalSwipes"].length;
     const oldMovieLength = oldMovieData["order"].length;
     let upper = totalSwipeLength + 20;
@@ -122,10 +122,10 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
       newMovieData[key] = oldMovieData[key];
     }
     await admin
-      .firestore()
-      .collection("sessions")
-      .doc(id)
-      .set(data, { merge: true });
+        .firestore()
+        .collection("sessions")
+        .doc(id)
+        .set(data, {merge: true});
     res.status(200).send({
       movies: newMovieData,
       isCreator: doc.data().creator == userId,
@@ -184,22 +184,22 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
       const pageNum = totalCards / 20 + 1;
       if (movie === "true") {
         dataSet = await generateMovieList(
-          languages,
-          categories,
-          platform,
-          region,
-          sortby,
-          pageNum
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+            pageNum,
         );
       }
       if (movie != "true") {
         dataSet = await generateTVList(
-          languages,
-          categories,
-          platform,
-          region,
-          sortby,
-          pageNum
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+            pageNum,
         );
       }
       const newOrder = dataSet["order"];
@@ -212,10 +212,10 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
         mediaInfo: oldDataSet,
       };
       await admin
-        .firestore()
-        .collection("sessions")
-        .doc(id)
-        .set(data, { merge: true });
+          .firestore()
+          .collection("sessions")
+          .doc(id)
+          .set(data, {merge: true});
     } else {
       let lower = totalCards;
       const upper = totalCards + 19;
@@ -227,7 +227,7 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
         dataSet["order"].push(key);
       }
     }
-    res.status(200).send({ movies: dataSet });
+    res.status(200).send({movies: dataSet});
   }
 });
 
@@ -280,11 +280,11 @@ exports.polling = functions.https.onRequest(async (req, res) => {
       participantData[key] = value["totalSwipes"].length;
     }
     await admin
-      .firestore()
-      .collection("sessions")
-      .doc(sessionId)
-      .set(data, { merge: true });
-    res.status(200).send({ match: results.length, userData: participantData });
+        .firestore()
+        .collection("sessions")
+        .doc(sessionId)
+        .set(data, {merge: true});
+    res.status(200).send({match: results.length, userData: participantData});
     return;
   }
 });
@@ -307,8 +307,8 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
       movieData[element] = data.mediaInfo[element];
     }
     res
-      .status(200)
-      .send({ movies: movieData, isCreator: doc.data().creator == username });
+        .status(200)
+        .send({movies: movieData, isCreator: doc.data().creator == username});
   }
   return;
 });
@@ -319,13 +319,13 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
- * @param  {int} page
+ * @param  {number} page
  */
 async function generateMovieList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-    `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
@@ -351,12 +351,13 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
- */
+ * @param  {number} page
+*/
 async function generateTVList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
   const resp = await axios.get(
-    `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
@@ -383,10 +384,10 @@ async function generateSessionId() {
   const idExists = true;
   while (idExists === true) {
     const docSnapshot = await admin
-      .firestore()
-      .collection("sessions")
-      .doc(id)
-      .get();
+        .firestore()
+        .collection("sessions")
+        .doc(id)
+        .get();
     if (docSnapshot.exists) {
       id = randomSessionCode();
     } else {
@@ -427,10 +428,10 @@ async function leaveSession(sessionId, userId, sessionData) {
   }
   delete sessionData["participants"][userId];
   await admin
-    .firestore()
-    .collection("sessions")
-    .doc(sessionId)
-    .set(sessionData);
+      .firestore()
+      .collection("sessions")
+      .doc(sessionId)
+      .set(sessionData);
 }
 
 /**
@@ -442,10 +443,10 @@ async function endSession(sessionId) {
     isValid: false,
   };
   await admin
-    .firestore()
-    .collection("sessions")
-    .doc(sessionId)
-    .set(data, { merge: true });
+      .firestore()
+      .collection("sessions")
+      .doc(sessionId)
+      .set(data, {merge: true});
 }
 
 /**
