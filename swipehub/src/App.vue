@@ -2,7 +2,7 @@
   <div id="app">
   <Navbar :sessionActive="sessionActive"/>
   <router-view/>
-  <button v-on:click="sessionActive = !sessionActive">Activate Session</button>
+  <button v-on:click="sessionActive = !sessionActive">Session is {{sessionActive}}</button>
   </div>
 </template>
 
