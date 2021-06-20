@@ -10,7 +10,8 @@ export default createStore({
   // modules: {
   // }
   state: {
-    count: 0
+    count: 0,
+    loader: false
   },
   mutations: {
     increment (state) {
