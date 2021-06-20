@@ -2,6 +2,7 @@
   <div id="app">
     <Navbar :sessionActive="sessionActive" />
     <div class="centered">
+      <button @click="toast">Notification</button>
     <Loader v-if="this.$store.state.loader"/>
       <router-view />
       <button v-on:click="sessionActive = !sessionActive">
@@ -24,12 +25,20 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import Navbar from "./components/Navbar.vue";
 import Loader from "./components/Loader.vue";
 import store from "./store/index.js";
+import { createToast } from 'mosha-vue-toastify';
+import 'mosha-vue-toastify/dist/style.css'
 
 export default {
   name: "App",
   components: {
     Navbar,
     Loader
+  },
+  setup () {
+    const toast = () => {
+        createToast({ title: 'Some title', description: 'some good description'}, {type: 'success', position: 'top-center'})
+    }
+    return { toast }
   },
   store,
   data: function () {
