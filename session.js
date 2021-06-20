@@ -245,12 +245,12 @@ function hammertimeFirstOnly() {
     hammertimeEach(newCards[0]);
     globalHammerTime[newCards[0].id] = true;
     if (newCards.length == 5) {
-      addSubsequentCards(newCards.length + removedCards.length);
+      addSubsequentCards();
     }
   }
-  if (newCards.length == 0 && removedCards[removedCards.length - 1].id != -1) {
-    addLastCard();
-  }
+  // if (newCards.length == 0 && removedCards[removedCards.length - 1].id != -1) {
+  //   addLastCard();
+  // }
 }
 
 function joinSession() {
@@ -419,11 +419,11 @@ function clearUserData() {
   }
 }
 
-function addSubsequentCards(totalCards) {
+function addSubsequentCards() {
   const xhr = new XMLHttpRequest();
   xhr.open(
       'GET',
-      `${baseUrl}/subsequentCards?id=${sessionId}&user=${userId}&totalCards=${totalCards}`,
+      `${baseUrl}/subsequentCards?id=${sessionId}&userId=${userId}&totalCards=${totalSwipes}`,
       true,
   );
   xhr.onload = function() {
@@ -443,6 +443,8 @@ function addSubsequentCards(totalCards) {
               data[key]['adult'],
           );
         }
+      } else {
+        addLastCard();
       }
     }
   };

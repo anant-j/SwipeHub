@@ -164,7 +164,7 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
 exports.subsequentCards = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const id = req.query.id.toUpperCase();
-  const totalCards = parseInt(req.query.totalCards);
+  let totalCards = parseInt(req.query.totalCards);
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
   if (!isValidSession(doc)) {
@@ -180,6 +180,7 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
     const sortby = doc.data().order;
     let dataSet = {};
     const oldDataSet = doc.data().mediaInfo;
+    totalCards = upperValue(totalCards);
     if (totalCards >= currentMovieSize) {
       const pageNum = totalCards / 20 + 1;
       if (movie === "true") {
@@ -474,4 +475,19 @@ function toArray(inp) {
  */
 function toSet(inp) {
   return new Set(inp);
+}
+
+/**
+ * @param  {number} numberOfCards
+ * @return {number} val
+ */
+function upperValue(numberOfCards) {
+  const ceiledNum = Math.ceil(numberOfCards/10);
+  let val = 0;
+  if (ceiledNum % 2 == 0) {
+    val = ceiledNum * 10;
+  } else {
+    val = (ceiledNum+1)*10;
+  }
+  return val;
 }
