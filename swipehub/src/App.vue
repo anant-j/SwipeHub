@@ -3,6 +3,8 @@
   <Navbar :sessionActive="sessionActive"/>
   <router-view/>
   <button v-on:click="sessionActive = !sessionActive">Session is {{sessionActive}}</button>
+  <button v-on:click="this.$store.state.count++">Session is {{this.$store.state.count}}</button>
+
   </div>
 </template>
 
@@ -11,17 +13,24 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'jquery/src/jquery.js'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import Navbar from './components/Navbar.vue'
+import store from './store/index.js'  
 
 export default {
   name: 'App',
   components: {
     Navbar
   },
+  store,
   data: function() {
     return {
       sessionActive: false
     };
   },
+  methods: {
+  increment() {
+    this.$store.commit('increment')
+  }
+}
 }
 </script>
 
