@@ -102,7 +102,7 @@ export default {
 /* } */
 
 #nav a {
-  font-weight: bold;
+  /* font-weight: bold; */
   color: white;
 }
 
@@ -112,5 +112,9 @@ export default {
 
 .navbar-brand {
   color: white !important;
+}
+
+.nav-item {
+  cursor: pointer;
 }
 </style>
