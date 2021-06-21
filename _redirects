@@ -1,2 +1,6 @@
-/*  /swipehub/dist/:splat
-/index   /swipehub/dist/index.html
+/js/*  /swipehub/dist/js/:splat
+/css/* /swipehub/dist/css/:splat
+/fonts/* /swipehub/dist/fonts/:splat
+/favicon.ico /swipehub/dist/favicon.ico
+/index.html   /swipehub/dist/index.html
+/   /swipehub/dist/index.html
