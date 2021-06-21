@@ -9,6 +9,7 @@ const options = {
     position: 'top-center',
     maxToasts: 3,
     closeOnClick: false,
+    pauseOnHover: false
   }
   
 createApp(App).use(store).use(Toast, options).use(router).mount('#app')
