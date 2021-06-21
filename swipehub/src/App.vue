@@ -2,17 +2,19 @@
   <div id="app">
     <Navbar :sessionActive="sessionActive" />
     <div class="centered">
-      <button @click="toast">Notification</button>
+      <button type="button" class="btn btn-primary" @click="toast(this.$store.state.count)">Notification</button>
     <Loader v-if="this.$store.state.loader"/>
       <router-view />
-      <button v-on:click="sessionActive = !sessionActive">
+            <button type="button" class="btn btn-warning" v-on:click="this.$store.state.loader = !this.$store.state.loader ">
+        Loader is {{ this.$store.state.loader }}
+      </button>
+      <br><br>
+      <button type="button" class="btn btn-success" v-on:click="sessionActive = !sessionActive">
         Session is {{ sessionActive }}
       </button>
-      <button v-on:click="this.$store.state.count++">
+      <br><br>
+      <button type="button" class="btn btn-danger" v-on:click="this.$store.state.count++">
         Session is {{ this.$store.state.count }}
-      </button>
-      <button v-on:click="this.$store.state.loader = !this.$store.state.loader ">
-        Loader is {{ this.$store.state.loader }}
       </button>
     </div>
   </div>
@@ -26,7 +28,7 @@ import Navbar from "./components/Navbar.vue";
 import Loader from "./components/Loader.vue";
 import store from "./store/index.js";
 import { createToast } from 'mosha-vue-toastify';
-import 'mosha-vue-toastify/dist/style.css'
+import './assets/navbar_style.css'
 
 export default {
   name: "App",
@@ -35,8 +37,8 @@ export default {
     Loader
   },
   setup () {
-    const toast = () => {
-        createToast({ title: 'Some title', description: 'some good description'}, {type: 'success', position: 'top-center'})
+    const toast = (content) => {
+        createToast({ title: content, description: 'some description'}, {type: 'success', position: 'top-center', timeout:5000})
     }
     return { toast }
   },
