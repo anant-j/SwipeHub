@@ -2,18 +2,33 @@
   <div id="app">
     <Navbar :sessionActive="sessionActive" />
     <div class="centered">
-      <button type="button" class="btn btn-primary" @click="toast(this.$store.state.count)">Notification</button>
-    <Loader v-if="this.$store.state.loader"/>
+      <br>
+      <button type="button" class="btn btn-primary" @click="showToast(`Notification ${this.$store.state.count}`, 'success', 3000)">
+        Notification
+      </button>
+      <Loader v-if="this.$store.state.loader" />
       <router-view />
-            <button type="button" class="btn btn-warning" v-on:click="this.$store.state.loader = !this.$store.state.loader ">
+      <button
+        type="button"
+        class="btn btn-warning"
+        v-on:click="this.$store.state.loader = !this.$store.state.loader"
+      >
         Loader is {{ this.$store.state.loader }}
       </button>
-      <br><br>
-      <button type="button" class="btn btn-success" v-on:click="sessionActive = !sessionActive">
+      <br /><br />
+      <button
+        type="button"
+        class="btn btn-success"
+        v-on:click="sessionActive = !sessionActive"
+      >
         Session is {{ sessionActive }}
       </button>
-      <br><br>
-      <button type="button" class="btn btn-danger" v-on:click="this.$store.state.count++">
+      <br /><br />
+      <button
+        type="button"
+        class="btn btn-danger"
+        v-on:click="this.$store.state.count++"
+      >
         Session is {{ this.$store.state.count }}
       </button>
     </div>
@@ -27,20 +42,17 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import Navbar from "./components/Navbar.vue";
 import Loader from "./components/Loader.vue";
 import store from "./store/index.js";
-import { createToast } from 'mosha-vue-toastify';
-import './assets/navbar_style.css'
+import { useToast } from "vue-toastification";
 
 export default {
   name: "App",
   components: {
     Navbar,
-    Loader
+    Loader,
   },
-  setup () {
-    const toast = (content) => {
-        createToast({ title: content, description: 'some description'}, {type: 'success', position: 'top-center', timeout:5000})
-    }
-    return { toast }
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   store,
   data: function () {
@@ -51,6 +63,9 @@ export default {
   methods: {
     increment() {
       this.$store.commit("increment");
+    },
+    showToast(message, type, timeout) {
+      this.toast(message, {type: type, timeout: timeout});
     },
   },
 };
@@ -88,7 +103,7 @@ template {
   margin: 0 !important;
 }
 
-.centered{
-    text-align: center;
+.centered {
+  text-align: center;
 }
 </style>
