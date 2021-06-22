@@ -19,10 +19,10 @@
           }"></div>
         </div>
       </template>
-      <!-- <img class="like-pointer" slot="like" src="./assets/like-txt.png">
-      <img class="nope-pointer" slot="nope" src="./assets/nope-txt.png">
-      <img class="super-pointer" slot="super" src="./assets/super-txt.png">
-      <img class="rewind-pointer" slot="rewind" src="./assets/rewind-txt.png"> -->
+      <img class="card-overlay like-pointer" slot="like" src="../assets/like.png">
+      <img class="card-overlay nope-pointer" slot="nope" src="../assets/nope.png">
+      <img class="card-overlay super-pointer" slot="super" src="../assets/super-like.png">
+      <img class="card-overlay rewind-pointer" slot="rewind" src="../assets/rewind.png">
     </Tinder>
     <div class="btns">
       <img src="../assets/rewind.png" @click="decide('rewind')">
@@ -65,7 +65,6 @@ export default {
     },
     onSubmit({ item }) {
       if (this.queue.length < 3) {
-        alert("Loading");
         this.mock();
       }
       this.history.push(item);
@@ -93,6 +92,13 @@ body {
   margin: 0;
   background-color: #20262e;
   overflow-y: hidden;
+}
+
+.card-overlay{
+  max-width:230px!important;
+  max-height:75px!important;
+  width: auto!important;
+  height: auto!important;
 }
 
 #session .vue-tinder {
