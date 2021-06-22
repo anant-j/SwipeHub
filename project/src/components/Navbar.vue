@@ -23,7 +23,6 @@
             </li>
             <li
               class="nav-item"
-              onclick="openPage('session')"
             >
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
@@ -77,6 +76,9 @@
 </template>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'jquery/src/jquery.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
 import store from "../store/index.js";
 export default {
   name: "Navbar",
@@ -96,9 +98,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* #nav { */
-  /* padding: 30px; */
-/* } */
+#nav {
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+}
 
 #nav a {
   /* font-weight: bold; */

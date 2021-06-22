@@ -4,6 +4,7 @@
       <template slot-scope="scope">
         <div
           class="pic"
+          @click = "clicked()"
           :style="{
             'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`
           }"
@@ -69,17 +70,15 @@ export default {
       } else {
         this.$refs.tinder.decide(choice);
       }
+    },
+    clicked(){
+      alert("clicked");
     }
   }
 };
 </script>
 
 <style scoped>
-html,
-body {
-  /* height: 100%; */
-}
-
 body {
   margin: 0;
   background-color: #20262e;
@@ -96,7 +95,9 @@ body {
   margin: auto;
   width: calc(100% - 20px);
   /* height: calc(100% - 23px - 65px - 47px - 16px); */
-  height: 70vh;
+  /* height: 60vh; */
+  min-height: 60vh;
+  /* height: auto; */
   min-width: 300px;
   max-width: 355px;
 }
@@ -149,7 +150,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 30px;
+  bottom: 100px;
   margin: auto;
   height: 65px;
   display: flex;

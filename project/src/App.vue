@@ -2,15 +2,13 @@
   <div id="app">
     <Navbar :sessionActive="sessionActive" />
     <div class="centered">
-            <router-view />
-            </div>
+    <router-view />
+    </div>
     <div class="centered" v-if="!sessionActive">
-      <br>
       <button type="button" class="btn btn-primary" @click="showToast(`Notification ${$store.state.count}`, 'success', 3000)">
         Notification
       </button>
       <Loader v-if="this.$store.state.loader" />
-
       <button
         type="button"
         class="btn btn-warning"
