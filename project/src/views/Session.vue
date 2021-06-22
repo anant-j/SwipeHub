@@ -1,6 +1,6 @@
 <template>
   <div id="session">
-    <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="10" @submit="onSubmit">
+    <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="-15" @submit="onSubmit">
       <template slot-scope="scope">
         <div v-if="!showInfo || queue[0].id != scope.data.id"
           class="pic"
@@ -97,16 +97,16 @@ body {
 
 #session .vue-tinder {
   position: absolute;
-    margin-top:7vh!important;
+  margin-top:7vh!important;
   z-index: 1;
   left: 0;
   right: 0;
-  top: 23px;
+  top: 50px;
   margin: auto;
   width: calc(100% - 20px);
   /* height: calc(100% - 23px - 65px - 47px - 16px); */
   /* height: 60vh; */
-  min-height: 60vh;
+  height: 62vh;
   /* height: auto; */
   min-width: 300px;
   max-width: 355px;
@@ -167,7 +167,7 @@ body {
   right: 0px;
   bottom: 0px;
   left: 0px;
-  opacity: 0.7;
+  opacity: 0.3;
   background-size: cover;
   background-position: center;
 }
@@ -194,10 +194,10 @@ body {
 }
 
 .btns {
-  position: absolute;
+  position: relative;
   left: 0;
   right: 0;
-  bottom: 100px;
+  top: 80vh;
   margin: auto;
   height: 65px;
   display: flex;
@@ -212,7 +212,7 @@ body {
   box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15);
   border-radius: 50%;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  /* -webkit-tap-highlight-color: transparent; */
 }
 
 .btns img:nth-child(2n + 1) {
@@ -220,7 +220,8 @@ body {
 }
 
 .btns img:nth-child(2n) {
-  width: 65px;
+  /* width: 65px; */
+  width: 53px;
 }
 
 .btns img:nth-last-child(1) {
