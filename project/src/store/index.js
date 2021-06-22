@@ -14,7 +14,8 @@ export default new Vuex.Store({
   // }
   state: {
     count: 0,
-    loader: false
+    loader: false,
+    sessionActive: false,
   },
   mutations: {
     increment (state) {

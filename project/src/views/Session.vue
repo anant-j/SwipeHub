@@ -48,6 +48,7 @@ export default {
     history: []
   }),
   created() {
+    this.$store.state.sessionActive = true;
     this.mock();
   },
   methods: {
@@ -63,11 +64,12 @@ export default {
         this.queue.unshift(...list);
       }
     },
-    onSubmit({ item }) {
+    onSubmit(choice) {
+      this.showInfo = false;
       if (this.queue.length < 3) {
         this.mock();
       }
-      this.history.push(item);
+      this.history.push(choice.item);
     },
     async decide(choice) {
       if (choice === "rewind") {

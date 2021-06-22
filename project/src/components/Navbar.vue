@@ -1,7 +1,7 @@
 <template>
   <div id="nav">
     <!-- <router-link to="/">Home</router-link> |
-    <router-link to="/about" v-if="sessionActive">About</router-link> -->
+    <router-link to="/about" v-if="this.$store.state.sessionActive">About</router-link> -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <router-link class="navbar-brand" to="/" @click="increment()">SwipeHub</router-link>
@@ -26,11 +26,11 @@
             >
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
-            <li class="nav-item" v-if="sessionActive">
+            <li class="nav-item" v-if="this.$store.state.sessionActive">
               <a class="nav-link active" id="matchTab">Matches</a>
             </li>
           </ul>
-          <ul class="navbar-nav" v-if="sessionActive">
+          <ul class="navbar-nav" v-if="this.$store.state.sessionActive">
             <li class="nav-item" onclick="createShareLink()">
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
@@ -83,11 +83,6 @@ import store from "../store/index.js";
 export default {
   name: "Navbar",
   store,
-  props: {
-    sessionActive: {
-      type: Boolean,
-    },
-  },
   methods: {
   increment() {
     this.$store.commit('increment')

@@ -17,6 +17,7 @@ export default {
     HelloWorld
   },
   mounted: function(){
+    this.$store.state.sessionActive = false;
     this.$store.state.count+=1;
   }
 }

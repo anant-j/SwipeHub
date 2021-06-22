@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <Navbar :sessionActive="sessionActive" />
+    <Navbar/>
     <div class="centered">
     <router-view />
     </div>
-    <div class="centered" v-if="!sessionActive">
+    <div class="centered" v-if="!this.$store.state.sessionActive">
       <button type="button" class="btn btn-primary" @click="showToast(`Notification ${$store.state.count}`, 'success', 3000)">
         Notification
       </button>
@@ -20,9 +20,9 @@
       <button
         type="button"
         class="btn btn-success"
-        v-on:click="sessionActive = !sessionActive"
+        v-on:click="$router.push({ name: 'Session' });"
       >
-        Session is {{ sessionActive }}
+        Session Page
       </button>
       <br /><br />
       <button
@@ -30,7 +30,7 @@
         class="btn btn-danger"
         v-on:click="$store.state.count++"
       >
-        Session is {{ this.$store.state.count }}
+        Gloval store ++ : {{ this.$store.state.count }}
       </button>
     </div>
   </div>
@@ -47,11 +47,6 @@ export default {
     Loader,
   },
   store,
-  data: function () {
-    return {
-      sessionActive: false,
-    };
-  },
   methods: {
     increment() {
       this.$store.commit("increment");
