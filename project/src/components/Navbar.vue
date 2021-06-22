@@ -24,9 +24,8 @@
             <li
               class="nav-item"
               onclick="openPage('session')"
-              v-if="sessionActive"
             >
-              <router-link class="nav-link" to="/about">Session</router-link>
+              <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="sessionActive">
               <a class="nav-link active" id="matchTab">Matches</a>
