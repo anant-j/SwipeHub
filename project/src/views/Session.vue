@@ -2,13 +2,22 @@
   <div id="session">
     <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="10" @submit="onSubmit">
       <template slot-scope="scope">
-        <div
+        <div v-if="!showInfo || queue[0].id != scope.data.id"
           class="pic"
-          @click = "clicked()"
+          @click = "showInfo = !showInfo"
           :style="{
             'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`
           }"
         />
+      <div v-if="showInfo && queue[0].id == scope.data.id"
+          class="pic_wrap"
+          @click = "showInfo = !showInfo"
+        >
+        <div class="pic_content">{{scope.data.id}}</div>
+        <div class="pic_img" :style="{
+            'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`
+          }"></div>
+        </div>
       </template>
       <!-- <img class="like-pointer" slot="like" src="./assets/like-txt.png">
       <img class="nope-pointer" slot="nope" src="./assets/nope-txt.png">
@@ -33,6 +42,7 @@ export default {
   name: "Session",
   components: { Tinder },
   data: () => ({
+    showInfo: false,
     queue: [],
     offset: 0,
     history: []
@@ -82,7 +92,7 @@ export default {
 body {
   margin: 0;
   background-color: #20262e;
-  overflow: hidden;
+  overflow-y: hidden;
 }
 
 #session .vue-tinder {
@@ -144,6 +154,43 @@ body {
   height: 100%;
   background-size: cover;
   background-position: center;
+}
+
+.pic_wrap {
+    height: 100%;
+    width: 100%;
+}
+
+.pic_img{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.7;
+  background-size: cover;
+  background-position: center;
+}
+
+/* .pic_wrap::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(0,0,0,0.25);
+} */
+
+.pic_content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 40%;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  z-index: 100;
 }
 
 .btns {
