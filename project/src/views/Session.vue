@@ -186,7 +186,6 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   /* box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15); */
-
 }
 
 .pic_wrap {
@@ -201,7 +200,7 @@ body {
   bottom: 0px;
   left: 0px;
   opacity: 0.3;
-    background-size: contain;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -264,10 +263,9 @@ body {
     width: 40vh;
   }
 
-  
-.btns {
-  top: 70vh;
-}
+  .btns {
+    top: 70vh;
+  }
 }
 </style>
 
