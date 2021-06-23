@@ -4,7 +4,9 @@
     <router-link to="/about" v-if="this.$store.state.sessionActive">About</router-link> -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <router-link class="navbar-brand" to="/" @click="increment()">SwipeHub</router-link>
+        <router-link class="navbar-brand" to="/" @click="increment()"
+          >SwipeHub</router-link
+        >
         <button
           class="navbar-toggler"
           type="button"
@@ -21,9 +23,7 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/">Home</router-link>
             </li>
-            <li
-              class="nav-item"
-            >
+            <li class="nav-item">
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="this.$store.state.sessionActive">
@@ -76,18 +76,13 @@
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'jquery/src/jquery.js'
-import 'bootstrap/dist/js/bootstrap.min.js'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "jquery/src/jquery.js";
+import "bootstrap/dist/js/bootstrap.min.js";
 import store from "../store/index.js";
 export default {
   name: "Navbar",
   store,
-  methods: {
-  increment() {
-    this.$store.commit('increment')
-  }
-}
 };
 </script>
 

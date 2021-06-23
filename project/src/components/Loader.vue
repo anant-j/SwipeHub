@@ -1,14 +1,13 @@
 <template>
-<div class="loader"></div>
+  <div class="loader"></div>
 </template>
 
 <script>
 export default {
-  name: 'Loader',
-}
+  name: "Loader",
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .loader {
   border: 16px solid #f3f3f3;

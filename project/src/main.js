@@ -11,6 +11,14 @@ import VueGtag from "vue-gtag";
 
 Vue.config.productionTip = false
 
+Vue.mixin({
+  methods: {
+    showToast(message, type, timeout) {
+      this.$toast(message, { type: type, timeout: timeout });
+    },
+  }
+})
+
 const options = {
   position: 'top-center',
   maxToasts: 3,

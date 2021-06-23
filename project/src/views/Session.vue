@@ -1,42 +1,69 @@
 <template>
   <div id="session">
-    <Tinder ref="tinder" key-name="id" :queue.sync="queue" :offset-y="-15" @submit="onSubmit">
+    <Tinder
+      ref="tinder"
+      key-name="id"
+      :queue.sync="queue"
+      :offset-y="-15"
+      @submit="onSubmit"
+    >
       <template slot-scope="scope">
-        <div v-if="!showInfo || queue[0].id != scope.data.id"
+        <div
+          v-if="!showInfo || queue[0].id != scope.data.id"
           class="pic"
-          @click = "showInfo = !showInfo"
+          @click="showInfo = !showInfo"
           :style="{
-            'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`
+            'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`,
           }"
         />
-      <div v-if="showInfo && queue[0].id == scope.data.id"
+        <div
+          v-if="showInfo && queue[0].id == scope.data.id"
           class="pic_wrap"
-          @click = "showInfo = !showInfo"
+          @click="showInfo = !showInfo"
         >
-        <div class="pic_content">{{scope.data.id}}</div>
-        <div class="pic_img" :style="{
-            'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`
-          }"></div>
+          <div class="pic_content">{{ scope.data.id }}</div>
+          <div
+            class="pic_img"
+            :style="{
+              'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`,
+            }"
+          ></div>
         </div>
       </template>
-      <img class="card-overlay like-pointer" slot="like" src="../assets/like.png">
-      <img class="card-overlay nope-pointer" slot="nope" src="../assets/nope.png">
-      <img class="card-overlay super-pointer" slot="super" src="../assets/super-like.png">
-      <img class="card-overlay rewind-pointer" slot="rewind" src="../assets/rewind.png">
+      <img
+        class="card-overlay like-pointer"
+        slot="like"
+        src="../assets/like.png"
+      />
+      <img
+        class="card-overlay nope-pointer"
+        slot="nope"
+        src="../assets/nope.png"
+      />
+      <img
+        class="card-overlay super-pointer"
+        slot="super"
+        src="../assets/super-like.png"
+      />
+      <img
+        class="card-overlay rewind-pointer"
+        slot="rewind"
+        src="../assets/rewind.png"
+      />
     </Tinder>
     <div class="btns">
-      <img src="../assets/rewind.png" @click="decide('rewind')">
-      <img src="../assets/nope.png" @click="decide('nope')">
-      <img src="../assets/super-like.png" @click="decide('super')">
-      <img src="../assets/like.png" @click="decide('like')">
-      <img src="../assets/help.png" @click="decide('help')">
+      <img src="../assets/rewind.png" @click="decide('rewind')" />
+      <img src="../assets/nope.png" @click="decide('nope')" />
+      <img src="../assets/super-like.png" @click="decide('super')" />
+      <img src="../assets/like.png" @click="decide('like')" />
+      <img src="../assets/help.png" @click="decide('help')" />
     </div>
   </div>
 </template>
 
 <script>
 import Tinder from "vue-tinder";
-import source from "./bing.js";
+import source from "@/views/bing.js";
 
 export default {
   name: "Session",
@@ -45,7 +72,7 @@ export default {
     showInfo: false,
     queue: [],
     offset: 0,
-    history: []
+    history: [],
   }),
   created() {
     this.$store.state.sessionActive = true;
@@ -82,10 +109,10 @@ export default {
         this.$refs.tinder.decide(choice);
       }
     },
-    clicked(){
+    clicked() {
       alert("clicked");
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -96,16 +123,16 @@ body {
   overflow-y: hidden;
 }
 
-.card-overlay{
-  max-width:230px!important;
-  max-height:75px!important;
-  width: auto!important;
-  height: auto!important;
+.card-overlay {
+  max-width: 230px !important;
+  max-height: 75px !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 #session .vue-tinder {
   position: absolute;
-  margin-top:7vh!important;
+  /* margin-top:7vh!important; */
   z-index: 1;
   left: 0;
   right: 0;
@@ -114,7 +141,7 @@ body {
   width: calc(100% - 20px);
   /* height: calc(100% - 23px - 65px - 47px - 16px); */
   /* height: 60vh; */
-  height: 62vh;
+  height: 64vh;
   /* height: auto; */
   min-width: 300px;
   max-width: 355px;
@@ -165,11 +192,11 @@ body {
 }
 
 .pic_wrap {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
-.pic_img{
+.pic_img {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -205,7 +232,7 @@ body {
   position: relative;
   left: 0;
   right: 0;
-  top: 80vh;
+  top: 75vh;
   margin: auto;
   height: 65px;
   display: flex;

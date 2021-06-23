@@ -4,22 +4,9 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  // state: {
-  // },
-  // mutations: {
-  // },
-  // actions: {
-  // },
-  // modules: {
-  // }
   state: {
-    count: 0,
     loader: false,
     sessionActive: false,
-  },
-  mutations: {
-    increment (state) {
-      state.count++
-    }
+    cardsLoaded: false,
   }
 })
