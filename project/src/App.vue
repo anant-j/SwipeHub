@@ -59,4 +59,10 @@ template {
   position: relative;
   text-align: center;
 }
+
+@media only screen and (min-width: 600px) {
+body {
+  overflow: hidden !important;
+}
+}
 </style>
