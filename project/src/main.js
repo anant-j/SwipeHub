@@ -13,12 +13,34 @@ Vue.config.productionTip = false
 
 Vue.mixin({
   methods: {
-    showToast(message, type, timeout) {
-      this.$toast(message, { type: type, timeout: timeout });
+    showAlert(message, type, timeout) {
+      this.$toast(message.toString(), { type: getType(type), timeout: parseInt(timeout) });
     },
   }
 })
 
+function getType(types) {
+  types = types.toLowerCase().trim();
+  switch (types) {
+    case "success":
+    case "s":
+      return "success"
+    case "error":
+    case "e":
+      return "error"
+    case "default":
+    case "d":
+      return "default"
+    case "info":
+    case "i":
+      return "info"
+    case "warning":
+    case "w":
+      return "warning"
+    default:
+      return "success"
+  }
+}
 const options = {
   position: 'top-center',
   maxToasts: 3,
