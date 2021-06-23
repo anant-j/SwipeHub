@@ -120,7 +120,7 @@ export default {
 body {
   margin: 0;
   background-color: #20262e;
-  overflow: hidden;
+  overflow-y: hidden;
 }
 
 .card-overlay {
@@ -269,13 +269,11 @@ body {
   top: 70vh;
 }
 }
+
+@media only screen and (min-width: 600px) {
+body {
+  overflow-x: hidden;
+}
+}
 </style>
 
-<style>
-@media only screen and (max-width: 600px) {
-body, #app, #session {
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-}
-</style>

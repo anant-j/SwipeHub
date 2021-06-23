@@ -39,7 +39,7 @@ body {
   height: 100vh;
   width: 100vw;
   background-color: rgb(20, 20, 20) !important;
-  overflow: hidden;
+  overflow-x: hidden;
   color: white;
   user-select: none;
   -moz-user-select: none;
