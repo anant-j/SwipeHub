@@ -13,8 +13,14 @@ Vue.config.productionTip = false
 
 Vue.mixin({
   methods: {
-    showAlert(message, type, timeout) {
-      this.$toast(message.toString(), { type: getType(type), timeout: parseInt(timeout) });
+    /**
+     * @param  {string} message : Content of the alert 
+     * @param  {string} type="s" Type: success, warning, error, info, default
+     * @param  {number} timeout=false : Add int in miliseconds, false for persistent
+     * @param  {boolean} icon=true : Show icon/symbol
+     */
+    showAlert(message, type = "s", timeout = false, icon = true) {
+      this.$toast(message.toString(), { type: getType(type), timeout: parseInt(timeout), icon: icon});
     },
   }
 })
