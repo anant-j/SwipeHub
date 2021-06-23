@@ -39,7 +39,7 @@ body {
   height: 100vh;
   width: 100vw;
   background-color: rgb(20, 20, 20) !important;
-  overflow-x: hidden;
+  overflow: hidden;
   color: white;
   user-select: none;
   -moz-user-select: none;
@@ -58,11 +58,5 @@ template {
 .centered {
   position: relative;
   text-align: center;
-}
-
-@media only screen and (min-width: 600px) {
-body {
-  overflow: hidden !important;
-}
 }
 </style>
