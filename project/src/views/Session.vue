@@ -13,7 +13,7 @@
           class="pic"
           @click="showInfo = !showInfo"
           :style="{
-            'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`,
+            'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
           }"
         />
         <div
@@ -25,7 +25,7 @@
           <div
             class="pic_img"
             :style="{
-              'background-image': `url(https://cn.bing.com//th?id=OHR.${scope.data.id}_UHD.jpg&pid=hp&w=720&h=1280&rs=1&c=4&r=0)`,
+              'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
             }"
           ></div>
         </div>
@@ -132,19 +132,14 @@ body {
 
 #session .vue-tinder {
   position: absolute;
-  /* margin-top:7vh!important; */
   z-index: 1;
-  left: 0;
+  left: 1px;
   right: 0;
   top: 50px;
   margin: auto;
-  width: calc(100% - 20px);
-  /* height: calc(100% - 23px - 65px - 47px - 16px); */
-  /* height: 60vh; */
-  height: 60vh;
-  /* height: auto; */
-  min-width: 300px;
-  max-width: 355px;
+  height: 69vh;
+  width: 46vh;
+  cursor: pointer;
 }
 
 .nope-pointer,
@@ -187,8 +182,11 @@ body {
 .pic {
   width: 100%;
   height: 100%;
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
+  /* box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15); */
+
 }
 
 .pic_wrap {
@@ -203,25 +201,19 @@ body {
   bottom: 0px;
   left: 0px;
   opacity: 0.3;
-  background-size: cover;
+    background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
 }
-
-/* .pic_wrap::before {
-    content: "";
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
-    background-color: rgba(0,0,0,0.25);
-} */
 
 .pic_content {
   position: absolute;
   width: 100%;
   height: 100%;
   top: 40%;
+  word-break: break-all;
+  padding-left: 20px;
+  padding-right: 20px;
   justify-content: center;
   align-items: center;
   color: black;
@@ -232,7 +224,7 @@ body {
   position: relative;
   left: 0;
   right: 0;
-  top: 70vh;
+  top: 80vh;
   margin: auto;
   height: 65px;
   display: flex;
@@ -262,4 +254,26 @@ body {
 .btns img:nth-last-child(1) {
   margin-right: 0;
 }
+
+@media only screen and (max-width: 600px) {
+  #session .vue-tinder {
+    top: 50px;
+    margin: auto;
+    width: calc(100% - 20px);
+    height: 60vh;
+    width: 40vh;
+  }
+
+  
+.btns {
+  top: 70vh;
+}
+}
+
+@media only screen and (min-width: 600px) {
+body {
+  overflow-x: hidden;
+}
+}
 </style>
+
