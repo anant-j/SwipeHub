@@ -141,7 +141,7 @@ body {
   width: calc(100% - 20px);
   /* height: calc(100% - 23px - 65px - 47px - 16px); */
   /* height: 60vh; */
-  height: 64vh;
+  height: 60vh;
   /* height: auto; */
   min-width: 300px;
   max-width: 355px;
@@ -232,7 +232,7 @@ body {
   position: relative;
   left: 0;
   right: 0;
-  top: 75vh;
+  top: 70vh;
   margin: auto;
   height: 65px;
   display: flex;
