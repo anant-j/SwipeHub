@@ -20,7 +20,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
+            <li class="nav-item" v-if="!this.$store.state.sessionActive">
               <router-link class="nav-link" to="/" v-on:click.native="toHomePage()">Home</router-link>
             </li>
             <li class="nav-item">

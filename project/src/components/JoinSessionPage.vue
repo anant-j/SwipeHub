@@ -15,6 +15,7 @@
               v-model="$v.form.username.$model"
               :state="validateState('username')"
               aria-describedby="username-feedback"
+              maxlength=30
             ></b-form-input>
 
             <b-form-valid-feedback id="username-feedback"
@@ -37,8 +38,8 @@
               v-model="$v.form.sessionId.$model"
               :state="validateState('sessionId')"
               aria-describedby="sessionId-feedback"
-              minlength="6"
-              maxlength="6"
+              minlength=6
+              maxlength=6
             ></b-form-input>
 
             <b-form-valid-feedback id="sessionId-feedback"
@@ -46,7 +47,7 @@
             >
             <b-form-invalid-feedback id="sessionId-feedback"
               >Session ID is required and must be 6
-              characters.<br>Don't have a session ID? <a onclick="toCreateSessionPage()">Create a Session</a></b-form-invalid-feedback
+              characters.<br>Don't have a session ID? <span class="errorLink" @click="toCreateSessionPage()"><u><b>Create a Session</b></u></span></b-form-invalid-feedback
             >
           </b-form-group>
           <br />
@@ -140,6 +141,9 @@ export default {
 button {
   margin: 10px;
   min-width: 100px;
+}
+.errorLink{
+  cursor: pointer;
 }
 @media only screen and (max-width: 600px) {
   .outerbtn {
