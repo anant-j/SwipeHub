@@ -25,14 +25,17 @@
               >User ID is required and cannot conatin special characters.</b-form-invalid-feedback
             >
           </b-form-group>
-<div>
-  <label class="typo__label">Select with search</label>
-  <multiselect v-model="value" :options="options" :custom-label="nameWithLang" placeholder="Select one" label="name" track-by="name"></multiselect>
-  <pre class="language-json"><code>{{ value  }}</code></pre>
-</div>
-          <br />
+          <br>
+
+          <div>
+          <label class="typo__label">Language</label>
+          <multiselect v-model="value" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Choose language"></multiselect>
+          <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
+          </div>
+
+          <br>
           
-          <br />
+          <br>
           <div class="button-center">
           <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
             >Back</b-button
@@ -67,16 +70,10 @@ export default {
     return {
       form: {
         username: null,
-        sessionId: null,
+        language: null,
       },
-      value: { name: 'Vue.js', language: 'JavaScript' },
-      options: [
-        { name: 'Vue.js', language: 'JavaScript' },
-        { name: 'Rails', language: 'Ruby' },
-        { name: 'Sinatra', language: 'Ruby' },
-        { name: 'Laravel', language: 'PHP' },
-        { name: 'Phoenix', language: 'Elixir' }
-      ]
+      value: null,
+      options: ['Select option', 'options', 'selected', 'mulitple', 'label', 'searchable', 'clearOnSelect', 'hideSelected', 'maxHeight', 'allowEmpty', 'showLabels', 'onChange', 'touched']
     };
   },
   validations: {
@@ -103,7 +100,7 @@ export default {
     resetForm() {
       this.form = {
         username: null,
-        sessionId: null,
+        language: null,
       };
 
       this.$nextTick(() => {
