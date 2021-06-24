@@ -1,54 +1,157 @@
 <template>
   <div class="vertical-center">
-    <div class="container">
-      <br><br>
-      <button
-        type="button"
-        class="col-3 btn outerbtn btn-primary btn-lg"
-        @click = "$store.state.sessionState=1"
-      >
-        Join Session
-      </button>
-        <br><br>
-        <button
-          type="button"
-          class="col-3 btn outerbtn btn-info btn-lg"
-          @click = "$store.state.sessionState=2"
-        >
-          Create Session
-        </button>
+    <div class="container h-100">
+      <div class="row h-100 justify-content-center align-items-center">
+        <b-form @submit.stop.prevent="onSubmit">
+          <b-form-group
+            id="username-label"
+            label="Username *"
+            label-for="username"
+          >
+            <b-form-input
+              id="username"
+              name="username"
+              placeholder="Enter Username"
+              v-model="$v.form.username.$model"
+              :state="validateState('username')"
+              aria-describedby="username-feedback"
+              maxlength=30
+            ></b-form-input>
+
+            <b-form-valid-feedback id="username-feedback"
+              >Looks good</b-form-valid-feedback
+            >
+            <b-form-invalid-feedback id="username-feedback"
+              >User ID is required and cannot conatin special characters.</b-form-invalid-feedback
+            >
+          </b-form-group>
+<div>
+  <label class="typo__label">Select with search</label>
+  <multiselect v-model="value" :options="options" :custom-label="nameWithLang" placeholder="Select one" label="name" track-by="name"></multiselect>
+  <pre class="language-json"><code>{{ value  }}</code></pre>
+</div>
+          <br />
+          
+          <br />
+          <div class="button-center">
+          <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
+            >Back</b-button
+          >
+          <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
+            >Reset</b-button
+          >
+          <b-button class="col-3" type="submit" variant="success">Submit</b-button>
+          </div>
+        </b-form>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
 // import Loader from "@/components/Loader.vue";
+import "vue-multiselect/dist/vue-multiselect.min.css"
+
 import store from "@/store/index.js";
+import { required, minLength, maxLength, helpers } from "vuelidate/lib/validators";
+const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i);
+import Multiselect from 'vue-multiselect'
 
 export default {
   name: "CreateSessionPage",
   store,
+    components: {
+      Multiselect
+  },
+  data() {
+    return {
+      form: {
+        username: null,
+        sessionId: null,
+      },
+      value: { name: 'Vue.js', language: 'JavaScript' },
+      options: [
+        { name: 'Vue.js', language: 'JavaScript' },
+        { name: 'Rails', language: 'Ruby' },
+        { name: 'Sinatra', language: 'Ruby' },
+        { name: 'Laravel', language: 'PHP' },
+        { name: 'Phoenix', language: 'Elixir' }
+      ]
+    };
+  },
+  validations: {
+    form: {
+      sessionId: {
+        required,
+        minLength: minLength(6),
+        maxLength: maxLength(6),
+      },
+      username: {
+        required,
+        alphaNumAndDotValidator
+      },
+    },
+  },
+  methods: {
+    nameWithLang ({ name, language }) {
+      return `${name} — [${language}]`
+    },
+    validateState(state) {
+      const { $dirty, $error } = this.$v.form[state];
+      return $dirty ? !$error : null;
+    },
+    resetForm() {
+      this.form = {
+        username: null,
+        sessionId: null,
+      };
+
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+    },
+    onSubmit() {
+      this.$v.form.$touch();
+      if (this.$v.form.$anyError) {
+        return;
+      }
+
+      alert("Form submitted!");
+    },
+  },
 };
 </script>
 
 <style scoped>
-.wrapper {
-  text-align: center;
-   /* display: flex; */
-  align-items: center;
-  justify-content: center;
-}
-
 .vertical-center {
-    min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-  min-height: 80vh; /* These two lines are counted as one :-)       */
-
-  display: flex;
+  height: 70vh;
+  /* text-align: center; */
   align-items: center;
 }
-@media only screen and (max-width:700px) {
+
+.button-center{
+  text-align: center;
+  align-items: center;
+} 
+
+.container {
+  max-width: 25vw;
+}
+button {
+  margin: 10px;
+  min-width: 100px;
+}
+.errorLink{
+  cursor: pointer;
+}
+@media only screen and (max-width: 600px) {
   .outerbtn {
     width: 90vw;
   }
+
+  .container {
+    max-width: 90vw;
+  }
 }
 </style>
+
