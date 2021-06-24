@@ -6,7 +6,7 @@
       <button
         type="button"
         class="col-3 btn outerbtn btn-primary btn-lg"
-        @click = "$store.state.sessionState=1"
+        @click = "toJoinSessionPage()"
       >
         Join Session
       </button>
@@ -14,7 +14,7 @@
         <button
           type="button"
           class="col-3 btn outerbtn btn-info btn-lg"
-          @click = "$store.state.sessionState=2"
+          @click = "toCreateSessionPage()"
         >
           Create Session
         </button>

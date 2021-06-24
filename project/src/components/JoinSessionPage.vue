@@ -2,63 +2,64 @@
   <div class="vertical-center">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
- <b-form @submit.stop.prevent="onSubmit">
-      <b-form-group id="username-label" label="Username *" label-for="username">
-        <b-form-input
-          id="username"
-          name="username"
-          placeholder="Enter Username"
-          v-model="$v.form.username.$model"
-          :state="validateState('username')"
-          aria-describedby="username-feedback"
-        ></b-form-input>
-
-    <b-form-valid-feedback
-          id="username-feedback"
-        >Looks good</b-form-valid-feedback>
-        <b-form-invalid-feedback
-          id="username-feedback"
-        >This is a required field and must be at least 3 characters.</b-form-invalid-feedback>
-      </b-form-group>
-
-
-      <b-button class="ml-2" variant="danger" @click="resetForm()">Back</b-button>
-      <b-button class="ml-2" variant="warning" @click="resetForm()">Reset</b-button>
-      <b-button type="submit" variant="success">Submit</b-button>
-    </b-form>
-        <!-- <form class="col-12" @submit.prevent="handleSubmit">
-          <div class="form-group">
-            <label for="username">First Name</label>
-            <input
-              type="text"
-              v-model="user.username"
+        <b-form @submit.stop.prevent="onSubmit">
+          <b-form-group
+            id="username-label"
+            label="Username *"
+            label-for="username"
+          >
+            <b-form-input
               id="username"
               name="username"
-              class="form-control"
-              :class="{ 'is-invalid': submitted && $v.user.username.$error }"
-            />
-            <div
-              v-if="submitted && !$v.user.username.required"
-              class="invalid-feedback"
+              placeholder="Enter Username"
+              v-model="$v.form.username.$model"
+              :state="validateState('username')"
+              aria-describedby="username-feedback"
+            ></b-form-input>
+
+            <b-form-valid-feedback id="username-feedback"
+              >Looks good</b-form-valid-feedback
             >
-              Username is required
-            </div>
+            <b-form-invalid-feedback id="username-feedback"
+              >User ID is required and cannot conatin special characters.</b-form-invalid-feedback
+            >
+          </b-form-group>
+          <br />
+          <b-form-group
+            id="sessionId-label"
+            label="Session ID *"
+            label-for="sessionId"
+          >
+            <b-form-input
+              id="sessionId"
+              name="sessionId"
+              placeholder="Enter Session ID"
+              v-model="$v.form.sessionId.$model"
+              :state="validateState('sessionId')"
+              aria-describedby="sessionId-feedback"
+              minlength="6"
+              maxlength="6"
+            ></b-form-input>
+
+            <b-form-valid-feedback id="sessionId-feedback"
+              >Looks good</b-form-valid-feedback
+            >
+            <b-form-invalid-feedback id="sessionId-feedback"
+              >Session ID is required and must be 6
+              characters.<br>Don't have a session ID? <a onclick="toCreateSessionPage()">Create a Session</a></b-form-invalid-feedback
+            >
+          </b-form-group>
+          <br />
+          <div class="button-center">
+          <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
+            >Back</b-button
+          >
+          <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
+            >Reset</b-button
+          >
+          <b-button class="col-3" type="submit" variant="success">Submit</b-button>
           </div>
-          <div class="text-center">
-            <button
-              type="button"
-              class="btn btn-lg btn-joinSession btn-danger"
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              class="btn btn-lg btn-joinSession btn-success"
-            >
-              Submit
-            </button>
-          </div>
-        </form> -->
+        </b-form>
       </div>
     </div>
   </div>
@@ -67,39 +68,42 @@
 <script>
 // import Loader from "@/components/Loader.vue";
 import store from "@/store/index.js";
-import { required, minLength } from "vuelidate/lib/validators";
+import { required, minLength, maxLength, helpers } from "vuelidate/lib/validators";
+const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i);
 
 export default {
   name: "JoinSessionPage",
   store,
-data() {
+  data() {
     return {
       form: {
         username: null,
-        sessionId: null
-      }
+        sessionId: null,
+      },
     };
   },
   validations: {
     form: {
       sessionId: {
-        required
+        required,
+        minLength: minLength(6),
+        maxLength: maxLength(6),
       },
       username: {
         required,
-        minLength: minLength(3)
-      }
-    }
+        alphaNumAndDotValidator
+      },
+    },
   },
   methods: {
-    validateState(username) {
-      const { $dirty, $error } = this.$v.form[username];
+    validateState(state) {
+      const { $dirty, $error } = this.$v.form[state];
       return $dirty ? !$error : null;
     },
     resetForm() {
       this.form = {
         username: null,
-        sessionId: null
+        sessionId: null,
       };
 
       this.$nextTick(() => {
@@ -113,9 +117,9 @@ data() {
       }
 
       alert("Form submitted!");
-    }
-  }
-  }
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -124,11 +128,18 @@ data() {
   /* text-align: center; */
   align-items: center;
 }
+
+.button-center{
+  text-align: center;
+  align-items: center;
+} 
+
 .container {
   max-width: 25vw;
 }
 button {
   margin: 10px;
+  min-width: 100px;
 }
 @media only screen and (max-width: 600px) {
   .outerbtn {
