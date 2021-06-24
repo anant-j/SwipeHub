@@ -8,5 +8,6 @@ export default new Vuex.Store({
     loader: false,
     sessionActive: false,
     cardsLoaded: false,
+    sessionState: 0
   }
 })
