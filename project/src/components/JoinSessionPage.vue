@@ -55,10 +55,7 @@
           <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
             >Back</b-button
           >
-          <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
-            >Reset</b-button
-          >
-          <b-button class="col-3" type="submit" variant="success">Submit</b-button>
+          <b-button class="col-3" type="submit" variant="success">Join</b-button>
           </div>
         </b-form>
       </div>
@@ -100,16 +97,6 @@ export default {
     validateState(state) {
       const { $dirty, $error } = this.$v.form[state];
       return $dirty ? !$error : null;
-    },
-    resetForm() {
-      this.form = {
-        username: null,
-        sessionId: null,
-      };
-
-      this.$nextTick(() => {
-        this.$v.$reset();
-      });
     },
     onSubmit() {
       this.$v.form.$touch();

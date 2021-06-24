@@ -4,7 +4,7 @@
     <router-link to="/about" v-if="this.$store.state.sessionActive">About</router-link> -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <router-link class="navbar-brand" to="/" @click="increment()"
+        <router-link class="navbar-brand" to="/" v-on:click.native="toHomePage()"
           >SwipeHub</router-link
         >
         <button
