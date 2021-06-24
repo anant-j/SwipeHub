@@ -217,6 +217,7 @@ body {
   align-items: center;
   color: black;
   z-index: 100;
+  text-align: center;
 }
 
 .btns {
