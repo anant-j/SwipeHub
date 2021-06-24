@@ -33,17 +33,11 @@ export default {
 </script>
 
 <style scoped>
-.wrapper {
-  text-align: center;
-   /* display: flex; */
-  align-items: center;
-  justify-content: center;
-}
-
 .vertical-center {
     min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
   min-height: 80vh; /* These two lines are counted as one :-)       */
-
+  position: relative;
+  text-align: center;
   display: flex;
   align-items: center;
 }

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Navbar style="position: relative" />
-    <div class="centered">
+    <div>
       <router-view />
     </div>
   </div>
@@ -53,11 +53,6 @@ body,
 template {
   padding: 0 !important;
   margin: 0 !important;
-}
-
-.centered {
-  position: relative;
-  text-align: center;
 }
 
 @media only screen and (min-width: 800px) {

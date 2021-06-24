@@ -1,24 +1,26 @@
 <template>
-  <div class="vertical-center">
-    <div class="container">
-      <br><br>
-      <button
-        type="button"
-        class="col-3 btn outerbtn btn-primary btn-lg"
-        @click = "$store.state.sessionState=0"
-      >
-        Back
-      </button>
-        <br><br>
-        <button
-          type="button"
-          class="col-3 btn outerbtn btn-info btn-lg"
-          @click = "$store.state.sessionState=3"
-        >
-          Join
-        </button>
+<div class="vertical-center">
+  <div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+    <form class="col-12" novalidate>
+      <div class="form-group">
+        <label for="usernameInput">Username</label>
+        <input type="text" class="form-control" id="username" placeholder="Enter a username">
       </div>
-    </div>
+      <div class="form-group">
+        <label for="sessionIdInput">Session Id</label>
+        <input type="text" class="form-control" id="sessionIdInput" placeholder="Session ID">
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-lg btn-joinSession btn-danger"
+            @click="toHomePage()">Back</button>
+        <button type="button" class="btn btn-lg btn-joinSession btn-success"
+            @click="validate1()">Submit</button>
+      </div>
+    </form>   
+  </div>
+</div>
+</div>
 </template>
 
 <script>
@@ -32,23 +34,28 @@ export default {
 </script>
 
 <style scoped>
-.wrapper {
-  text-align: center;
-   /* display: flex; */
-  align-items: center;
-  justify-content: center;
-}
-
-.vertical-center {
-    min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-  min-height: 80vh; /* These two lines are counted as one :-)       */
-
-  display: flex;
+.vertical-center{
+  height: 70vh; 
+  /* text-align: center; */
   align-items: center;
 }
-@media only screen and (max-width:700px) {
+.container {
+  max-width: 20vw;
+}
+input{
+  margin-bottom: 20px;
+}
+button{
+  margin: 10px;
+}
+@media only screen and (max-width:600px) {
   .outerbtn {
     width: 90vw;
   }
+
+  .container {
+    max-width: 90vw;
+  }
+
 }
 </style>
