@@ -60,9 +60,10 @@ template {
   text-align: center;
 }
 
-@media only screen and (min-width:800px) {
-body, #app {
-  overflow-y: hidden;
-}
+@media only screen and (min-width: 800px) {
+  body,
+  #app {
+    overflow-y: hidden;
+  }
 }
 </style>
