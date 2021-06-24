@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Navbar style="position: relative" />
-    <div>
+    <div style="position: relative">
       <router-view />
     </div>
   </div>
