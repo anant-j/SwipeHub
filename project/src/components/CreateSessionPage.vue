@@ -28,37 +28,8 @@
             >
           </b-form-group>
           <br />
-          <div v-if="localState >= 1">
-            <label class="typo__label">Language</label>
-            <multiselect
-              v-model="language"
-              :options="languageOptions"
-              :custom-label="langName"
-              placeholder="Select one"
-              :allow-empty="false"
-              label="name"
-              :searchable="true"
-              track-by="name"
-            ></multiselect>
-                    <br />
-          </div>
-  
-          <div v-if="localState >= 2">
-            <label class="typo__label">Platform</label>
-            <multiselect
-              v-model="platform"
-              :options="platformOptions"
-              :custom-label="platformName"
-              placeholder="Select one"
-              :allow-empty="false"
-              label="name"
-              :searchable="true"
-              track-by="name"
-            ></multiselect>
-                      <br />
-          </div>
 
-          <div v-if="localState >= 3">
+          <div v-if="localState >= 1">
             <label class="typo__label">Country</label>
             <multiselect
               v-model="country"
@@ -70,10 +41,38 @@
               :searchable="true"
               track-by="name"
             ></multiselect>
-                    <br />
+            <br />
           </div>
 
-  
+          <div v-if="localState >= 2">
+            <label class="typo__label">Language</label>
+            <multiselect
+              v-model="language"
+              :options="languageOptions"
+              :custom-label="langName"
+              placeholder="Select one"
+              :allow-empty="false"
+              label="name"
+              :searchable="true"
+              track-by="name"
+            ></multiselect>
+            <br />
+          </div>
+
+          <div v-if="localState >= 3">
+            <label class="typo__label">Platform</label>
+            <multiselect
+              v-model="platform"
+              :options="included(this.country)"
+              :custom-label="platformName"
+              placeholder="Select one"
+              :allow-empty="false"
+              label="name"
+              :searchable="true"
+              track-by="name"
+            ></multiselect>
+            <br />
+          </div>
 
           <br />
           <div class="button-center">
@@ -83,9 +82,9 @@
             <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
               >Reset</b-button
             >
-            <b-button class="col-3" @click="nextPage()" variant="success"
-              >{{submitButton}}</b-button
-            >
+            <b-button class="col-3" @click="nextPage()" variant="success">{{
+              submitButton
+            }}</b-button>
           </div>
         </b-form>
       </div>
@@ -132,6 +131,15 @@ export default {
     },
   },
   methods: {
+    included(country){
+      let tempPlatformOptions = []
+      for (let index = 0; index < this.platformOptions.length; index++) {
+        if ((this.platformOptions[index].country).includes(country.id)){
+          tempPlatformOptions.push(this.platformOptions[index]);
+        } 
+      }
+      return tempPlatformOptions;
+    },
     langName({ name }) {
       return `${name}`;
     },
@@ -149,8 +157,8 @@ export default {
       this.form = {
         username: null,
       };
-      this.localState= 0,
-      (this.language = data.defaultLanguage),
+      (this.localState = 0),
+        (this.language = data.defaultLanguage),
         (this.platform = data.defaultPlatform),
         (this.country = data.defaultCountry);
       this.$nextTick(() => {
@@ -159,9 +167,10 @@ export default {
     },
     nextPage() {
       if (this.localState < 3) {
-      this.localState += 1;}
-       if (this.localState == 3){
-        this.submitButton="Submit";
+        this.localState += 1;
+      }
+      if (this.localState == 3) {
+        this.submitButton = "Submit";
       }
     },
     onSubmit() {
