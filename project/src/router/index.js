@@ -14,7 +14,8 @@ const routes = [
     path: '/session',
     name: 'Session',
     component: () => import(/* webpackChunkName: "session" */ '../views/Session.vue')
-  }
+  },
+  { path: "*", component: Home }
 ]
 
 const router = new VueRouter({

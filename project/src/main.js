@@ -1,69 +1,91 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import Toast from "vue-toastification"
-import "./assets/alert.css"
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import Vue from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import Toast from "vue-toastification";
+import "./assets/alert.css";
 import VueGtag from "vue-gtag";
+import Vuelidate from "vuelidate";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import Multiselect from 'vue-multiselect'
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
     /**
-     * @param  {string} message : Content of the alert 
+     * @param  {string} message : Content of the alert
      * @param  {string} type="s" Type: success, warning, error, info, default
      * @param  {number} timeout=false : Add int in miliseconds, false for persistent
      * @param  {boolean} icon=true : Show icon/symbol
      */
     showAlert(message, type = "s", timeout = false, icon = true) {
-      this.$toast(message.toString(), { type: getType(type), timeout: parseInt(timeout), icon: icon});
+      this.$toast(message.toString(), {
+        type: getType(type),
+        timeout: parseInt(timeout),
+        icon: icon,
+      });
     },
-  }
-})
+    toHomePage(){
+      this.$store.state.sessionActive=false;
+      this.$store.state.sessionState=0;
+    },
+    toJoinSessionPage(){
+      this.$store.state.sessionState=1;
+    },
+    toCreateSessionPage(){
+      this.$store.state.sessionState=2;
+    }
+  },
+});
 
 function getType(types) {
   types = types.toLowerCase().trim();
   switch (types) {
     case "success":
     case "s":
-      return "success"
+      return "success";
     case "error":
     case "e":
-      return "error"
+      return "error";
     case "default":
     case "d":
-      return "default"
+      return "default";
     case "info":
     case "i":
-      return "info"
+      return "info";
     case "warning":
     case "w":
-      return "warning"
+      return "warning";
     default:
-      return "success"
+      return "success";
   }
 }
 const options = {
-  position: 'top-center',
+  position: "top-center",
   maxToasts: 3,
   closeOnClick: false,
-  pauseOnHover: false
-}
+  pauseOnHover: false,
+};
 
-Vue.use(VueGtag, {
-  config: { id: "G-7V3PX5TM85" }
-}, router);
+Vue.use(
+  VueGtag,
+  {
+    config: { id: "G-7V3PX5TM85" },
+  },
+  router
+);
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
 Vue.use(Toast, options);
+Vue.use(Vuelidate);
+Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
+Vue.component('multiselect', Multiselect)
 
 new Vue({
   router,
   store,
-  render: h => h(App)
-}).$mount('#app')
+  render: (h) => h(App),
+}).$mount("#app");
