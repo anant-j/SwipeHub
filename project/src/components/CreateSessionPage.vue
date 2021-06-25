@@ -170,6 +170,7 @@ export default {
         username: null,
       };
       (this.localState = 0),
+        (this.submitButton = "Next"),
         (this.language = data.defaultLanguage),
         (this.platform = data.defaultPlatform),
         (this.country = data.defaultCountry);
@@ -178,10 +179,14 @@ export default {
       });
     },
     nextPage() {
-      if (this.localState < 3) {
+      if (this.form.username == null) {
+        alert("Enter username")    // to be changed
+        this.localState = 0
+      }
+      else if (this.localState < 3) {
         this.localState += 1;
       }
-      if (this.localState == 3) {
+      else if (this.localState == 3) {
         this.submitButton = "Submit";
       }
     },
