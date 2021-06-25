@@ -179,15 +179,13 @@ export default {
       });
     },
     nextPage() {
-      if (this.form.username == null) {
-        // alert("Enter username")    // to be changed
+      if(this.form.username == null) {
         this.$v.form.$touch();
-        this.localState = 0
       }
-      else if (this.localState < 3) {
+      if (this.form.username != null && this.localState < 3) {
         this.localState += 1;
       }
-      else if (this.localState == 3) {
+      if (this.localState == 3) {
         this.submitButton = "Submit";
       }
     },
