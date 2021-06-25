@@ -40,6 +40,7 @@
               label="name"
               :searchable="true"
               track-by="name"
+              deselectLabel = "Currently Selected"
             ></multiselect>
             <br />
           </div>
@@ -55,6 +56,7 @@
               label="name"
               :searchable="true"
               track-by="name"
+              deselectLabel = "Currently Selected"
             ></multiselect>
             <br />
           </div>
@@ -70,7 +72,10 @@
               label="name"
               :searchable="true"
               track-by="name"
-            ></multiselect>
+              deselectLabel = "Currently Selected"
+            >
+            <template slot="singleLabel"><img class="option__image" height="30px" :src="platform.logo" :alt="platform.name"><span class="option__desc"><span class="option__title">  {{ platform.name }}</span></span></template>
+            </multiselect>
             <br />
           </div>
 
@@ -82,9 +87,13 @@
             <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
               >Reset</b-button
             >
-            <b-button class="col-3" @click="nextPage()" variant="success">{{
-              submitButton
-            }}</b-button>
+            <b-button
+              class="col-3"
+              @click="nextPage()"
+              v-if="submitButtonEnabled"
+              variant="success"
+              >{{ submitButton }}</b-button
+            >
           </div>
         </b-form>
       </div>
@@ -114,6 +123,7 @@ export default {
       },
       localState: 0,
       submitButton: "Next",
+      submitButtonEnabled: true,
       language: data.defaultLanguage,
       languageOptions: data.languages,
       platform: data.defaultPlatform,
@@ -131,13 +141,15 @@ export default {
     },
   },
   methods: {
-    included(country){
-      let tempPlatformOptions = []
+    included(country) {
+      let tempPlatformOptions = [];
       for (let index = 0; index < this.platformOptions.length; index++) {
-        if ((this.platformOptions[index].country).includes(country.id)){
+        if (this.platformOptions[index].country.includes(country.id)) {
           tempPlatformOptions.push(this.platformOptions[index]);
-        } 
+        }
       }
+      if (!tempPlatformOptions.includes(this.platform)){
+      this.platform = tempPlatformOptions[0];}
       return tempPlatformOptions;
     },
     langName({ name }) {
