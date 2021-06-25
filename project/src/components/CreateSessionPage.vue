@@ -7,6 +7,7 @@
             id="username-label"
             label="Username *"
             label-for="username"
+            v-if="localState >= 0"
           >
             <b-form-input
               id="username"
@@ -15,44 +16,76 @@
               v-model="$v.form.username.$model"
               :state="validateState('username')"
               aria-describedby="username-feedback"
-              maxlength=30
+              maxlength="30"
             ></b-form-input>
 
             <b-form-valid-feedback id="username-feedback"
               >Looks good</b-form-valid-feedback
             >
             <b-form-invalid-feedback id="username-feedback"
-              >User ID is required and cannot conatin special characters.</b-form-invalid-feedback
+              >User ID is required and cannot conatin special
+              characters.</b-form-invalid-feedback
             >
           </b-form-group>
-          <br>
+          <br />
+          <div v-if="localState >= 1">
+            <label class="typo__label">Language</label>
+            <multiselect
+              v-model="language"
+              :options="languageOptions"
+              :custom-label="langName"
+              placeholder="Select one"
+              :allow-empty="false"
+              label="name"
+              :searchable="true"
+              track-by="name"
+            ></multiselect>
+                    <br />
+          </div>
+  
+          <div v-if="localState >= 2">
+            <label class="typo__label">Platform</label>
+            <multiselect
+              v-model="platform"
+              :options="platformOptions"
+              :custom-label="platformName"
+              placeholder="Select one"
+              :allow-empty="false"
+              label="name"
+              :searchable="true"
+              track-by="name"
+            ></multiselect>
+                      <br />
+          </div>
 
-    <div>
-      <label class="typo__label">Language</label>
-      <multiselect v-model="language" :options="languageOptions" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
-    </div>
-<br>
-    <div>
-      <label class="typo__label">Platform</label>
-      <multiselect v-model="platform" :options="platformOptions" :custom-label="platformName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
-    </div>
-<br>
-    <div>
-      <label class="typo__label">Country</label>
-      <multiselect v-model="country" :options="countryOptions" :custom-label="countryName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
-    </div>
+          <div v-if="localState >= 3">
+            <label class="typo__label">Country</label>
+            <multiselect
+              v-model="country"
+              :options="countryOptions"
+              :custom-label="countryName"
+              placeholder="Select one"
+              :allow-empty="false"
+              label="name"
+              :searchable="true"
+              track-by="name"
+            ></multiselect>
+                    <br />
+          </div>
 
-          <br>
-          
-          <br>
+  
+
+          <br />
           <div class="button-center">
-          <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
-            >Back</b-button
-          >
-          <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
-            >Reset</b-button
-          >
-          <b-button class="col-3" type="submit" variant="success">Submit</b-button>
+            <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
+              >Back</b-button
+            >
+            <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
+              >Reset</b-button
+            >
+            <b-button class="col-3" @click="nextPage()" variant="success"
+              >{{submitButton}}</b-button
+            >
           </div>
         </b-form>
       </div>
@@ -62,49 +95,51 @@
 
 <script>
 // import Loader from "@/components/Loader.vue";
-import "vue-multiselect/dist/vue-multiselect.min.css"
+import "vue-multiselect/dist/vue-multiselect.min.css";
 
 import store from "@/store/index.js";
 import { required, helpers } from "vuelidate/lib/validators";
-const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i);
-import Multiselect from 'vue-multiselect'
-import * as data from "@/assets/data.js"
+const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
+import Multiselect from "vue-multiselect";
+import * as data from "@/assets/data.js";
 export default {
   name: "CreateSessionPage",
   store,
-    components: {
-      Multiselect
+  components: {
+    Multiselect,
   },
   data() {
     return {
       form: {
-        username: null
+        username: null,
       },
+      localState: 0,
+      submitButton: "Next",
       language: data.defaultLanguage,
       languageOptions: data.languages,
       platform: data.defaultPlatform,
       platformOptions: data.platforms,
       country: data.defaultCountry,
-      countryOptions: data.countries
+      countryOptions: data.countries,
     };
   },
   validations: {
     form: {
       username: {
         required,
-        alphaNumAndDotValidator
+        alphaNumAndDotValidator,
       },
     },
   },
   methods: {
-    langName ({ name }) {
-      return `${name}`
+    langName({ name }) {
+      return `${name}`;
     },
-    platformName ({ name }) {
-      return `${name}`
+    platformName({ name }) {
+      return `${name}`;
     },
-    countryName ({ name }) {
-      return `${name}`
+    countryName({ name }) {
+      return `${name}`;
     },
     validateState(state) {
       const { $dirty, $error } = this.$v.form[state];
@@ -114,12 +149,20 @@ export default {
       this.form = {
         username: null,
       };
-      this.language= data.defaultLanguage,
-      this.platform= data.defaultPlatform,
-      this.country= data.defaultCountry
+      this.localState= 0,
+      (this.language = data.defaultLanguage),
+        (this.platform = data.defaultPlatform),
+        (this.country = data.defaultCountry);
       this.$nextTick(() => {
         this.$v.$reset();
       });
+    },
+    nextPage() {
+      if (this.localState < 3) {
+      this.localState += 1;}
+       if (this.localState == 3){
+        this.submitButton="Submit";
+      }
     },
     onSubmit() {
       this.$v.form.$touch();
@@ -139,10 +182,10 @@ export default {
   align-items: center;
 }
 
-.button-center{
+.button-center {
   text-align: center;
   align-items: center;
-} 
+}
 
 .container {
   max-width: 25vw;
@@ -151,7 +194,7 @@ button {
   margin: 10px;
   min-width: 100px;
 }
-.errorLink{
+.errorLink {
   cursor: pointer;
 }
 @media only screen and (max-width: 600px) {
@@ -164,4 +207,3 @@ button {
   }
 }
 </style>
-
