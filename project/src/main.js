@@ -9,11 +9,33 @@ import Vuelidate from "vuelidate";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import Multiselect from 'vue-multiselect'
+import Multiselect from "vue-multiselect";
 
-Vue.config.productionTip = false;
+let productionMode = false;
+let backendUrl = "http://localhost:5001/theswipehub/us-central1";
+document.title = "SwipeHub Dev Mode";
+if (window.location.hostname != "localhost") {
+  productionMode = true;
+}
 
+Vue.config.productionTip = !productionMode;
+if (productionMode) {
+  Vue.use(
+    VueGtag,
+    {
+      config: { id: "G-7V3PX5TM85" },
+    },
+    router
+  );
+  document.title = "SwipeHub";
+  backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
+}
 Vue.mixin({
+  data() {
+    return {
+      backend: backendUrl,
+    };
+  },
   methods: {
     /**
      * @param  {string} message : Content of the alert
@@ -28,16 +50,16 @@ Vue.mixin({
         icon: icon,
       });
     },
-    toHomePage(){
-      this.$store.state.sessionActive=false;
-      this.$store.state.sessionState=0;
+    toHomePage() {
+      this.$store.state.sessionActive = false;
+      this.$store.state.sessionState = 0;
     },
-    toJoinSessionPage(){
-      this.$store.state.sessionState=1;
+    toJoinSessionPage() {
+      this.$store.state.sessionState = 1;
     },
-    toCreateSessionPage(){
-      this.$store.state.sessionState=2;
-    }
+    toCreateSessionPage() {
+      this.$store.state.sessionState = 2;
+    },
   },
 });
 
@@ -70,19 +92,11 @@ const options = {
   pauseOnHover: false,
 };
 
-Vue.use(
-  VueGtag,
-  {
-    config: { id: "G-7V3PX5TM85" },
-  },
-  router
-);
-
 Vue.use(Toast, options);
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
-Vue.component('multiselect', Multiselect)
+Vue.component("multiselect", Multiselect);
 
 new Vue({
   router,
