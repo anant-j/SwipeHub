@@ -180,7 +180,8 @@ export default {
     },
     nextPage() {
       if (this.form.username == null) {
-        alert("Enter username")    // to be changed
+        // alert("Enter username")    // to be changed
+        this.$v.form.$touch();
         this.localState = 0
       }
       else if (this.localState < 3) {
