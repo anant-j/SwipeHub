@@ -196,6 +196,10 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       }
+      if (this.localState < 3){
+        this.localState += 1;
+        return;
+      }
       alert("Form submitted!");
     },
   },
