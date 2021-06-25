@@ -27,11 +27,20 @@
           </b-form-group>
           <br>
 
-          <div>
-          <label class="typo__label">Language</label>
-          <multiselect v-model="value" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Choose language"></multiselect>
-          <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
-          </div>
+    <div>
+      <label class="typo__label">Language</label>
+      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+    </div>
+
+    <div>
+      <label class="typo__label">Platform</label>
+      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+    </div>
+
+    <div>
+      <label class="typo__label">Country</label>
+      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+    </div>
 
           <br>
           
@@ -56,10 +65,10 @@
 import "vue-multiselect/dist/vue-multiselect.min.css"
 
 import store from "@/store/index.js";
-import { required, minLength, maxLength, helpers } from "vuelidate/lib/validators";
+import { required, helpers } from "vuelidate/lib/validators";
 const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i);
 import Multiselect from 'vue-multiselect'
-
+import {defaultLanguage, languages} from "@/assets/data.js"
 export default {
   name: "CreateSessionPage",
   store,
@@ -69,20 +78,14 @@ export default {
   data() {
     return {
       form: {
-        username: null,
-        language: null,
+        username: null
       },
-      value: null,
-      options: ['Select option', 'options', 'selected', 'mulitple', 'label', 'searchable', 'clearOnSelect', 'hideSelected', 'maxHeight', 'allowEmpty', 'showLabels', 'onChange', 'touched']
+      language: defaultLanguage,
+      options: languages
     };
   },
   validations: {
     form: {
-      sessionId: {
-        required,
-        minLength: minLength(6),
-        maxLength: maxLength(6),
-      },
       username: {
         required,
         alphaNumAndDotValidator
@@ -90,8 +93,8 @@ export default {
     },
   },
   methods: {
-    nameWithLang ({ name, language }) {
-      return `${name} — [${language}]`
+    langName ({ name }) {
+      return `${name}`
     },
     validateState(state) {
       const { $dirty, $error } = this.$v.form[state];
@@ -100,9 +103,8 @@ export default {
     resetForm() {
       this.form = {
         username: null,
-        language: null,
       };
-
+      this.language= defaultLanguage,
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -112,7 +114,6 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       }
-
       alert("Form submitted!");
     },
   },
