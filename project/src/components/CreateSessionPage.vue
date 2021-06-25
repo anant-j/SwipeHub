@@ -29,17 +29,17 @@
 
     <div>
       <label class="typo__label">Language</label>
-      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+      <multiselect v-model="language" :options="languageOptions" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
     </div>
-
+<br>
     <div>
       <label class="typo__label">Platform</label>
-      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+      <multiselect v-model="platform" :options="platformOptions" :custom-label="platformName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
     </div>
-
+<br>
     <div>
       <label class="typo__label">Country</label>
-      <multiselect v-model="language" :options="options" :custom-label="langName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
+      <multiselect v-model="country" :options="countryOptions" :custom-label="countryName" placeholder="Select one" :allow-empty="false" label="name" :searchable="true" track-by="name"></multiselect>
     </div>
 
           <br>
@@ -68,7 +68,7 @@ import store from "@/store/index.js";
 import { required, helpers } from "vuelidate/lib/validators";
 const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i);
 import Multiselect from 'vue-multiselect'
-import {defaultLanguage, languages} from "@/assets/data.js"
+import * as data from "@/assets/data.js"
 export default {
   name: "CreateSessionPage",
   store,
@@ -80,8 +80,12 @@ export default {
       form: {
         username: null
       },
-      language: defaultLanguage,
-      options: languages
+      language: data.defaultLanguage,
+      languageOptions: data.languages,
+      platform: data.defaultPlatform,
+      platformOptions: data.platforms,
+      country: data.defaultCountry,
+      countryOptions: data.countries
     };
   },
   validations: {
@@ -96,6 +100,12 @@ export default {
     langName ({ name }) {
       return `${name}`
     },
+    platformName ({ name }) {
+      return `${name}`
+    },
+    countryName ({ name }) {
+      return `${name}`
+    },
     validateState(state) {
       const { $dirty, $error } = this.$v.form[state];
       return $dirty ? !$error : null;
@@ -104,7 +114,9 @@ export default {
       this.form = {
         username: null,
       };
-      this.language= defaultLanguage,
+      this.language= data.defaultLanguage,
+      this.platform= data.defaultPlatform,
+      this.country= data.defaultCountry
       this.$nextTick(() => {
         this.$v.$reset();
       });
