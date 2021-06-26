@@ -4,7 +4,7 @@
       <div class="row h-100 justify-content-center align-items-center">
         <b-form @submit.stop.prevent="onSubmit">
           <b-form-group id="username-label" label-for="username">
-            <b-label>Username <span style="color: red">*</span></b-label>
+            <label>Username <span style="color: red">*</span></label>
             <b-form-input
               id="username"
               name="username"
@@ -25,7 +25,7 @@
           </b-form-group>
           <br />
           <b-form-group id="sessionId-label" label-for="sessionId">
-            <b-label>Session ID <span style="color: red">*</span></b-label>
+            <label>Session ID <span style="color: red">*</span></label>
             <b-form-input
               id="sessionId"
               name="sessionId"

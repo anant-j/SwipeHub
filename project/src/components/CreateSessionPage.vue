@@ -10,7 +10,7 @@
                 label-for="username"
                 v-if="localState >= 0"
               >
-                <b-label>Username <span style="color: red">*</span></b-label>
+                <label>Username <span style="color: red">*</span></label>
                 <b-form-input
                   id="username"
                   name="username"
