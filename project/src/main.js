@@ -51,7 +51,6 @@ Vue.mixin({
       });
     },
     toHomePage() {
-      this.$store.state.sessionActive = false;
       this.$store.state.sessionState = 0;
     },
     toJoinSessionPage() {

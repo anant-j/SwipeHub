@@ -11,7 +11,7 @@
         <div
           v-if="!showInfo || queue[0].id != scope.data.id"
           class="pic"
-          @click="showInfo = !showInfo"
+          @click="cardClicked()"
           :style="{
             'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
           }"
@@ -19,7 +19,7 @@
         <div
           v-if="showInfo && queue[0].id == scope.data.id"
           class="pic_wrap"
-          @click="showInfo = !showInfo"
+          @click="cardClicked()"
         >
           <div class="pic_content">{{ scope.data.id }}</div>
           <div
@@ -53,7 +53,11 @@
     </Tinder>
     <div class="btns">
       <img src="../assets/nope.png" @click="decide('nope')" />
-      <img src="../assets/rewind.png" @click="decide('rewind')" />
+      <img
+        src="../assets/rewind.png"
+        v-if="rewindAllow"
+        @click="decide('rewind')"
+      />
       <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
       <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
@@ -70,7 +74,7 @@ export default {
   components: { Tinder },
   data: () => ({
     showInfo: false,
-    rewindAllow: true,
+    rewindAllow: false,
     queue: [],
     offset: 0,
     history: [],
@@ -110,8 +114,8 @@ export default {
         this.$refs.tinder.decide(choice);
       }
     },
-    clicked() {
-      alert("clicked");
+    cardClicked() {
+      this.showInfo = !this.showInfo;
     },
   },
 };

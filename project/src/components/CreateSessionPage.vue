@@ -177,7 +177,6 @@
 </template>
 
 <script>
-// import Loader from "@/components/Loader.vue";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
 import store from "@/store/index.js";
