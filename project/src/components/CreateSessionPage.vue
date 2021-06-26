@@ -186,7 +186,7 @@ export default {
       form: {
         username: null,
       },
-      localState: 3,
+      localState: 0,
       submitButton: "Next",
       submitButtonEnabled: true,
       language: data.defaultLanguage,
@@ -217,7 +217,7 @@ export default {
   },
   watch: {
     localState(value) {
-      if (value >= 2) {
+      if (value >= 3) {
         this.submitButton = "Submit";
       } else {
         this.submitButton = "Next";
