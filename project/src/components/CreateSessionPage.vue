@@ -21,9 +21,9 @@
                   maxlength="30"
                 ></b-form-input>
 
-                <b-form-valid-feedback id="username-feedback"
+                <!-- <b-form-valid-feedback id="username-feedback"
                   >Looks good</b-form-valid-feedback
-                >
+                > -->
                 <b-form-invalid-feedback id="username-feedback"
                   >User ID is required and cannot conatin special
                   characters.</b-form-invalid-feedback
@@ -43,6 +43,7 @@
                   track-by="name"
                   deselectLabel="Currently Selected"
                 ></multiselect>
+                <br />
               </div>
             </b-col>
           </b-row>
@@ -93,7 +94,6 @@
               </div>
             </b-col>
           </b-row>
-
           <div v-if="localState >= 2">
             <label class="typo__label">Categories</label>
             <multiselect
@@ -108,8 +108,43 @@
             >
             </multiselect>
           </div>
-
           <br />
+          <b-row>
+            <b-col>
+              <div v-if="localState >= 3">
+                <label class="typo__label">Content Type</label>
+                <multiselect
+                  v-model="contentType"
+                  :options="contentOptions"
+                  placeholder="Select one"
+                  :allow-empty="false"
+                  label="name"
+                  :searchable="false"
+                  track-by="name"
+                  deselectLabel="Currently Selected"
+                ></multiselect>
+                <br />
+              </div>
+            </b-col>
+            <b-col>
+              <div v-if="localState >= 3">
+                <label class="typo__label">Sort by</label>
+                <multiselect
+                  v-model="sortType"
+                  :options="sortOptions"
+                  placeholder="Select one"
+                  :allow-empty="false"
+                  label="name"
+                  :searchable="true"
+                  track-by="name"
+                  deselectLabel="Currently Selected"
+                >
+                </multiselect>
+                <br />
+              </div>
+            </b-col>
+          </b-row>
+
           <div class="button-center">
             <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
               >Back</b-button
@@ -151,7 +186,7 @@ export default {
       form: {
         username: null,
       },
-      localState: 0,
+      localState: 3,
       submitButton: "Next",
       submitButtonEnabled: true,
       language: data.defaultLanguage,
@@ -162,6 +197,14 @@ export default {
       countryOptions: data.countries,
       category: null,
       categoryOptions: data.categories,
+      contentType: { name: "Movie" },
+      contentOptions: [{ name: "Movie" }, { name: "TV" }],
+      sortType: { name: "Popularity" },
+      sortOptions: [
+        { name: "Popularity" },
+        { name: "Release Date" },
+        { name: "Revenue" },
+      ],
     };
   },
   validations: {
