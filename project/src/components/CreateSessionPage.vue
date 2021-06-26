@@ -7,10 +7,10 @@
             <b-col>
               <b-form-group
                 id="username-label"
-                label="Username *"
                 label-for="username"
                 v-if="localState >= 0"
               >
+                <b-label>Username <span style="color: red">*</span></b-label>
                 <b-form-input
                   id="username"
                   name="username"
@@ -32,7 +32,9 @@
             </b-col>
             <b-col>
               <div v-if="localState >= 0">
-                <label class="typo__label">Country</label>
+                <label class="typo__label"
+                  >Country <span style="color: red">*</span></label
+                >
                 <multiselect
                   v-model="country"
                   :options="countryOptions"
@@ -50,7 +52,9 @@
           <b-row>
             <b-col>
               <div v-if="localState >= 1">
-                <label class="typo__label">Language</label>
+                <label class="typo__label"
+                  >Language <span style="color: red">*</span></label
+                >
                 <multiselect
                   v-model="language"
                   :options="languageOptions"
@@ -66,7 +70,9 @@
             </b-col>
             <b-col>
               <div v-if="localState >= 1">
-                <label class="typo__label">Platform</label>
+                <label class="typo__label"
+                  >Platform <span style="color: red">*</span></label
+                >
                 <multiselect
                   v-model="platform"
                   :options="included(this.country)"
@@ -95,7 +101,7 @@
             </b-col>
           </b-row>
           <div v-if="localState >= 2">
-            <label class="typo__label">Categories</label>
+            <label class="typo__label">Categories (Optional)</label>
             <multiselect
               v-model="category"
               placeholder="Search or add a Category"
@@ -112,7 +118,9 @@
           <b-row>
             <b-col>
               <div v-if="localState >= 3">
-                <label class="typo__label">Content Type</label>
+                <label class="typo__label"
+                  >Content Type <span style="color: red">*</span></label
+                >
                 <multiselect
                   v-model="contentType"
                   :options="contentOptions"
@@ -128,7 +136,9 @@
             </b-col>
             <b-col>
               <div v-if="localState >= 3">
-                <label class="typo__label">Sort by</label>
+                <label class="typo__label"
+                  >Sort by <span style="color: red">*</span></label
+                >
                 <multiselect
                   v-model="sortType"
                   :options="sortOptions"
