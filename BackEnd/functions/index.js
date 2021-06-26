@@ -4,6 +4,9 @@ const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 const apiToken = functions.config().tmdb.key;
 // const apiToken = "";
+const TelegramURL = functions.config().telegram.url;
+const TelegramToken = functions.config().telegram.token;
+const TelegramChatID = functions.config().telegram.chatid;
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -63,6 +66,7 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
         platform,
         region,
         sortby,
+        1,
     );
   }
 
@@ -125,13 +129,11 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         .collection("sessions")
         .doc(id)
         .set(data, {merge: true});
-    res
-        .status(200)
-        .send({
-          movies: newMovieData,
-          isCreator: doc.data().creator == userId,
-          totalSwipes: users[userId]["totalSwipes"].length,
-        });
+    res.status(200).send({
+      movies: newMovieData,
+      isCreator: doc.data().creator == userId,
+      totalSwipes: users[userId]["totalSwipes"].length,
+    });
   }
 });
 
@@ -155,19 +157,17 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
     } else {
       res.status(404).send("Session does not exist");
     }
-    res
-        .status(200)
-        .send({
-          movies: doc.data().mediaInfo,
-          isCreator: doc.data().creator == userId,
-        });
+    res.status(200).send({
+      movies: doc.data().mediaInfo,
+      isCreator: doc.data().creator == userId,
+    });
   }
 });
 
 exports.subsequentCards = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const id = req.query.id.toUpperCase();
-  const totalCards = req.query.totalCards;
+  let totalCards = parseInt(req.query.totalCards);
   const sessionDb = admin.firestore().collection("sessions").doc(id);
   const doc = await sessionDb.get();
   if (!isValidSession(doc)) {
@@ -183,6 +183,7 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
     const sortby = doc.data().order;
     let dataSet = {};
     const oldDataSet = doc.data().mediaInfo;
+    totalCards = upperValue(totalCards);
     if (totalCards >= currentMovieSize) {
       const pageNum = totalCards / 20 + 1;
       if (movie === "true") {
@@ -202,6 +203,7 @@ exports.subsequentCards = functions.https.onRequest(async (req, res) => {
             platform,
             region,
             sortby,
+            pageNum,
         );
       }
       const newOrder = dataSet["order"];
@@ -315,13 +317,24 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
   return;
 });
 
+exports.deploymessages = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  const title = req.body.title;
+  const branch = req.body.branch;
+  const status = req.body.state;
+  const content = `Deployment: ${title}\nBranch : ${branch}\nStatus: ${status}`;
+  const resp = await axios.get(`${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`);
+  res.send(resp.status);
+  return;
+});
+
 /**
  * @param  {string} lang
  * @param  {string} genres
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
- * @param  {int} page
+ * @param  {number} page
  */
 async function generateMovieList(lang, genres, platform, region, sort, page) {
   const final = {};
@@ -353,16 +366,21 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
  * @param  {string} platform
  * @param  {string} region
  * @param  {string} sort
+ * @param  {number} page
  */
-async function generateTVList(lang, genres, platform, region, sort) {
+async function generateTVList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   for (let i = 0; i < data.length; i++) {
     const tempDict = {};
+    if (!("order" in final)) {
+      final["order"] = [];
+    }
+    final["order"].push(data[i]["id"]);
     tempDict["title"] = data[i]["original_name"];
     tempDict["description"] = data[i]["overview"];
     tempDict["poster"] =
@@ -471,4 +489,19 @@ function toArray(inp) {
  */
 function toSet(inp) {
   return new Set(inp);
+}
+
+/**
+ * @param  {number} numberOfCards
+ * @return {number} val
+ */
+function upperValue(numberOfCards) {
+  const ceiledNum = Math.ceil(numberOfCards / 10);
+  let val = 0;
+  if (ceiledNum % 2 == 0) {
+    val = ceiledNum * 10;
+  } else {
+    val = (ceiledNum + 1) * 10;
+  }
+  return val;
 }
