@@ -43,7 +43,7 @@
       <img
         class="card-overlay super-pointer"
         slot="super"
-        src="../assets/super-like.png"
+        src="../assets/like.png"
       />
       <img
         class="card-overlay rewind-pointer"
@@ -54,9 +54,9 @@
     <div class="btns">
       <img src="../assets/rewind.png" @click="decide('rewind')" />
       <img src="../assets/nope.png" @click="decide('nope')" />
-      <img src="../assets/super-like.png" @click="decide('super')" />
+      <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
-      <img src="../assets/help.png" @click="decide('help')" />
+      <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
     </div>
   </div>
 </template>
@@ -70,6 +70,7 @@ export default {
   components: { Tinder },
   data: () => ({
     showInfo: false,
+    rewindAllow: true,
     queue: [],
     offset: 0,
     history: [],
@@ -100,13 +101,13 @@ export default {
     },
     async decide(choice) {
       if (choice === "rewind") {
-        if (this.history.length) {
+        if (this.history.length && this.rewindAllow) {
           this.$refs.tinder.rewind([this.history.pop()]);
+          this.rewindAllow = false;
         }
-      } else if (choice === "help") {
-        window.open("https://shanlh.github.io/vue-tinder");
       } else {
         this.$refs.tinder.decide(choice);
+        this.rewindAllow = true;
       }
     },
     clicked() {
