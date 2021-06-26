@@ -75,7 +75,7 @@
                 >
                 <multiselect
                   v-model="platform"
-                  :options="included(this.country)"
+                  :options="tempPlatformOptions"
                   placeholder="Select one"
                   :allow-empty="false"
                   label="name"
@@ -203,6 +203,7 @@ export default {
       languageOptions: data.languages,
       platform: data.defaultPlatform,
       platformOptions: data.platforms,
+      tempPlatformOptions: data.platforms,
       country: data.defaultCountry,
       countryOptions: data.countries,
       category: null,
@@ -236,18 +237,17 @@ export default {
     "form.username": function (value) {
       this.form.username = value.trim();
     },
-  },
-  methods: {
-    included(country) {
-      let tempPlatformOptions = [];
-      tempPlatformOptions = this.platformOptions.filter((platform) =>
-        platform.country.includes(country.id)
+    country() {
+      let tempPlatformOptions = this.platformOptions.filter((platform) =>
+        platform.country.includes(this.country.id)
       );
       if (!tempPlatformOptions.includes(this.platform)) {
         this.platform = tempPlatformOptions[0];
       }
-      return tempPlatformOptions;
+      this.tempPlatformOptions = tempPlatformOptions;
     },
+  },
+  methods: {
     validateState(state) {
       const { $dirty, $error } = this.$v.form[state];
       return $dirty ? !$error : null;
