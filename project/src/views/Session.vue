@@ -52,8 +52,8 @@
       />
     </Tinder>
     <div class="btns">
-      <img src="../assets/rewind.png" @click="decide('rewind')" />
       <img src="../assets/nope.png" @click="decide('nope')" />
+      <img src="../assets/rewind.png" @click="decide('rewind')" />
       <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
       <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
@@ -93,6 +93,7 @@ export default {
       }
     },
     onSubmit(choice) {
+      this.rewindAllow = true;
       this.showInfo = false;
       if (this.queue.length < 3) {
         this.mock();
@@ -107,7 +108,6 @@ export default {
         }
       } else {
         this.$refs.tinder.decide(choice);
-        this.rewindAllow = true;
       }
     },
     clicked() {
