@@ -4,6 +4,9 @@ const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 const apiToken = functions.config().tmdb.key;
 // const apiToken = "";
+const TelegramURL = functions.config().telegram.url;
+const TelegramToken = functions.config().telegram.token;
+const TelegramChatID = functions.config().telegram.chatid;
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -314,6 +317,17 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
   return;
 });
 
+exports.deploymessages = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  const title = req.body.title;
+  const branch = req.body.branch;
+  const status = req.body.state;
+  const content = `Deployment: ${title}\nBranch : ${branch}\nStatus: ${status}`;
+  const resp = await axios.get(`${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`);
+  res.send(resp.status);
+  return;
+});
+
 /**
  * @param  {string} lang
  * @param  {string} genres
@@ -353,7 +367,7 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
  * @param  {string} region
  * @param  {string} sort
  * @param  {number} page
-*/
+ */
 async function generateTVList(lang, genres, platform, region, sort, page) {
   const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
@@ -482,12 +496,12 @@ function toSet(inp) {
  * @return {number} val
  */
 function upperValue(numberOfCards) {
-  const ceiledNum = Math.ceil(numberOfCards/10);
+  const ceiledNum = Math.ceil(numberOfCards / 10);
   let val = 0;
   if (ceiledNum % 2 == 0) {
     val = ceiledNum * 10;
   } else {
-    val = (ceiledNum+1)*10;
+    val = (ceiledNum + 1) * 10;
   }
   return val;
 }
