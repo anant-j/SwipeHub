@@ -156,8 +156,11 @@
           </b-row>
 
           <div class="button-center">
-            <b-button class="ml-2 col-3" variant="danger" @click="toHomePage()"
-              >Back</b-button
+            <b-button
+              class="ml-2 col-3"
+              variant="danger"
+              @click="toHomePage()"
+              >{{ backButton }}</b-button
             >
             <b-button class="ml-2 col-3" variant="warning" @click="resetForm()"
               >Reset</b-button
@@ -197,6 +200,7 @@ export default {
       },
       localState: 0,
       submitButton: "Next",
+      backButton: "Back",
       submitButtonEnabled: true,
       language: data.defaultLanguage,
       languageOptions: data.languages,
@@ -231,6 +235,11 @@ export default {
         this.submitButton = "Submit";
       } else {
         this.submitButton = "Next";
+      }
+      if (value == 0) {
+        this.backButton = "Back";
+      } else {
+        this.backButton = "Home";
       }
     },
     "form.username": function (value) {
