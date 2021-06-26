@@ -234,19 +234,15 @@ export default {
       }
     },
     "form.username": function (value) {
-      console.log(value);
-      this.form.username = this.form.username.trim();
-      //to work with changes in prop
+      this.form.username = value.trim();
     },
   },
   methods: {
     included(country) {
       let tempPlatformOptions = [];
-      for (let index = 0; index < this.platformOptions.length; index++) {
-        if (this.platformOptions[index].country.includes(country.id)) {
-          tempPlatformOptions.push(this.platformOptions[index]);
-        }
-      }
+      tempPlatformOptions = this.platformOptions.filter((platform) =>
+        platform.country.includes(country.id)
+      );
       if (!tempPlatformOptions.includes(this.platform)) {
         this.platform = tempPlatformOptions[0];
       }
@@ -289,14 +285,14 @@ export default {
       }
       alert("Form submitted!");
     },
-  },
-  addTag(newTag) {
-    const tag = {
-      name: newTag,
-      code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
-    };
-    this.categoryOptions.push(tag);
-    this.category.push(tag);
+    addTag(newTag) {
+      const tag = {
+        name: newTag,
+        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
+      };
+      this.categoryOptions.push(tag);
+      this.category.push(tag);
+    },
   },
 };
 </script>
