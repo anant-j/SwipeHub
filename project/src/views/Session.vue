@@ -68,6 +68,7 @@
 <script>
 import Tinder from "vue-tinder";
 import source from "@/views/bing.js";
+import axios from "axios";
 
 export default {
   name: "Session",
@@ -82,8 +83,13 @@ export default {
   created() {
     this.$store.state.sessionActive = true;
     this.mock();
+    this.callApi();
   },
   methods: {
+    async callApi() {
+      const result = await axios.get("https://randomuser.me/api/");
+      console.log(result);
+    },
     mock(count = 10, append = true) {
       const list = [];
       for (let i = 0; i < count; i++) {
