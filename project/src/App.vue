@@ -33,6 +33,7 @@ export default {
 body {
   overflow: hidden;
 }
+
 #app {
   font-family: tfont, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
