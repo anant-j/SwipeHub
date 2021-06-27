@@ -14,7 +14,6 @@
               aria-describedby="username-feedback"
               maxlength="30"
             ></b-form-input>
-
             <b-form-valid-feedback id="username-feedback"
               >Looks good</b-form-valid-feedback
             >
