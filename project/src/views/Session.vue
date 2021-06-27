@@ -70,7 +70,6 @@
 
 <script>
 import Tinder from "vue-tinder";
-import source from "@/views/bing.js";
 import axios from "axios";
 
 export default {
@@ -86,7 +85,6 @@ export default {
   created() {
     this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
-    // this.mock();
     this.joinSession();
   },
   watch: {
@@ -146,18 +144,6 @@ export default {
           }
           this.queue = this.queue.concat(list);
         });
-    },
-    mock(count = 10, append = true) {
-      const list = [];
-      for (let i = 0; i < count; i++) {
-        list.push({ id: source[this.offset] });
-        this.offset++;
-      }
-      if (append) {
-        this.queue = this.queue.concat(list);
-      } else {
-        this.queue.unshift(...list);
-      }
     },
     onSubmit(choice) {
       this.rewindAllow = true;
