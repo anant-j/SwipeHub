@@ -2,7 +2,7 @@
   <div id="app">
     <Navbar style="position: relative" />
     <Loader v-if="this.$store.state.loader" />
-    <div style="position: relative" v-else>
+    <div style="position: relative">
       <router-view />
     </div>
   </div>

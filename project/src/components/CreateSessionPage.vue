@@ -43,7 +43,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -63,7 +64,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -81,7 +83,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 >
                   <template slot="singleLabel"
                     ><img
@@ -129,7 +132,8 @@
                   label="name"
                   :searchable="false"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -147,7 +151,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 >
                 </multiselect>
                 <br />
@@ -181,6 +186,7 @@
 
 <script>
 import "vue-multiselect/dist/vue-multiselect.min.css";
+import axios from "axios";
 
 import store from "@/store/index.js";
 import { required, helpers } from "vuelidate/lib/validators";
@@ -278,20 +284,11 @@ export default {
       if (this.$v.form.$anyError) {
         return;
       }
-      if (this.form.username != null && this.localState < 4) {
-        this.localState += 1;
-      }
-    },
-    onSubmit() {
-      this.$v.form.$touch();
-      if (this.$v.form.$anyError) {
-        return;
-      }
-      if (this.localState < 4) {
+      if (this.form.username != null && this.localState < 3) {
         this.localState += 1;
         return;
       }
-      alert("Form submitted!");
+      this.createSession();
     },
     addTag(newTag) {
       const tag = {
@@ -300,6 +297,55 @@ export default {
       };
       this.categoryOptions.push(tag);
       this.category.push(tag);
+    },
+    createSession() {
+      this.$store.state.loader = true;
+      const username = this.form.username;
+      const language = this.language.id;
+      const platform = this.platform.id;
+      const country = this.country.id;
+      const categories = this.category;
+      const type = this.contentType.name == "Movie";
+      const order = this.sortType.name;
+      let categoryList = "";
+      if (categories != null) {
+        for (const category of categories) {
+          categoryList += category.id.toString() + "|";
+        }
+        categoryList = categoryList.substring(0, categoryList.length - 1);
+      }
+      const params = {
+        username: username,
+        categories: categoryList,
+        languages: language,
+        platform: platform,
+        region: country,
+        type: type,
+        order: order,
+      };
+      const data = Object.keys(params)
+        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+        .join("&");
+      axios({
+        url: `${this.backend}/createSession`,
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        data,
+      })
+        .then((response) => {
+          if (response.status == 200) {
+            const sessionId = response.data.sessionId;
+            this.setSessionId(sessionId);
+            this.setUserId(username);
+            this.$router.push({ name: "Session" });
+          } else {
+            this.showAlert("This session could not be created!", "e", 5000);
+          }
+        })
+        .catch((response) => {
+          //handle error
+          console.log(response);
+        });
     },
   },
 };

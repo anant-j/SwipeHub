@@ -1,5 +1,5 @@
 <template>
-  <div id="session">
+  <div id="session" v-if="!this.$store.state.loader">
     <Tinder
       ref="tinder"
       key-name="id"
@@ -9,23 +9,26 @@
     >
       <template slot-scope="scope">
         <div
-          v-if="!showInfo || queue[0].id != scope.data.id"
+          v-if="(!showInfo || queue[0].id != scope.data.id) && photoAvailable"
           class="pic"
-          @click="cardClicked()"
+          v-on:dblclick="cardClicked()"
           :style="{
-            'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
+            'background-image': `url(${scope.data.id})`,
           }"
         />
         <div
-          v-if="showInfo && queue[0].id == scope.data.id"
+          v-if="(showInfo || !photoAvailable) && queue[0].id == scope.data.id"
           class="pic_wrap"
-          @click="cardClicked()"
+          v-on:dblclick="cardClicked()"
         >
-          <div class="pic_content">{{ scope.data.id }}</div>
+          <div class="pic_content">
+            <h2>{{ getTitle }}</h2>
+            <p>{{ getDescription }}</p>
+          </div>
           <div
             class="pic_img"
             :style="{
-              'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
+              'background-image': `url(${scope.data.id})`,
             }"
           ></div>
         </div>
@@ -53,11 +56,11 @@
     </Tinder>
     <div class="btns">
       <img src="../assets/nope.png" @click="decide('nope')" />
-      <img
+      <!-- <img
         src="../assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
-      />
+      /> -->
       <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
       <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
@@ -67,7 +70,7 @@
 
 <script>
 import Tinder from "vue-tinder";
-import source from "@/views/bing.js";
+import axios from "axios";
 
 export default {
   name: "Session",
@@ -76,31 +79,118 @@ export default {
     showInfo: false,
     rewindAllow: false,
     queue: [],
-    offset: 0,
     history: [],
+    likedList: [],
+    lastInteraction: 0,
   }),
   created() {
+    this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
-    this.mock();
+    this.getCards(
+      `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
+    );
+    this.poll();
+  },
+  computed: {
+    photoAvailable() {
+      const inputId = this.queue[0].id;
+      const posterlink = inputId.split("?id=")[0];
+      if (
+        posterlink == "http://image.tmdb.org/t/p/originalnull" ||
+        posterlink == "https://i.imgur.com/Sql8s2M.png"
+      ) {
+        return false;
+      }
+      return true;
+    },
+    getTitle() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const movieName = this.$store.state.movieData[movieId].title;
+      return movieName;
+    },
+    getDescription() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const movieDescription = this.$store.state.movieData[movieId].description;
+      return movieDescription;
+    },
   },
   methods: {
-    mock(count = 10, append = true) {
-      const list = [];
-      for (let i = 0; i < count; i++) {
-        list.push({ id: source[this.offset] });
-        this.offset++;
+    getCards(url) {
+      axios
+        .get(url, {
+          validateStatus: false,
+        })
+        .then((result) => {
+          this.$store.state.loader = false;
+          if (result.data.totalSwipes != undefined) {
+            this.$store.state.totalSwipes = result.data.totalSwipes;
+          }
+          const order = result.data.movies.order;
+          const list = [];
+          for (let i = 0; i < order.length; i++) {
+            let posterlink = result.data.movies[order[i]].poster;
+            if (posterlink == "http://image.tmdb.org/t/p/originalnull") {
+              posterlink = "https://i.imgur.com/Sql8s2M.png";
+            }
+            list.push({
+              id: posterlink + `?id=${order[i]}`,
+            });
+            this.$store.state.movieData[order[i]] =
+              result.data.movies[order[i]];
+          }
+          this.queue = this.queue.concat(list);
+        });
+    },
+    poll() {
+      if (this.pollAllowed()) {
+        const localTotalSwipes = [];
+        for (const val of this.history) {
+          localTotalSwipes.push(this.getId(val.id));
+        }
+        const params = {
+          totalSwipes: localTotalSwipes,
+          likedList: this.likedList,
+          sessionId: this.getSessionId,
+          userId: this.getUserId,
+        };
+        const data = Object.keys(params)
+          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+          .join("&");
+        axios({
+          url: `${this.backend}/polling`,
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          data,
+        })
+          .then((response) => {
+            const numMatch = response.data.match;
+            if (this.$store.state.totalMatches != numMatch) {
+              this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
+            }
+            this.$store.state.totalMatches = numMatch;
+          })
+          .catch((response) => {
+            //handle error
+            console.log(response);
+          });
       }
-      if (append) {
-        this.queue = this.queue.concat(list);
-      } else {
-        this.queue.unshift(...list);
-      }
+      setTimeout(() => this.poll(), 5000);
     },
     onSubmit(choice) {
+      this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
-      if (this.queue.length < 3) {
-        this.mock();
+      this.$store.state.totalSwipes += 1;
+      if (this.queue.length == 5) {
+        this.getCards(
+          `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
+        );
+      }
+      if (choice.type == "like" || choice.type == "super") {
+        const id = this.getId(choice.item.id);
+        this.likedList.push(id);
       }
       this.history.push(choice.item);
     },
@@ -115,7 +205,22 @@ export default {
       }
     },
     cardClicked() {
+      this.lastInteraction = new Date();
       this.showInfo = !this.showInfo;
+    },
+    getId(inputUrl) {
+      const movieId = inputUrl.split("?id=")[1];
+      return movieId;
+    },
+    pollAllowed() {
+      const currentTime = new Date();
+      if (
+        (currentTime - this.lastInteraction) / 1000 > 45 ||
+        this.lastInteraction == 0
+      ) {
+        return false;
+      }
+      return true;
     },
   },
 };
@@ -214,8 +319,8 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 40%;
-  word-break: break-all;
+  top: 10%;
+  /* word-break: break-all; */
   padding-left: 20px;
   padding-right: 20px;
   justify-content: center;

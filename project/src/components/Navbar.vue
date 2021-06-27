@@ -58,7 +58,9 @@
                 aria-labelledby="navbarDropdown"
               >
                 <li>
-                  <a class="dropdown-item" id="userIdPlaceholder">User Id</a>
+                  <a class="dropdown-item" id="userIdPlaceholder"
+                    >User Id: {{ getUserId }}</a
+                  >
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
@@ -68,7 +70,15 @@
                     class="dropdown-item"
                     id="sessionIdPlaceholder"
                     onclick="copyToClipboard('sessionId')"
-                    >SessionId</a
+                    >Session Id: {{ getSessionId }}</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" id="swipePlaceHolder"
+                    >Total Swipes : {{ $store.state.totalSwipes }}</a
                   >
                 </li>
               </ul>
