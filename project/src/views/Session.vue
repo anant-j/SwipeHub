@@ -144,7 +144,7 @@ export default {
         });
     },
     poll() {
-      if (this.pollAllowed()) {
+      if (this.pollAllowed() && this.$store.state.sessionActive) {
         const localTotalSwipes = [];
         for (const val of this.history) {
           localTotalSwipes.push(this.getId(val.id));
