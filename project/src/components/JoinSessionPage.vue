@@ -120,9 +120,8 @@ export default {
         })
         .then((result) => {
           if (result.status == 200) {
-            this.$store.state.sessionId = sessionId;
-            this.$store.state.userId = username;
-            // this.$store.state.loader = true;
+            this.setSessionId(sessionId);
+            this.setUserId(username);
             this.$router.push({ name: "Session" });
           } else {
             this.showAlert("This session could not be found!", "e", 5000);

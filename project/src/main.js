@@ -10,6 +10,7 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Multiselect from "vue-multiselect";
+const storage = window.localStorage;
 
 let productionMode = false;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -36,6 +37,24 @@ Vue.mixin({
       backend: backendUrl,
     };
   },
+  computed:{ 
+    getSessionId(){
+      if(this.$store.state.sessionId == null){
+        return(storage.getItem('sessionId'));
+      }
+      else{
+        return (this.$store.state.sessionId);
+      }
+    },
+    getUserId(){
+      if(this.$store.state.userId == null){
+        return(storage.getItem('userId'));
+      }
+      else{
+        return (this.$store.state.userId);
+      }
+    },
+  },
   methods: {
     /**
      * @param  {string} message : Content of the alert
@@ -59,6 +78,14 @@ Vue.mixin({
     toCreateSessionPage() {
       this.$store.state.sessionState = 2;
     },
+    setSessionId(sessionId){
+      storage.setItem('sessionId',sessionId);
+      this.$store.state.sessionId = sessionId;
+    },
+    setUserId(userId) {
+      storage.setItem('userId',userId);
+      this.$store.state.userId = userId;
+    }
   },
 });
 

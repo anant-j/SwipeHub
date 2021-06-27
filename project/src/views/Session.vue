@@ -123,7 +123,7 @@ export default {
     joinSession() {
       axios
         .get(
-          `${this.backend}/joinSession?id=${this.$store.state.sessionId}&user=${this.$store.state.userId}`
+          `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
         )
         .then((result) => {
           const order = result.data.movies.order;
