@@ -11,7 +11,7 @@
         <div
           v-if="(!showInfo || queue[0].id != scope.data.id) && photoAvailable"
           class="pic"
-          @click="cardClicked()"
+          v-on:dblclick="cardClicked()"
           :style="{
             'background-image': `url(${scope.data.id})`,
           }"
@@ -19,7 +19,7 @@
         <div
           v-if="(showInfo || !photoAvailable) && queue[0].id == scope.data.id"
           class="pic_wrap"
-          @click="cardClicked()"
+          v-on:dblclick="cardClicked()"
         >
           <div class="pic_content">
             <h2>{{ getTitle }}</h2>
@@ -79,13 +79,14 @@ export default {
     showInfo: false,
     rewindAllow: false,
     queue: [],
-    // offset: 0,
     history: [],
   }),
   created() {
     this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
-    this.joinSession();
+    this.getCards(
+      `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
+    );
   },
   watch: {
     history(value) {
@@ -118,14 +119,11 @@ export default {
     },
   },
   methods: {
-    joinSession() {
+    getCards(url) {
       axios
-        .get(
-          `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`,
-          {
-            validateStatus: false,
-          }
-        )
+        .get(url, {
+          validateStatus: false,
+        })
         .then((result) => {
           this.$store.state.loader = false;
           const order = result.data.movies.order;
@@ -140,7 +138,6 @@ export default {
             });
             this.$store.state.movieData[order[i]] =
               result.data.movies[order[i]];
-            // this.offset++;
           }
           this.queue = this.queue.concat(list);
         });
@@ -148,8 +145,10 @@ export default {
     onSubmit(choice) {
       this.rewindAllow = true;
       this.showInfo = false;
-      if (this.queue.length < 3) {
-        this.mock();
+      if (this.queue.length == 5) {
+        this.getCards(
+          `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
+        );
       }
       this.history.push(choice.item);
     },
