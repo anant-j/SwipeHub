@@ -322,7 +322,13 @@ exports.deploymessages = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const title = req.body.title;
   const key = req.query.token;
-  if (key==undefined || key.toLowerCase() != expectedToken) {
+  const branch = req.body.branch;
+  const status = req.body.state;
+  if (title == undefined || status == undefined || branch == undefined) {
+    res.status(404).send("Data Error");
+    return;
+  }
+  if (key == undefined || key.toLowerCase() != expectedToken) {
     res.status(401).send("Unauthorized!");
     return;
   }
@@ -330,8 +336,6 @@ exports.deploymessages = functions.https.onRequest(async (req, res) => {
     res.status(200).send("Done!");
     return;
   }
-  const branch = req.body.branch;
-  const status = req.body.state;
   const content = `Deployment: ${title}\nBranch : ${branch}\nStatus: ${status}`;
   const resp = await axios.get(
       `${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`,
