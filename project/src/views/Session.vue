@@ -11,9 +11,11 @@
         <div
           v-if="!showInfo || queue[0].id != scope.data.id"
           class="pic"
-          @click="cardClicked()"
+          @click="showAlert($store.state.movieData[scope.data.id].poster)"
           :style="{
-            'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
+            'background-image': `url(http://image.tmdb.org/t/p/original/${
+              $store.state.movieData[scope.data.id].poster
+            })`,
           }"
         />
         <div
@@ -21,11 +23,15 @@
           class="pic_wrap"
           @click="cardClicked()"
         >
-          <div class="pic_content">{{ scope.data.id }}</div>
+          <!-- <div class="pic_content">
+            {{ $store.state.movieData[scope.data.id].title }}
+          </div> -->
           <div
             class="pic_img"
             :style="{
-              'background-image': `url(http://image.tmdb.org/t/p/original/${scope.data.id})`,
+              'background-image': `url(http://image.tmdb.org/t/p/original/${
+                $store.state.movieData[scope.data.id].poster
+              })`,
             }"
           ></div>
         </div>
@@ -82,13 +88,26 @@ export default {
   }),
   created() {
     this.$store.state.sessionActive = true;
-    this.mock();
+    // this.mock();
     this.callApi();
   },
   methods: {
-    async callApi() {
-      const result = await axios.get("https://randomuser.me/api/");
-      console.log(result);
+    callApi() {
+      axios
+        .get(
+          `${this.backend}/joinSession?id=${this.$store.state.sessionId}&user=${this.$store.state.userId}`
+        )
+        .then((result) => {
+          const order = result.data.movies.order;
+          const list = [];
+          for (let i = 0; i < order.length; i++) {
+            list.push({ id: order[this.offset] });
+            this.$store.state.movieData[order[i]] =
+              result.data.movies[order[i]];
+            this.offset++;
+          }
+          this.queue = this.queue.concat(list);
+        });
     },
     mock(count = 10, append = true) {
       const list = [];
