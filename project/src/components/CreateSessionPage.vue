@@ -294,7 +294,7 @@ export default {
       this.category.push(tag);
     },
     createSession() {
-      // this.$store.state.loader = true;
+      this.$store.state.loader = true;
       const username = this.form.username;
       const language = this.language.id;
       const platform = this.platform.id;
