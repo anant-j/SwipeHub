@@ -82,6 +82,7 @@ export default {
     history: [],
     likedList: [],
     lastInteraction: 0,
+    sessionPausedNotifications: true,
   }),
   created() {
     this.$store.state.loader = true;
@@ -145,6 +146,7 @@ export default {
     },
     poll() {
       if (this.pollAllowed() && this.$store.state.sessionActive) {
+        this.sessionPausedNotifications = false;
         const localTotalSwipes = [];
         for (const val of this.history) {
           localTotalSwipes.push(this.getId(val.id));
@@ -175,6 +177,15 @@ export default {
             //handle error
             console.log(response);
           });
+      } else {
+        if (!this.sessionPausedNotifications) {
+          this.showAlert(
+            "Session is paused. Swipe again to receive session updates",
+            "w",
+            4900
+          );
+          this.sessionPausedNotifications = true;
+        }
       }
       setTimeout(() => this.poll(), 5000);
     },
