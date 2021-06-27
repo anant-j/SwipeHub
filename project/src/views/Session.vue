@@ -9,29 +9,26 @@
     >
       <template slot-scope="scope">
         <div
-          v-if="!showInfo || queue[0].id != scope.data.id"
+          v-if="(!showInfo || queue[0].id != scope.data.id) && photoAvailable"
           class="pic"
-          @click="showAlert($store.state.movieData[scope.data.id].poster)"
+          @click="cardClicked()"
           :style="{
-            'background-image': `url(http://image.tmdb.org/t/p/original/${
-              $store.state.movieData[scope.data.id].poster
-            })`,
+            'background-image': `url(${scope.data.id})`,
           }"
         />
         <div
-          v-if="showInfo && queue[0].id == scope.data.id"
+          v-if="(showInfo || !photoAvailable) && queue[0].id == scope.data.id"
           class="pic_wrap"
           @click="cardClicked()"
         >
-          <!-- <div class="pic_content">
-            {{ $store.state.movieData[scope.data.id].title }}
-          </div> -->
+          <div class="pic_content">
+            <h2>{{ getTitle }}</h2>
+            <p>{{ getDescription }}</p>
+          </div>
           <div
             class="pic_img"
             :style="{
-              'background-image': `url(http://image.tmdb.org/t/p/original/${
-                $store.state.movieData[scope.data.id].poster
-              })`,
+              'background-image': `url(${scope.data.id})`,
             }"
           ></div>
         </div>
@@ -91,6 +88,32 @@ export default {
     // this.mock();
     this.callApi();
   },
+  computed: {
+    photoAvailable() {
+      const inputId = this.queue[0].id;
+      const posterlink = inputId.split("?id=")[0];
+      console.log("photoAvailable" + inputId);
+      if (
+        posterlink == "http://image.tmdb.org/t/p/originalnull" ||
+        posterlink == "https://i.imgur.com/Sql8s2M.png"
+      ) {
+        return false;
+      }
+      return true;
+    },
+    getTitle() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const movieName = this.$store.state.movieData[movieId].title;
+      return movieName;
+    },
+    getDescription() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const movieDescription = this.$store.state.movieData[movieId].description;
+      return movieDescription;
+    },
+  },
   methods: {
     callApi() {
       axios
@@ -101,9 +124,15 @@ export default {
           const order = result.data.movies.order;
           const list = [];
           for (let i = 0; i < order.length; i++) {
-            list.push({ id: order[this.offset] });
-            this.$store.state.movieData[order[i]] =
-              result.data.movies[order[i]];
+            let posterlink = result.data.movies[order[this.offset]].poster;
+            if (posterlink == "http://image.tmdb.org/t/p/originalnull") {
+              posterlink = "https://i.imgur.com/Sql8s2M.png";
+            }
+            list.push({
+              id: posterlink + `?id=${order[this.offset]}`,
+            });
+            this.$store.state.movieData[order[this.offset]] =
+              result.data.movies[order[this.offset]];
             this.offset++;
           }
           this.queue = this.queue.concat(list);
@@ -239,8 +268,8 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 40%;
-  word-break: break-all;
+  top: 10%;
+  /* word-break: break-all; */
   padding-left: 20px;
   padding-right: 20px;
   justify-content: center;
