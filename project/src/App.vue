@@ -1,21 +1,21 @@
 <template>
   <div id="app">
     <Navbar style="position: relative" />
-    <!-- <Loader /> -->
+    <Loader v-if="this.$store.state.loader" />
     <div style="position: relative">
       <router-view />
     </div>
   </div>
 </template>
 <script>
-// import Loader from "@/components/Loader.vue";
+import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
 import store from "@/store/index.js";
 
 export default {
   name: "App",
   components: {
-    // Loader,
+    Loader,
     Navbar,
   },
   store,

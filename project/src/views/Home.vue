@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!this.$store.state.loader">
     <InitialPage v-if="this.$store.state.sessionState == 0" />
     <JoinSessionPage v-if="this.$store.state.sessionState == 1" />
     <CreateSessionPage v-if="this.$store.state.sessionState == 2" />

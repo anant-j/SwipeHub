@@ -114,6 +114,7 @@ export default {
     isSessionValid() {
       const username = this.form.username;
       const sessionId = this.form.sessionId;
+      this.$store.state.loader = true;
       axios
         .get(`${this.backend}/sessionValid?id=${sessionId}`, {
           validateStatus: false,

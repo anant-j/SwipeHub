@@ -1,5 +1,5 @@
 <template>
-  <div id="session">
+  <div id="session" v-if="!this.$store.state.loader">
     <Tinder
       ref="tinder"
       key-name="id"
@@ -84,7 +84,7 @@ export default {
     history: [],
   }),
   created() {
-    this.$store.state.showLoading = true;
+    this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
     // this.mock();
     this.joinSession();
@@ -123,9 +123,13 @@ export default {
     joinSession() {
       axios
         .get(
-          `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
+          `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`,
+          {
+            validateStatus: false,
+          }
         )
         .then((result) => {
+          this.$store.state.loader = false;
           const order = result.data.movies.order;
           const list = [];
           for (let i = 0; i < order.length; i++) {
@@ -141,7 +145,6 @@ export default {
             // this.offset++;
           }
           this.queue = this.queue.concat(list);
-          this.$store.state.showLoading = false;
         });
     },
     mock(count = 10, append = true) {
