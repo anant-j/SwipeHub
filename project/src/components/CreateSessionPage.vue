@@ -43,7 +43,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -63,7 +64,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -81,7 +83,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 >
                   <template slot="singleLabel"
                     ><img
@@ -129,7 +132,8 @@
                   label="name"
                   :searchable="false"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 ></multiselect>
                 <br />
               </div>
@@ -147,7 +151,8 @@
                   label="name"
                   :searchable="true"
                   track-by="name"
-                  deselectLabel="Currently Selected"
+                  selectLabel=""
+                  deselectLabel=""
                 >
                 </multiselect>
                 <br />
