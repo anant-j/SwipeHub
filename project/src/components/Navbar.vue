@@ -71,6 +71,14 @@
                     >SessionId</a
                   >
                 </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" id="swipePlaceHolder"
+                    >Total Swipes : {{ $store.state.totalSwipes }}</a
+                  >
+                </li>
               </ul>
             </li>
             <li class="nav-item" onclick="leaveSession()">

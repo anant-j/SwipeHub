@@ -11,6 +11,7 @@ export default new Vuex.Store({
     sessionActive: false,
     cardsLoaded: false,
     sessionState: 0,
-    movieData: {}
+    movieData: {},
+    totalSwipes: 0,
   },
 });

@@ -80,19 +80,24 @@ export default {
     showInfo: false,
     rewindAllow: false,
     queue: [],
-    offset: 0,
+    // offset: 0,
     history: [],
   }),
   created() {
+    this.$store.state.showLoading = true;
     this.$store.state.sessionActive = true;
     // this.mock();
-    this.callApi();
+    this.joinSession();
+  },
+  watch: {
+    history(value) {
+      this.$store.state.totalSwipes = value.length;
+    },
   },
   computed: {
     photoAvailable() {
       const inputId = this.queue[0].id;
       const posterlink = inputId.split("?id=")[0];
-      console.log("photoAvailable" + inputId);
       if (
         posterlink == "http://image.tmdb.org/t/p/originalnull" ||
         posterlink == "https://i.imgur.com/Sql8s2M.png"
@@ -115,7 +120,7 @@ export default {
     },
   },
   methods: {
-    callApi() {
+    joinSession() {
       axios
         .get(
           `${this.backend}/joinSession?id=${this.$store.state.sessionId}&user=${this.$store.state.userId}`
@@ -124,18 +129,19 @@ export default {
           const order = result.data.movies.order;
           const list = [];
           for (let i = 0; i < order.length; i++) {
-            let posterlink = result.data.movies[order[this.offset]].poster;
+            let posterlink = result.data.movies[order[i]].poster;
             if (posterlink == "http://image.tmdb.org/t/p/originalnull") {
               posterlink = "https://i.imgur.com/Sql8s2M.png";
             }
             list.push({
-              id: posterlink + `?id=${order[this.offset]}`,
+              id: posterlink + `?id=${order[i]}`,
             });
-            this.$store.state.movieData[order[this.offset]] =
-              result.data.movies[order[this.offset]];
-            this.offset++;
+            this.$store.state.movieData[order[i]] =
+              result.data.movies[order[i]];
+            // this.offset++;
           }
           this.queue = this.queue.concat(list);
+          this.$store.state.showLoading = false;
         });
     },
     mock(count = 10, append = true) {
