@@ -9,9 +9,10 @@ export default new Vuex.Store({
     sessionId: null,
     userId: null,
     sessionActive: false,
-    cardsLoaded: false,
     sessionState: 0,
     movieData: {},
     totalSwipes: 0,
+    matchData: {},
+    totalMatches: 0
   },
 });

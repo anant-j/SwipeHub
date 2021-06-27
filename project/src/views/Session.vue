@@ -56,11 +56,11 @@
     </Tinder>
     <div class="btns">
       <img src="../assets/nope.png" @click="decide('nope')" />
-      <img
+      <!-- <img
         src="../assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
-      />
+      /> -->
       <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
       <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
@@ -80,6 +80,8 @@ export default {
     rewindAllow: false,
     queue: [],
     history: [],
+    likedList: [],
+    lastInteraction: 0,
   }),
   created() {
     this.$store.state.loader = true;
@@ -87,11 +89,7 @@ export default {
     this.getCards(
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
-  },
-  watch: {
-    history(value) {
-      this.$store.state.totalSwipes = value.length;
-    },
+    this.poll();
   },
   computed: {
     photoAvailable() {
@@ -126,6 +124,9 @@ export default {
         })
         .then((result) => {
           this.$store.state.loader = false;
+          if (result.data.totalSwipes != undefined) {
+            this.$store.state.totalSwipes = result.data.totalSwipes;
+          }
           const order = result.data.movies.order;
           const list = [];
           for (let i = 0; i < order.length; i++) {
@@ -142,13 +143,54 @@ export default {
           this.queue = this.queue.concat(list);
         });
     },
+    poll() {
+      if (this.pollAllowed()) {
+        const localTotalSwipes = [];
+        for (const val of this.history) {
+          localTotalSwipes.push(this.getId(val.id));
+        }
+        const params = {
+          totalSwipes: localTotalSwipes,
+          likedList: this.likedList,
+          sessionId: this.getSessionId,
+          userId: this.getUserId,
+        };
+        const data = Object.keys(params)
+          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+          .join("&");
+        axios({
+          url: `${this.backend}/polling`,
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          data,
+        })
+          .then((response) => {
+            const numMatch = response.data.match;
+            if (this.$store.state.totalMatches != numMatch) {
+              this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
+            }
+            this.$store.state.totalMatches = numMatch;
+          })
+          .catch((response) => {
+            //handle error
+            console.log(response);
+          });
+      }
+      setTimeout(() => this.poll(), 5000);
+    },
     onSubmit(choice) {
+      this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
+      this.$store.state.totalSwipes += 1;
       if (this.queue.length == 5) {
         this.getCards(
           `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
         );
+      }
+      if (choice.type == "like" || choice.type == "super") {
+        const id = this.getId(choice.item.id);
+        this.likedList.push(id);
       }
       this.history.push(choice.item);
     },
@@ -163,7 +205,22 @@ export default {
       }
     },
     cardClicked() {
+      this.lastInteraction = new Date();
       this.showInfo = !this.showInfo;
+    },
+    getId(inputUrl) {
+      const movieId = inputUrl.split("?id=")[1];
+      return movieId;
+    },
+    pollAllowed() {
+      const currentTime = new Date();
+      if (
+        (currentTime - this.lastInteraction) / 1000 > 45 ||
+        this.lastInteraction == 0
+      ) {
+        return false;
+      }
+      return true;
     },
   },
 };
