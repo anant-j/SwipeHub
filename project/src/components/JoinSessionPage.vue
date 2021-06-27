@@ -64,6 +64,7 @@
 
 <script>
 import store from "@/store/index.js";
+import axios from "axios";
 import {
   required,
   minLength,
@@ -103,11 +104,30 @@ export default {
     },
     onSubmit() {
       this.$v.form.$touch();
+
       if (this.$v.form.$anyError) {
         return;
       }
 
-      alert("Form submitted!");
+      this.isSessionValid();
+    },
+    isSessionValid() {
+      const username = this.form.username;
+      const sessionId = this.form.sessionId;
+      axios
+        .get(`${this.backend}/sessionValid?id=${sessionId}`, {
+          validateStatus: false,
+        })
+        .then((result) => {
+          if (result.status == 200) {
+            this.$store.state.sessionId = sessionId;
+            this.$store.state.userId = username;
+            // this.$store.state.loader = true;
+            this.$router.push({ name: "Session" });
+          } else {
+            this.showAlert("This session could not be found!", "e", 5000);
+          }
+        });
     },
   },
 };
