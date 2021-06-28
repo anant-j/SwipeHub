@@ -7,10 +7,6 @@ const TelegramURL = functions.config().telegram.url;
 const TelegramToken = functions.config().telegram.token;
 const TelegramChatID = functions.config().telegram.chatid;
 const expectedToken = TelegramToken.split(":")[1].toLowerCase();
-// const apiToken = "";
-// const TelegramURL = "";
-// const TelegramToken = "";
-// const TelegramChatID = "";
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
