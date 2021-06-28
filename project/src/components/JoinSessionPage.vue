@@ -34,19 +34,6 @@
               aria-describedby="sessionId-feedback"
               minlength="6"
               maxlength="6"
-              v-if="!this.$store.state.sessionIdLocked"
-            ></b-form-input>
-            <b-form-input
-              id="sessionId"
-              name="sessionId"
-              placeholder="Enter Session ID"
-              v-model="$v.form.sessionId.$model"
-              :state="validateState('sessionId')"
-              aria-describedby="sessionId-feedback"
-              minlength="6"
-              maxlength="6"
-              v-if="this.$store.state.sessionIdLocked"
-              :disabled="true"
             ></b-form-input>
             <b-form-valid-feedback id="sessionId-feedback"
               >Looks good</b-form-valid-feedback
@@ -141,10 +128,12 @@ export default {
             this.setSessionId(sessionId);
             this.setUserId(username);
             this.$router.push({ name: "Session" });
-          } else {
-            this.showAlert("This session could not be found!", "e", 5000);
-            this.leaveSession();
+            return;
           }
+        })
+        .catch(() => {
+          this.showAlert("This session could not be found!", "e", 5000);
+          this.$store.state.loader = false;
         });
     },
   },
