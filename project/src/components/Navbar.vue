@@ -39,7 +39,7 @@
             </li>
           </ul>
           <ul class="navbar-nav" v-if="this.$store.state.sessionActive">
-            <li class="nav-item" onclick="createShareLink()">
+            <li class="nav-item" @click="createShareLink()">
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
             <li class="nav-item dropdown">
@@ -69,7 +69,7 @@
                   <a
                     class="dropdown-item"
                     id="sessionIdPlaceholder"
-                    onclick="copyToClipboard('sessionId')"
+                    @click="copyToClipboard('sessionId')"
                     >Session Id: {{ getSessionId }}</a
                   >
                 </li>
