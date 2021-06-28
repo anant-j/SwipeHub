@@ -85,6 +85,9 @@ export default {
     sessionPausedNotifications: true,
   }),
   created() {
+    if (!this.sessionDataPresent) {
+      this.$router.push({ name: "Home" });
+    }
     this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
     this.getCards(
@@ -127,6 +130,9 @@ export default {
           this.$store.state.loader = false;
           if (result.data.totalSwipes != undefined) {
             this.$store.state.totalSwipes = result.data.totalSwipes;
+          }
+          if (result.data.isCreator != undefined) {
+            this.$store.state.isCreator = result.data.isCreator;
           }
           const order = result.data.movies.order;
           const list = [];

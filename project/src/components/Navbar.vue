@@ -31,7 +31,7 @@
                 >Home</router-link
               >
             </li>
-            <li class="nav-item" v-if="this.$store.state.sessionActive">
+            <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="this.$store.state.sessionActive">
@@ -84,7 +84,18 @@
               </ul>
             </li>
             <li class="nav-item" @click="leaveSession()">
-              <a class="nav-link" id="leaveSessionBtn">Leave Session</a>
+              <a
+                class="nav-link"
+                id="leaveSessionBtn"
+                v-if="!this.$store.state.isCreator"
+                >Leave Session</a
+              >
+              <a
+                class="nav-link"
+                id="leaveSessionBtn"
+                v-if="this.$store.state.isCreator"
+                >End Session</a
+              >
             </li>
           </ul>
         </div>

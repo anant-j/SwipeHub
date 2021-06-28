@@ -55,6 +55,14 @@ Vue.mixin({
         return (this.$store.state.userId);
       }
     },
+    sessionDataPresent(){
+      if( this.getSessionId == null || this.getSessionId == undefined ||
+        this.getUserId == null ||
+        this.getUserId == undefined){
+          return false;
+        }
+      return true;
+    },
   },
   methods: {
     /**
