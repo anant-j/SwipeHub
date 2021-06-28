@@ -2,32 +2,7 @@
   <div id="app">
     <Navbar style="position: relative" />
     <Loader v-if="this.$store.state.loader" />
-    <b-modal
-      :visible="modalVisible"
-      id="modal-center"
-      @hide="$store.state.activeModal = false"
-      hide-header-close
-      centered
-      title="Share via QR Code/Send Link"
-      ok-only
-      ok-title="Done"
-    >
-      <p class="my-4 text-center">
-        <qrcode :value="this.getShareLink()" :options="{ width: 200 }"></qrcode
-        ><br />
-        <a :href="this.getShareLink()" target="_blank">{{
-          this.getShareLink()
-        }}</a>
-        <br /><br />
-        <button
-          type="button"
-          class="col-3 btn btn-primary btn-sm"
-          @click="shareLinkNatively()"
-        >
-          Send Link
-        </button>
-      </p>
-    </b-modal>
+    <ShareScreen />
     <div style="position: relative">
       <router-view />
     </div>
@@ -36,6 +11,7 @@
 <script>
 import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
+import ShareScreen from "@/components/ShareScreen.vue";
 import store from "@/store/index.js";
 
 export default {
@@ -43,13 +19,9 @@ export default {
   components: {
     Loader,
     Navbar,
+    ShareScreen,
   },
   store,
-  computed: {
-    modalVisible() {
-      return this.$store.state.activeModal;
-    },
-  },
 };
 </script>
 

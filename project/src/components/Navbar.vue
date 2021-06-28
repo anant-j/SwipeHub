@@ -39,7 +39,13 @@
             </li>
           </ul>
           <ul class="navbar-nav" v-if="this.$store.state.sessionActive">
-            <li class="nav-item" @click="createShareLink()">
+            <li
+              class="nav-item"
+              @click="
+                createShareLink();
+                hideModal();
+              "
+            >
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
             <li class="nav-item dropdown">
@@ -112,6 +118,20 @@ import store from "../store/index.js";
 export default {
   name: "Navbar",
   store,
+  watch: {
+    $route() {
+      document
+        .getElementById("navbarSupportedContent")
+        .classList.toggle("show");
+    },
+  },
+  methods: {
+    hideModal() {
+      document
+        .getElementById("navbarSupportedContent")
+        .classList.toggle("show");
+    },
+  },
 };
 </script>
 

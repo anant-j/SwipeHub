@@ -86,6 +86,7 @@ export default {
   }),
   created() {
     if (!this.sessionDataPresent) {
+      this.showAlert("Please join or create a session", "w", 5000);
       this.$router.push({ name: "Home" });
       return;
     }
