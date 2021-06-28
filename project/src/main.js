@@ -11,6 +11,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Multiselect from "vue-multiselect";
 const storage = window.localStorage;
+import axios from "axios";
 
 let productionMode = false;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -85,6 +86,23 @@ Vue.mixin({
     setUserId(userId) {
       storage.setItem('userId',userId);
       this.$store.state.userId = userId;
+    },
+    clearSession() {
+      storage.removeItem('sessionId');
+      storage.removeItem('userId');
+      this.$store.state.userId = null;
+      this.$store.state.sessionId = null;
+    },
+    leaveSession() {
+      const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`
+      axios
+        .get(url, {
+          validateStatus: false,
+        })
+        .then(() => {
+        this.clearSession();
+        this.$router.push({ name: "Home" });
+        });
     }
   },
 });
