@@ -10,8 +10,9 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Multiselect from "vue-multiselect";
-const storage = window.localStorage;
 import axios from "axios";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
+const storage = window.localStorage;
 
 let productionMode = false;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -156,8 +157,16 @@ Vue.mixin({
       this.showAlert(`${text} copied to clipboard`, "s", 7000);
     },
     createShareLink() {
-      const joinLink = `${hostURL}/?join=${this.getSessionId}`;
+      const joinLink = this.getShareLink();
       navigator.clipboard.writeText(joinLink);
+      this.$store.state.activeModal = true;
+      this.showAlert(`Shareable link copied to clipboard.`, "s", 7000);
+    },
+    getShareLink() {
+      return `${hostURL}/?join=${this.getSessionId}`;
+    },
+    shareLinkNatively() {
+      const joinLink = this.getShareLink();
       navigator
         .share({
           title: "SwipeHub Session Share",
@@ -166,7 +175,6 @@ Vue.mixin({
         })
         .then(() => console.log("Successful share! 🎉"))
         .catch((err) => console.error(err));
-      this.showAlert(`Shareable link copied to clipboard.`, "s", 7000);
     },
   },
 });
@@ -204,6 +212,7 @@ Vue.use(Toast, options);
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.component(VueQrcode.name, VueQrcode);
 Vue.component("multiselect", Multiselect);
 
 new Vue({
