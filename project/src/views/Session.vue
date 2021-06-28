@@ -87,6 +87,7 @@ export default {
   created() {
     if (!this.sessionDataPresent) {
       this.$router.push({ name: "Home" });
+      return;
     }
     this.$store.state.loader = true;
     this.$store.state.sessionActive = true;

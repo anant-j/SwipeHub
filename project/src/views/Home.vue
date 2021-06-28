@@ -18,6 +18,12 @@ export default {
   store,
   mounted() {
     this.$store.state.sessionActive = false;
+    if (window.location.href.includes("?join=")) {
+      const id = window.location.href.split("=")[1];
+      this.setSessionId(id);
+      this.$store.state.sessionState = 1;
+      this.$store.state.sessionIdLocked = true;
+    }
   },
 };
 </script>

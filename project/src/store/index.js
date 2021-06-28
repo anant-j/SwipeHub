@@ -8,12 +8,13 @@ export default new Vuex.Store({
     loader: false,
     sessionId: null,
     userId: null,
+    sessionIdLocked: false,
     sessionActive: false,
-    isCreator:false,
+    isCreator: false,
     sessionState: 0,
     movieData: {},
     totalSwipes: 0,
     matchData: {},
-    totalMatches: 0
+    totalMatches: 0,
   },
 });

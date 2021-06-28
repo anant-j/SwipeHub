@@ -105,7 +105,7 @@ Vue.mixin({
       this.$store.state.sessionState = 2;
     },
     setSessionId(sessionId) {
-      storage.setItem("sessionId", sessionId);
+      storage.setItem("sessionId", sessionId.toUpperCase());
       this.$store.state.sessionId = sessionId;
     },
     setUserId(userId) {
