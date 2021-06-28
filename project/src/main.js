@@ -33,7 +33,7 @@ if (productionMode) {
   );
   document.title = "SwipeHub";
   backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
-  hostURL = window.location.hostname;
+  hostURL = "https://" + window.location.hostname;
 }
 Vue.mixin({
   data() {
