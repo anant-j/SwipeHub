@@ -185,7 +185,10 @@ export default {
             console.log(response);
           });
       } else {
-        if (!this.sessionPausedNotifications) {
+        if (
+          !this.sessionPausedNotifications &&
+          this.$store.state.sessionActive
+        ) {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
             "w",

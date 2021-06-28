@@ -6,6 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     loader: false,
+    userId: null,
+    sessionId: null,
     sessionActive: false,
     isCreator: false,
     sessionState: 0,

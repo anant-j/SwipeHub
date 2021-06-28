@@ -42,23 +42,31 @@ Vue.mixin({
   },
   computed: {
     getSessionId() {
-      if (
-        storage.getItem("sessionId") == undefined ||
-        storage.getItem("sessionId") == null
-      ) {
-        return null;
+      if (this.$store.state.sessionId == null) {
+        if (
+          storage.getItem("sessionId") == undefined ||
+          storage.getItem("sessionId") == null
+        ) {
+          return null;
+        } else {
+          return storage.getItem("sessionId");
+        }
       } else {
-        return storage.getItem("sessionId").toUpperCase();
+        return this.$store.state.sessionId;
       }
     },
     getUserId() {
-      if (
-        storage.getItem("userId") == undefined ||
-        storage.getItem("userId") == null
-      ) {
-        return null;
+      if (this.$store.state.userId == null) {
+        if (
+          storage.getItem("userId") == undefined ||
+          storage.getItem("userId") == null
+        ) {
+          return null;
+        } else {
+          return storage.getItem("userId");
+        }
       } else {
-        return storage.getItem("userId");
+        return this.$store.state.userId;
       }
     },
     sessionDataPresent() {
@@ -97,14 +105,24 @@ Vue.mixin({
       this.$store.state.sessionState = 2;
     },
     setSessionId(sessionId) {
+      this.$store.state.sessionId = sessionId;
       storage.setItem("sessionId", sessionId.toUpperCase());
     },
     setUserId(userId) {
+      this.$store.state.userId = userId;
       storage.setItem("userId", userId);
     },
     clearSession() {
       storage.removeItem("sessionId");
       storage.removeItem("userId");
+      this.$store.state.userId = null;
+      this.$store.state.sessionId = null;
+      this.$store.state.sessionActive = false;
+      this.$store.state.isCreator = false;
+      this.$store.state.movieData = {};
+      this.$store.state.matchData = {};
+      this.$store.state.totalSwipes = 0;
+      this.$store.state.totalMatches = 0;
     },
     leaveSession() {
       const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
