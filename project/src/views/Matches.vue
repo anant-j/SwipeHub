@@ -1,6 +1,6 @@
 <template>
   <div v-if="!this.$store.state.loader">
-    <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3">
+    <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3 mb-3">
       <div
         class="col"
         v-for="item in this.$store.state.matchData"
@@ -82,4 +82,8 @@ export default {
 </script>
 
 <style scoped>
+#cardHolder {
+  margin-left: 10px;
+  margin-right: 30px;
+}
 </style>
