@@ -141,6 +141,7 @@ export default {
             if (posterlink == "http://image.tmdb.org/t/p/originalnull") {
               posterlink = "https://i.imgur.com/Sql8s2M.png";
             }
+            posterlink = posterlink.replace("http://", "https://");
             list.push({
               id: posterlink + `?id=${order[i]}`,
             });

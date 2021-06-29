@@ -64,10 +64,17 @@ export default {
         const movieData = response.data.movies;
         const movieList = [];
         for (const iterator of Object.keys(movieData)) {
+          let posterlink = movieData[iterator].poster.replace(
+            "http://",
+            "https://"
+          );
+          if (posterlink == "https://image.tmdb.org/t/p/originalnull") {
+            posterlink = "https://i.imgur.com/Sql8s2M.png";
+          }
           movieList.push({
             movieId: iterator,
             title: movieData[iterator].title,
-            posterURL: movieData[iterator].poster,
+            posterURL: posterlink,
             description: movieData[iterator].description,
           });
         }
