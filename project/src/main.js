@@ -116,14 +116,22 @@ Vue.mixin({
     clearSession() {
       storage.removeItem("sessionId");
       storage.removeItem("userId");
-      this.$store.state.userId = null;
-      this.$store.state.sessionId = null;
-      this.$store.state.sessionActive = false;
-      this.$store.state.isCreator = false;
-      this.$store.state.movieData = {};
-      this.$store.state.matchData = {};
-      this.$store.state.totalSwipes = 0;
-      this.$store.state.totalMatches = 0;
+      this.$store.replaceState({
+        loader: false,
+        userId: null,
+        sessionId: null,
+        activePage: false,
+        activeModal: false,
+        isCreator: false,
+        sessionState: 0,
+        movieData: {},
+        totalSwipes: 0,
+        likedList: [],
+        swipeHistory: [],
+        matchData: {},
+        totalMatches: 0,
+        usersData: [],
+    })
     },
     leaveSession() {
       const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
@@ -176,6 +184,60 @@ Vue.mixin({
         .then(() => console.log("Successful share! 🎉"))
         .catch((err) => console.error(err));
     },
+    getId(inputUrl) {
+      const movieId = inputUrl.split("?id=")[1];
+      return movieId;
+    },
+    globalSessionPoll() {
+      const localTotalSwipes = [];
+        for (const val of this.$store.state.swipeHistory) {
+          localTotalSwipes.push(this.getId(val.id));
+        }
+        const localLikedList = this.$store.state.likedList;
+        const params = {
+          totalSwipes: localTotalSwipes,
+          likedList: localLikedList,
+          sessionId: this.getSessionId,
+          userId: this.getUserId,
+        };
+        const data = Object.keys(params)
+          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+          .join("&");
+        axios({
+          url: `${this.backend}/polling`,
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          data,
+        })
+          .then((response) => {
+            const numMatch = response.data.match;
+            if (this.$store.state.totalMatches != numMatch && numMatch > 0) {
+              this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
+            }
+            this.$store.state.totalMatches = numMatch;
+            const userData = response.data.userData;
+            const userDataArray = [];
+            for (const iterator of Object.keys(userData)) {
+              if (iterator != this.getUserId) {
+                userDataArray.push({
+                  userId: iterator,
+                  value: userData[iterator],
+                });
+              }
+            }
+            this.$store.state.usersData = userDataArray;
+            for (const iterator of localLikedList) {
+              const index = this.$store.state.likedList.indexOf(iterator);
+              if (index > -1) {
+                this.$store.state.likedList.splice(index, 1);
+              }
+            }
+          })
+          .catch((response) => {
+            //handle error
+            console.log(response);
+          });
+    }
   },
 });
 

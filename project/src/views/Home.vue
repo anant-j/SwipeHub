@@ -17,7 +17,7 @@ export default {
   components: { InitialPage, JoinSessionPage, CreateSessionPage },
   store,
   mounted() {
-    this.$store.state.sessionActive = false;
+    this.$store.state.activePage = 0;
     if (window.location.href.includes("?join=")) {
       const id = window.location.href.split("=")[1];
       this.setSessionId(id);

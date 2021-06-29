@@ -34,11 +34,16 @@
             <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
-            <li class="nav-item" v-if="this.$store.state.sessionActive">
-              <a class="nav-link active" id="matchTab">Matches</a>
+            <li class="nav-item" v-if="this.sessionDataPresent">
+              <router-link
+                class="nav-link"
+                to="/matches"
+                @click.native="checkPollPending()"
+                >Matches</router-link
+              >
             </li>
           </ul>
-          <ul class="navbar-nav" v-if="this.$store.state.sessionActive">
+          <ul class="navbar-nav" v-if="this.$store.state.activePage">
             <li
               class="nav-item"
               @click="
@@ -143,6 +148,11 @@ export default {
       document
         .getElementById("navbarSupportedContent")
         .classList.toggle("show");
+    },
+    checkPollPending() {
+      if (this.$store.state.likedList.length > 0) {
+        this.globalSessionPoll();
+      }
     },
   },
 };

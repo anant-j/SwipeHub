@@ -79,8 +79,6 @@ export default {
     showInfo: false,
     rewindAllow: false,
     queue: [],
-    history: [],
-    likedList: [],
     lastInteraction: 0,
     sessionPausedNotifications: true,
   }),
@@ -91,7 +89,7 @@ export default {
       return;
     }
     this.$store.state.loader = true;
-    this.$store.state.sessionActive = true;
+    this.$store.state.activePage = 1;
     this.getCards(
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
@@ -153,53 +151,13 @@ export default {
         });
     },
     poll() {
-      if (this.pollAllowed() && this.$store.state.sessionActive) {
+      if (this.pollAllowed() && this.$store.state.activePage == 1) {
         this.sessionPausedNotifications = false;
-        const localTotalSwipes = [];
-        for (const val of this.history) {
-          localTotalSwipes.push(this.getId(val.id));
-        }
-        const params = {
-          totalSwipes: localTotalSwipes,
-          likedList: this.likedList,
-          sessionId: this.getSessionId,
-          userId: this.getUserId,
-        };
-        const data = Object.keys(params)
-          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-          .join("&");
-        axios({
-          url: `${this.backend}/polling`,
-          method: "POST",
-          headers: { "content-type": "application/x-www-form-urlencoded" },
-          data,
-        })
-          .then((response) => {
-            const numMatch = response.data.match;
-            if (this.$store.state.totalMatches != numMatch && numMatch > 0) {
-              this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
-            }
-            this.$store.state.totalMatches = numMatch;
-            const userData = response.data.userData;
-            const userDataArray = [];
-            for (const iterator of Object.keys(userData)) {
-              if (iterator != this.getUserId) {
-                userDataArray.push({
-                  userId: iterator,
-                  value: userData[iterator],
-                });
-              }
-            }
-            this.$store.state.usersData = userDataArray;
-          })
-          .catch((response) => {
-            //handle error
-            console.log(response);
-          });
+        this.globalSessionPoll();
       } else {
         if (
           !this.sessionPausedNotifications &&
-          this.$store.state.sessionActive
+          this.$store.state.activePage == 1
         ) {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
@@ -223,14 +181,14 @@ export default {
       }
       if (choice.type == "like" || choice.type == "super") {
         const id = this.getId(choice.item.id);
-        this.likedList.push(id);
+        this.$store.state.likedList.push(id);
       }
-      this.history.push(choice.item);
+      this.$store.state.swipeHistory.push(choice.item);
     },
     async decide(choice) {
       if (choice === "rewind") {
-        if (this.history.length && this.rewindAllow) {
-          this.$refs.tinder.rewind([this.history.pop()]);
+        if (this.$store.state.swipeHistory.length && this.rewindAllow) {
+          this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
           this.rewindAllow = false;
         }
       } else {
@@ -240,10 +198,6 @@ export default {
     cardClicked() {
       this.lastInteraction = new Date();
       this.showInfo = !this.showInfo;
-    },
-    getId(inputUrl) {
-      const movieId = inputUrl.split("?id=")[1];
-      return movieId;
     },
     pollAllowed() {
       const currentTime = new Date();
