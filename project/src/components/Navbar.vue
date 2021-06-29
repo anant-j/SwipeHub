@@ -140,7 +140,7 @@ export default {
     $route() {
       document
         .getElementById("navbarSupportedContent")
-        .classList.toggle("show");
+        .classList.remove("show");
     },
   },
   methods: {
