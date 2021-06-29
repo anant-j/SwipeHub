@@ -1,55 +1,30 @@
 <template>
   <div v-if="!this.$store.state.loader">
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      <div class="col">
-        <div class="card h-100">
-          <img class="card-img-top" alt="..." />
+    <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3">
+      <div
+        class="col"
+        v-for="item in this.$store.state.matchData"
+        :key="item.movieId"
+      >
+        <div class="card text-white bg-dark h-100 text-center">
+          <img
+            class="card-img-top"
+            style="max-height: 50vh; object-fit: contain; margin-top: 30px"
+            alt="..."
+            :src="item.posterURL"
+          />
           <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">
-              This is a wider card with supporting text below as a natural
-              lead-in to additional content. This content is a little bit
-              longer.
-            </p>
+            <h5 class="card-title">
+              <b>{{ item.title }}</b>
+            </h5>
+            <p class="card-text">{{ item.description }}</p>
           </div>
           <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img class="card-img-top" alt="..." />
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">
-              This card has supporting text below as a natural lead-in to
-              additional content.
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img class="card-img-top" alt="..." />
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">
-              This is a wider card with supporting text below as a natural
-              lead-in to additional content. This card has even longer content
-              than the first to show that equal height action.
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
+            <small class="text-muted">Released on {{ item.release }}</small>
           </div>
         </div>
       </div>
     </div>
-    <!-- {{ this.$store.state.matchData }} -->
   </div>
 </template>
 
@@ -86,9 +61,19 @@ export default {
         data,
       }).then((response) => {
         this.$store.state.loader = false;
+        const movieData = response.data.movies;
+        const movieList = [];
+        for (const iterator of Object.keys(movieData)) {
+          movieList.push({
+            movieId: iterator,
+            title: movieData[iterator].title,
+            posterURL: movieData[iterator].poster,
+            description: movieData[iterator].description,
+          });
+        }
         //   if(this.response.status(200)) {
         console.log(response.data);
-        this.$store.state.matchData = response.data.movies;
+        this.$store.state.matchData = movieList;
         //   }
       });
     },
@@ -96,5 +81,5 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 </style>
