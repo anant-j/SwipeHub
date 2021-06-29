@@ -16,5 +16,6 @@ export default new Vuex.Store({
     totalSwipes: 0,
     matchData: {},
     totalMatches: 0,
+    usersData: [],
   },
 });

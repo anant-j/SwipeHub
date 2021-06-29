@@ -18,7 +18,7 @@
       <br /><br />
       <button
         type="button"
-        class="col-3 btn btn-primary btn-sm"
+        class="col-6 btn btn-primary btn-sm"
         @click="shareLinkNatively()"
       >
         Send Link

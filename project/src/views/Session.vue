@@ -180,6 +180,17 @@ export default {
               this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
             }
             this.$store.state.totalMatches = numMatch;
+            const userData = response.data.userData;
+            const userDataArray = [];
+            for (const iterator of Object.keys(userData)) {
+              if (iterator != this.getUserId) {
+                userDataArray.push({
+                  userId: iterator,
+                  value: userData[iterator],
+                });
+              }
+            }
+            this.$store.state.usersData = userDataArray;
           })
           .catch((response) => {
             //handle error

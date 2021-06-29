@@ -87,6 +87,19 @@
                     >Total Swipes : {{ $store.state.totalSwipes }}</a
                   >
                 </li>
+                <div
+                  v-for="item in this.$store.state.usersData"
+                  :key="item.userId"
+                >
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a class="dropdown-item"
+                      >{{ item.userId }} : {{ item.value }}</a
+                    >
+                  </li>
+                </div>
               </ul>
             </li>
             <li class="nav-item" @click="leaveSession()">
