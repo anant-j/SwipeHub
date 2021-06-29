@@ -176,7 +176,7 @@ export default {
         })
           .then((response) => {
             const numMatch = response.data.match;
-            if (this.$store.state.totalMatches != numMatch) {
+            if (this.$store.state.totalMatches != numMatch && numMatch > 0) {
               this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
             }
             this.$store.state.totalMatches = numMatch;
