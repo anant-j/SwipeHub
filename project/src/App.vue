@@ -32,20 +32,15 @@ export default {
   font-display: swap;
 }
 
-body {
-  overflow: hidden;
-}
-
 #app {
   font-family: tfont, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* text-align: center; */
   color: #2c3e50;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   background-color: rgb(20, 20, 20) !important;
-  overflow-x: hidden;
   color: white;
   user-select: none;
   -moz-user-select: none;
@@ -59,12 +54,6 @@ body,
 template {
   padding: 0 !important;
   margin: 0 !important;
-}
-
-@media only screen and (min-width: 800px) {
-  body,
-  #app {
-    overflow-y: hidden;
-  }
+  overflow-x: hidden;
 }
 </style>

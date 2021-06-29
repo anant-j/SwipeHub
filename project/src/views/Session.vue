@@ -213,11 +213,18 @@ export default {
 };
 </script>
 
+<style>
+body,
+#app,
+template {
+  overflow: hidden;
+}
+</style>
 <style scoped>
 body {
   margin: 0;
   background-color: #20262e;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
 .card-overlay {
