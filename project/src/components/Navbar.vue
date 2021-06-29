@@ -31,7 +31,7 @@
                 >Home</router-link
               >
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="this.$store.state.sessionActive">
@@ -39,7 +39,13 @@
             </li>
           </ul>
           <ul class="navbar-nav" v-if="this.$store.state.sessionActive">
-            <li class="nav-item" onclick="createShareLink()">
+            <li
+              class="nav-item"
+              @click="
+                createShareLink();
+                hideModal();
+              "
+            >
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
             <li class="nav-item dropdown">
@@ -69,7 +75,7 @@
                   <a
                     class="dropdown-item"
                     id="sessionIdPlaceholder"
-                    onclick="copyToClipboard('sessionId')"
+                    @click="copyToClipboard('sessionId')"
                     >Session Id: {{ getSessionId }}</a
                   >
                 </li>
@@ -83,8 +89,19 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item" onclick="leaveSession()">
-              <a class="nav-link" id="leaveSessionBtn">Leave Session</a>
+            <li class="nav-item" @click="leaveSession()">
+              <a
+                class="nav-link"
+                id="leaveSessionBtn"
+                v-if="!this.$store.state.isCreator"
+                >Leave Session</a
+              >
+              <a
+                class="nav-link"
+                id="leaveSessionBtn"
+                v-if="this.$store.state.isCreator"
+                >End Session</a
+              >
             </li>
           </ul>
         </div>
@@ -101,6 +118,20 @@ import store from "../store/index.js";
 export default {
   name: "Navbar",
   store,
+  watch: {
+    $route() {
+      document
+        .getElementById("navbarSupportedContent")
+        .classList.toggle("show");
+    },
+  },
+  methods: {
+    hideModal() {
+      document
+        .getElementById("navbarSupportedContent")
+        .classList.toggle("show");
+    },
+  },
 };
 </script>
 

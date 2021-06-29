@@ -2,6 +2,7 @@
   <div id="app">
     <Navbar style="position: relative" />
     <Loader v-if="this.$store.state.loader" />
+    <ShareScreen />
     <div style="position: relative">
       <router-view />
     </div>
@@ -10,6 +11,7 @@
 <script>
 import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
+import ShareScreen from "@/components/ShareScreen.vue";
 import store from "@/store/index.js";
 
 export default {
@@ -17,9 +19,9 @@ export default {
   components: {
     Loader,
     Navbar,
+    ShareScreen,
   },
   store,
-  methods: {},
 };
 </script>
 

@@ -85,6 +85,11 @@ export default {
     sessionPausedNotifications: true,
   }),
   created() {
+    if (!this.sessionDataPresent) {
+      this.showAlert("Please join or create a session", "w", 5000);
+      this.$router.push({ name: "Home" });
+      return;
+    }
     this.$store.state.loader = true;
     this.$store.state.sessionActive = true;
     this.getCards(
@@ -127,6 +132,9 @@ export default {
           this.$store.state.loader = false;
           if (result.data.totalSwipes != undefined) {
             this.$store.state.totalSwipes = result.data.totalSwipes;
+          }
+          if (result.data.isCreator != undefined) {
+            this.$store.state.isCreator = result.data.isCreator;
           }
           const order = result.data.movies.order;
           const list = [];
@@ -178,7 +186,10 @@ export default {
             console.log(response);
           });
       } else {
-        if (!this.sessionPausedNotifications) {
+        if (
+          !this.sessionPausedNotifications &&
+          this.$store.state.sessionActive
+        ) {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
             "w",

@@ -342,9 +342,13 @@ export default {
             this.showAlert("This session could not be created!", "e", 5000);
           }
         })
-        .catch((response) => {
-          //handle error
-          console.log(response);
+        .catch(() => {
+          this.showAlert(
+            "The session could not be created! Please try again later",
+            "e",
+            5000
+          );
+          this.$store.state.loader = false;
         });
     },
   },

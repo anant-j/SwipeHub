@@ -10,10 +10,13 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Multiselect from "vue-multiselect";
+import axios from "axios";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 
 let productionMode = false;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
+let hostURL = "http://localhost:" + window.location.port;
 document.title = "SwipeHub Dev Mode";
 if (window.location.hostname != "localhost") {
   productionMode = true;
@@ -30,6 +33,7 @@ if (productionMode) {
   );
   document.title = "SwipeHub";
   backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
+  hostURL = "https://" + window.location.hostname;
 }
 Vue.mixin({
   data() {
@@ -37,22 +41,45 @@ Vue.mixin({
       backend: backendUrl,
     };
   },
-  computed:{ 
-    getSessionId(){
-      if(this.$store.state.sessionId == null){
-        return(storage.getItem('sessionId'));
-      }
-      else{
-        return (this.$store.state.sessionId);
+  computed: {
+    getSessionId() {
+      if (this.$store.state.sessionId == null) {
+        if (
+          storage.getItem("sessionId") == undefined ||
+          storage.getItem("sessionId") == null
+        ) {
+          return null;
+        } else {
+          return storage.getItem("sessionId");
+        }
+      } else {
+        return this.$store.state.sessionId;
       }
     },
-    getUserId(){
-      if(this.$store.state.userId == null){
-        return(storage.getItem('userId'));
+    getUserId() {
+      if (this.$store.state.userId == null) {
+        if (
+          storage.getItem("userId") == undefined ||
+          storage.getItem("userId") == null
+        ) {
+          return null;
+        } else {
+          return storage.getItem("userId");
+        }
+      } else {
+        return this.$store.state.userId;
       }
-      else{
-        return (this.$store.state.userId);
+    },
+    sessionDataPresent() {
+      if (
+        this.getSessionId == null ||
+        this.getSessionId == undefined ||
+        this.getUserId == null ||
+        this.getUserId == undefined
+      ) {
+        return false;
       }
+      return true;
     },
   },
   methods: {
@@ -78,14 +105,77 @@ Vue.mixin({
     toCreateSessionPage() {
       this.$store.state.sessionState = 2;
     },
-    setSessionId(sessionId){
-      storage.setItem('sessionId',sessionId);
+    setSessionId(sessionId) {
       this.$store.state.sessionId = sessionId;
+      storage.setItem("sessionId", sessionId.toUpperCase());
     },
     setUserId(userId) {
-      storage.setItem('userId',userId);
       this.$store.state.userId = userId;
-    }
+      storage.setItem("userId", userId);
+    },
+    clearSession() {
+      storage.removeItem("sessionId");
+      storage.removeItem("userId");
+      this.$store.state.userId = null;
+      this.$store.state.sessionId = null;
+      this.$store.state.sessionActive = false;
+      this.$store.state.isCreator = false;
+      this.$store.state.movieData = {};
+      this.$store.state.matchData = {};
+      this.$store.state.totalSwipes = 0;
+      this.$store.state.totalMatches = 0;
+    },
+    leaveSession() {
+      const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
+      axios
+        .get(url, {
+          validateStatus: false,
+        })
+        .then(() => {
+          this.clearSession();
+          this.$router.push({ name: "Home" });
+        });
+    },
+    copyToClipboard(item) {
+      let data = "";
+      let text = "";
+      switch (item) {
+        case "userId":
+          data = this.getUserId;
+          text = "User Id";
+          break;
+        case "sessionId":
+          data = this.getSessionId;
+          text = "Session Id";
+          break;
+        default:
+          console.log("error while copying to clipboard");
+        // this.showAlert("Alert occurred while copying to clipboard", "e", 7000);
+        // code block
+      }
+      navigator.clipboard.writeText(data);
+      this.showAlert(`${text} copied to clipboard`, "s", 7000);
+    },
+    createShareLink() {
+      const joinLink = this.getShareLink();
+      navigator.clipboard.writeText(joinLink);
+      this.$store.state.activeModal = true;
+      this.showAlert(`Shareable link copied to clipboard.`, "s", 7000);
+    },
+    getShareLink() {
+      return `${hostURL}/?join=${this.getSessionId}`;
+    },
+    shareLinkNatively() {
+      const joinLink = this.getShareLink();
+      navigator
+        .share({
+          title: "SwipeHub Session Share",
+          text: `Come join my Swipehub session with Session Id: ${this.getSessionId}.`,
+          url: joinLink,
+        })
+        .then(() => console.log("Successful share! 🎉"))
+        .catch((err) => console.error(err));
+    },
   },
 });
 
@@ -122,6 +212,7 @@ Vue.use(Toast, options);
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.component(VueQrcode.name, VueQrcode);
 Vue.component("multiselect", Multiselect);
 
 new Vue({

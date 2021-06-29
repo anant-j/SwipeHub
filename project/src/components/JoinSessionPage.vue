@@ -35,7 +35,6 @@
               minlength="6"
               maxlength="6"
             ></b-form-input>
-
             <b-form-valid-feedback id="sessionId-feedback"
               >Looks good</b-form-valid-feedback
             >
@@ -84,6 +83,11 @@ export default {
       },
     };
   },
+  mounted() {
+    if (this.getSessionId != null || this.getSessionId != undefined) {
+      this.form.sessionId = this.getSessionId;
+    }
+  },
   validations: {
     form: {
       sessionId: {
@@ -124,9 +128,16 @@ export default {
             this.setSessionId(sessionId);
             this.setUserId(username);
             this.$router.push({ name: "Session" });
+            return;
           } else {
             this.showAlert("This session could not be found!", "e", 5000);
+            this.$store.state.loader = false;
+            return;
           }
+        })
+        .catch(() => {
+          this.showAlert("This session could not be found!", "e", 5000);
+          this.$store.state.loader = false;
         });
     },
   },
