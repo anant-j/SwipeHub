@@ -36,10 +36,8 @@ export default {
   font-family: tfont, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* text-align: center; */
   color: #2c3e50;
   min-height: 100vh;
-  width: 100vw;
   background-color: rgb(20, 20, 20) !important;
   color: white;
   user-select: none;
