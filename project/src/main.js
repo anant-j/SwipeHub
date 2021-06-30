@@ -235,6 +235,17 @@ Vue.mixin({
         })
         .catch((response) => {
           // handle error
+          this.showAlert(
+            "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
+            "e",
+            5000
+          );
+          let root = this;
+          setTimeout(function () {
+            root.clearSession();
+            root.$router.push({ name: "Home" });
+          }, 5000);
+
           console.log(response);
         });
     },
