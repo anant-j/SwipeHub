@@ -185,28 +185,28 @@
 </template>
 
 <script>
-import "vue-multiselect/dist/vue-multiselect.min.css";
-import axios from "axios";
+import 'vue-multiselect/dist/vue-multiselect.min.css'
+import axios from 'axios'
 
-import store from "@/store/index.js";
-import { required, helpers } from "vuelidate/lib/validators";
-const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
-import Multiselect from "vue-multiselect";
-import * as data from "@/assets/data.js";
+import store from '@/store/index.js'
+import { required, helpers } from 'vuelidate/lib/validators'
+import Multiselect from 'vue-multiselect'
+import * as data from '@/assets/data.js'
+const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i)
 export default {
-  name: "CreateSessionPage",
+  name: 'CreateSessionPage',
   store,
   components: {
-    Multiselect,
+    Multiselect
   },
-  data() {
+  data () {
     return {
       form: {
-        username: null,
+        username: null
       },
       localState: 0,
-      submitButton: "Next",
-      backButton: "Back",
+      submitButton: 'Next',
+      backButton: 'Back',
       submitButtonEnabled: true,
       language: data.defaultLanguage,
       languageOptions: data.languages,
@@ -217,102 +217,102 @@ export default {
       countryOptions: data.countries,
       category: null,
       categoryOptions: data.categories,
-      contentType: { name: "Movie" },
-      contentOptions: [{ name: "Movie" }, { name: "TV" }],
-      sortType: { name: "Popularity" },
+      contentType: { name: 'Movie' },
+      contentOptions: [{ name: 'Movie' }, { name: 'TV' }],
+      sortType: { name: 'Popularity' },
       sortOptions: [
-        { name: "Popularity" },
-        { name: "Release Date" },
-        { name: "Revenue" },
-      ],
-    };
+        { name: 'Popularity' },
+        { name: 'Release Date' },
+        { name: 'Revenue' }
+      ]
+    }
   },
   validations: {
     form: {
       username: {
         required,
-        alphaNumAndDotValidator,
-      },
-    },
+        alphaNumAndDotValidator
+      }
+    }
   },
   watch: {
-    localState(value) {
+    localState (value) {
       if (value >= 3) {
-        this.submitButton = "Submit";
+        this.submitButton = 'Submit'
       } else {
-        this.submitButton = "Next";
+        this.submitButton = 'Next'
       }
-      if (value == 0) {
-        this.backButton = "Back";
+      if (value === 0) {
+        this.backButton = 'Back'
       } else {
-        this.backButton = "Home";
+        this.backButton = 'Home'
       }
     },
-    "form.username": function (value) {
-      this.form.username = value.trim();
+    'form.username': function (value) {
+      this.form.username = value.trim()
     },
-    country() {
-      let tempPlatformOptions = this.platformOptions.filter((platform) =>
+    country () {
+      const tempPlatformOptions = this.platformOptions.filter(platform =>
         platform.country.includes(this.country.id)
-      );
+      )
       if (!tempPlatformOptions.includes(this.platform)) {
-        this.platform = tempPlatformOptions[0];
+        this.platform = tempPlatformOptions[0]
       }
-      this.tempPlatformOptions = tempPlatformOptions;
-    },
+      this.tempPlatformOptions = tempPlatformOptions
+    }
   },
   methods: {
-    validateState(state) {
-      const { $dirty, $error } = this.$v.form[state];
-      return $dirty ? !$error : null;
+    validateState (state) {
+      const { $dirty, $error } = this.$v.form[state]
+      return $dirty ? !$error : null
     },
-    resetForm() {
+    resetForm () {
       this.form = {
-        username: null,
-      };
-      (this.localState = 0),
-        (this.language = data.defaultLanguage),
-        (this.platform = data.defaultPlatform),
-        (this.country = data.defaultCountry),
-        (this.category = null);
+        username: null
+      }
+      this.localState = 0
+      this.language = data.defaultLanguage
+      this.platform = data.defaultPlatform
+      this.country = data.defaultCountry
+      this.category = null
       this.$nextTick(() => {
-        this.$v.$reset();
-      });
+        this.$v.$reset()
+      })
     },
-    nextPage() {
-      this.$v.form.$touch();
+    nextPage () {
+      this.$v.form.$touch()
       if (this.$v.form.$anyError) {
-        return;
+        return
       }
-      if (this.form.username != null && this.localState < 3) {
-        this.localState += 1;
-        return;
+      if (this.form.username !== null && this.localState < 3) {
+        this.localState += 1
+        return
       }
-      this.createSession();
+      this.createSession()
     },
-    addTag(newTag) {
+    addTag (newTag) {
       const tag = {
         name: newTag,
-        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
-      };
-      this.categoryOptions.push(tag);
-      this.category.push(tag);
+        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
+      }
+      this.categoryOptions.push(tag)
+      this.category.push(tag)
     },
-    createSession() {
-      this.$store.state.loader = true;
-      const username = this.form.username;
-      const language = this.language.id;
-      const platform = this.platform.id;
-      const country = this.country.id;
-      const categories = this.category;
-      const type = this.contentType.name == "Movie";
-      const order = this.sortType.name;
-      let categoryList = "";
-      if (categories != null) {
+    createSession () {
+      this.$store.state.loader = true
+      const username = this.form.username
+      const language = this.language.id
+      const platform = this.platform.id
+      const country = this.country.id
+      const categories = this.category
+      const type = this.contentType.name === 'Movie'
+      const order = this.sortType.name
+      let categoryList = ''
+      if (categories !== null) {
         for (const category of categories) {
-          categoryList += category.id.toString() + "|";
+          categoryList += category.id.toString() + '|'
         }
-        categoryList = categoryList.substring(0, categoryList.length - 1);
+        categoryList = categoryList.substring(0, categoryList.length - 1)
       }
       const params = {
         username: username,
@@ -321,38 +321,38 @@ export default {
         platform: platform,
         region: country,
         type: type,
-        order: order,
-      };
+        order: order
+      }
       const data = Object.keys(params)
-        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join("&");
+        .map(key => `${key}=${encodeURIComponent(params[key])}`)
+        .join('&')
       axios({
         url: `${this.backend}/createSession`,
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data,
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        data
       })
-        .then((response) => {
-          if (response.status == 200) {
-            const sessionId = response.data.sessionId;
-            this.setSessionId(sessionId);
-            this.setUserId(username);
-            this.$router.push({ name: "Session" });
+        .then(response => {
+          if (response.status === 200) {
+            const sessionId = response.data.sessionId
+            this.setSessionId(sessionId)
+            this.setUserId(username)
+            this.$router.push({ name: 'Session' })
           } else {
-            this.showAlert("This session could not be created!", "e", 5000);
+            this.showAlert('This session could not be created!', 'e', 5000)
           }
         })
         .catch(() => {
           this.showAlert(
-            "The session could not be created! Please try again later",
-            "e",
+            'The session could not be created! Please try again later',
+            'e',
             5000
-          );
-          this.$store.state.loader = false;
-        });
-    },
-  },
-};
+          )
+          this.$store.state.loader = false
+        })
+    }
+  }
+}
 </script>
 
 <style scoped>

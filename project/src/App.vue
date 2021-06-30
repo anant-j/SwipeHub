@@ -9,20 +9,20 @@
   </div>
 </template>
 <script>
-import Loader from "@/components/Loader.vue";
-import Navbar from "@/components/Navbar.vue";
-import ShareScreen from "@/components/ShareScreen.vue";
-import store from "@/store/index.js";
+import Loader from '@/components/Loader.vue'
+import Navbar from '@/components/Navbar.vue'
+import ShareScreen from '@/components/ShareScreen.vue'
+import store from '@/store/index.js'
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
     Loader,
     Navbar,
-    ShareScreen,
+    ShareScreen
   },
-  store,
-};
+  store
+}
 </script>
 
 <style>

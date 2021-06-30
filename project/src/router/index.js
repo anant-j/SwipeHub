@@ -20,7 +20,7 @@ const routes = [
     name: 'Matches',
     component: () => import(/* webpackChunkName: "session" */ '../views/Matches.vue')
   },
-  { path: "*", component: Home }
+  { path: '*', component: Home }
 ]
 
 const router = new VueRouter({

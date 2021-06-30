@@ -29,62 +29,62 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
-import axios from "axios";
+import store from '@/store/index.js'
+import axios from 'axios'
 
 export default {
-  name: "Matches",
+  name: 'Matches',
   store,
-  created() {
+  created () {
     if (!this.sessionDataPresent) {
-      this.showAlert("Please join or create a session", "w", 5000);
-      this.$router.push({ name: "Home" });
-      return;
+      this.showAlert('Please join or create a session', 'w', 5000)
+      this.$router.push({ name: 'Home' })
+      return
     }
-    this.$store.state.loader = true;
-    this.$store.state.activePage = 2;
-    this.matchPoll();
+    this.$store.state.loader = true
+    this.$store.state.activePage = 2
+    this.matchPoll()
   },
   methods: {
-    matchPoll() {
+    matchPoll () {
       const params = {
         sessionId: this.getSessionId,
-        userId: this.getUserId,
-      };
+        userId: this.getUserId
+      }
       const data = Object.keys(params)
         .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join("&");
+        .join('&')
       axios({
         url: `${this.backend}/matchPolling`,
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data,
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        data
       }).then((response) => {
-        this.$store.state.loader = false;
-        const movieData = response.data.movies;
-        const movieList = [];
+        this.$store.state.loader = false
+        const movieData = response.data.movies
+        const movieList = []
         for (const iterator of Object.keys(movieData)) {
           let posterlink = movieData[iterator].poster.replace(
-            "http://",
-            "https://"
-          );
-          if (posterlink == "https://image.tmdb.org/t/p/originalnull") {
-            posterlink = "https://i.imgur.com/Sql8s2M.png";
+            'http://',
+            'https://'
+          )
+          if (posterlink === 'https://image.tmdb.org/t/p/originalnull') {
+            posterlink = 'https://i.imgur.com/Sql8s2M.png'
           }
           movieList.push({
             movieId: iterator,
             title: movieData[iterator].title,
             posterURL: posterlink,
             description: movieData[iterator].description,
-            release: movieData[iterator].release_date,
-          });
+            release: movieData[iterator].release_date
+          })
         }
-        this.$store.state.matchData = movieList;
-        this.$store.state.totalMatches = movieList.length;
-      });
-    },
-  },
-};
+        this.$store.state.matchData = movieList
+        this.$store.state.totalMatches = movieList.length
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
