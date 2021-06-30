@@ -1,5 +1,21 @@
 <template>
   <div v-if="!this.$store.state.loader">
+    <div
+      class="card mx-auto mt-3 text-center"
+      style="max-width: 500px"
+      id="noCards"
+      v-if="this.$store.state.totalMatches == 0"
+    >
+      <div class="card-body" style="color: black">
+        <h5 class="card-title">No matches found</h5>
+        <p class="card-text">
+          Please swipe right on more cards for matches to appear
+        </p>
+        <router-link class="btn btn-primary" to="/session"
+          >Start Swiping</router-link
+        >
+      </div>
+    </div>
     <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3 mb-3">
       <div
         class="col"
@@ -59,29 +75,33 @@ export default {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         data,
-      }).then((response) => {
-        this.$store.state.loader = false;
-        const movieData = response.data.movies;
-        const movieList = [];
-        for (const iterator of Object.keys(movieData)) {
-          let posterlink = movieData[iterator].poster.replace(
-            "http://",
-            "https://"
-          );
-          if (posterlink === "https://image.tmdb.org/t/p/originalnull") {
-            posterlink = "https://i.imgur.com/Sql8s2M.png";
+      })
+        .then((response) => {
+          this.$store.state.loader = false;
+          const movieData = response.data.movies;
+          const movieList = [];
+          for (const iterator of Object.keys(movieData)) {
+            let posterlink = movieData[iterator].poster.replace(
+              "http://",
+              "https://"
+            );
+            if (posterlink === "https://image.tmdb.org/t/p/originalnull") {
+              posterlink = "https://i.imgur.com/Sql8s2M.png";
+            }
+            movieList.push({
+              movieId: iterator,
+              title: movieData[iterator].title,
+              posterURL: posterlink,
+              description: movieData[iterator].description,
+              release: movieData[iterator].release_date,
+            });
           }
-          movieList.push({
-            movieId: iterator,
-            title: movieData[iterator].title,
-            posterURL: posterlink,
-            description: movieData[iterator].description,
-            release: movieData[iterator].release_date,
-          });
-        }
-        this.$store.state.matchData = movieList;
-        this.$store.state.totalMatches = movieList.length;
-      });
+          this.$store.state.matchData = movieList;
+          this.$store.state.totalMatches = movieList.length;
+        })
+        .catch(() => {
+          this.$store.state.loader = false;
+        });
     },
   },
 };
