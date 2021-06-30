@@ -53,5 +53,6 @@ template {
   padding: 0 !important;
   margin: 0 !important;
   overflow-x: hidden;
+  background-color: rgb(20, 20, 20) !important;
 }
 </style>
