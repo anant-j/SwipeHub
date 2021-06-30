@@ -39,8 +39,11 @@
                 class="nav-link"
                 to="/matches"
                 @click.native="checkPollPending()"
-                >Matches</router-link
-              >
+                >Matches
+                <span v-if="this.$store.state.totalMatches > 0"
+                  >({{ this.$store.state.totalMatches }})
+                </span>
+              </router-link>
             </li>
           </ul>
           <ul class="navbar-nav" v-if="this.$store.state.activePage">

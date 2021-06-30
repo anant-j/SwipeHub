@@ -76,12 +76,11 @@ export default {
             title: movieData[iterator].title,
             posterURL: posterlink,
             description: movieData[iterator].description,
+            release: movieData[iterator].release_date,
           });
         }
-        //   if(this.response.status(200)) {
-        console.log(response.data);
         this.$store.state.matchData = movieList;
-        //   }
+        this.$store.state.totalMatches = movieList.length;
       });
     },
   },
