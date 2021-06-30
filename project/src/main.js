@@ -1,86 +1,86 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import Toast from 'vue-toastification'
-import './assets/alert.css'
-import VueGtag from 'vue-gtag'
-import Vuelidate from 'vuelidate'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import Multiselect from 'vue-multiselect'
-import axios from 'axios'
-import VueQrcode from '@chenfengyuan/vue-qrcode'
-const storage = window.localStorage
+import Vue from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import Toast from "vue-toastification";
+import "./assets/alert.css";
+import VueGtag from "vue-gtag";
+import Vuelidate from "vuelidate";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import Multiselect from "vue-multiselect";
+import axios from "axios";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
+const storage = window.localStorage;
 
-let productionMode = false
-let backendUrl = 'http://localhost:5001/theswipehub/us-central1'
-let hostURL = 'http://localhost:' + window.location.port
-document.title = 'SwipeHub Dev Mode'
-if (window.location.hostname !== 'localhost') {
-  productionMode = true
+let productionMode = false;
+let backendUrl = "http://localhost:5001/theswipehub/us-central1";
+let hostURL = "http://localhost:" + window.location.port;
+document.title = "SwipeHub Dev Mode";
+if (window.location.hostname !== "localhost") {
+  productionMode = true;
 }
 
-Vue.config.productionTip = !productionMode
+Vue.config.productionTip = !productionMode;
 if (productionMode) {
   Vue.use(
     VueGtag,
     {
-      config: { id: 'G-7V3PX5TM85' }
+      config: { id: "G-7V3PX5TM85" },
     },
     router
-  )
-  document.title = 'SwipeHub'
-  backendUrl = 'https://us-central1-theswipehub.cloudfunctions.net'
-  hostURL = 'https://' + window.location.hostname
+  );
+  document.title = "SwipeHub";
+  backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
+  hostURL = "https://" + window.location.hostname;
 }
 Vue.mixin({
-  data () {
+  data() {
     return {
-      backend: backendUrl
-    }
+      backend: backendUrl,
+    };
   },
   computed: {
-    getSessionId () {
+    getSessionId() {
       if (this.$store.state.sessionId === null) {
         if (
-          storage.getItem('sessionId') === undefined ||
-          storage.getItem('sessionId') === null
+          storage.getItem("sessionId") === undefined ||
+          storage.getItem("sessionId") === null
         ) {
-          return null
+          return null;
         } else {
-          return storage.getItem('sessionId')
+          return storage.getItem("sessionId");
         }
       } else {
-        return this.$store.state.sessionId
+        return this.$store.state.sessionId;
       }
     },
-    getUserId () {
+    getUserId() {
       if (this.$store.state.userId === null) {
         if (
-          storage.getItem('userId') === undefined ||
-          storage.getItem('userId') === null
+          storage.getItem("userId") === undefined ||
+          storage.getItem("userId") === null
         ) {
-          return null
+          return null;
         } else {
-          return storage.getItem('userId')
+          return storage.getItem("userId");
         }
       } else {
-        return this.$store.state.userId
+        return this.$store.state.userId;
       }
     },
-    sessionDataPresent () {
+    sessionDataPresent() {
       if (
         this.getSessionId === null ||
         this.getSessionId === undefined ||
         this.getUserId === null ||
         this.getUserId === undefined
       ) {
-        return false
+        return false;
       }
-      return true
-    }
+      return true;
+    },
   },
   methods: {
     /**
@@ -89,33 +89,33 @@ Vue.mixin({
      * @param  {number} timeout=false : Add int in miliseconds, false for persistent
      * @param  {boolean} icon=true : Show icon/symbol
      */
-    showAlert (message, type = 's', timeout = false, icon = true) {
+    showAlert(message, type = "s", timeout = false, icon = true) {
       this.$toast(message.toString(), {
         type: getType(type),
         timeout: parseInt(timeout),
-        icon: icon
-      })
+        icon: icon,
+      });
     },
-    toHomePage () {
-      this.$store.state.sessionState = 0
+    toHomePage() {
+      this.$store.state.sessionState = 0;
     },
-    toJoinSessionPage () {
-      this.$store.state.sessionState = 1
+    toJoinSessionPage() {
+      this.$store.state.sessionState = 1;
     },
-    toCreateSessionPage () {
-      this.$store.state.sessionState = 2
+    toCreateSessionPage() {
+      this.$store.state.sessionState = 2;
     },
-    setSessionId (sessionId) {
-      this.$store.state.sessionId = sessionId
-      storage.setItem('sessionId', sessionId.toUpperCase())
+    setSessionId(sessionId) {
+      this.$store.state.sessionId = sessionId;
+      storage.setItem("sessionId", sessionId.toUpperCase());
     },
-    setUserId (userId) {
-      this.$store.state.userId = userId
-      storage.setItem('userId', userId)
+    setUserId(userId) {
+      this.$store.state.userId = userId;
+      storage.setItem("userId", userId);
     },
-    clearSession () {
-      storage.removeItem('sessionId')
-      storage.removeItem('userId')
+    clearSession() {
+      storage.removeItem("sessionId");
+      storage.removeItem("userId");
       this.$store.replaceState({
         loader: false,
         userId: null,
@@ -130,155 +130,155 @@ Vue.mixin({
         swipeHistory: [],
         matchData: {},
         totalMatches: 0,
-        usersData: []
-      })
+        usersData: [],
+      });
     },
-    leaveSession () {
-      const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`
+    leaveSession() {
+      const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
       axios
         .get(url, {
-          validateStatus: false
+          validateStatus: false,
         })
         .then(() => {
-          this.clearSession()
-          this.$router.push({ name: 'Home' })
-        })
+          this.clearSession();
+          this.$router.push({ name: "Home" });
+        });
     },
-    copyToClipboard (item) {
-      let data = ''
-      let text = ''
+    copyToClipboard(item) {
+      let data = "";
+      let text = "";
       switch (item) {
-        case 'userId':
-          data = this.getUserId
-          text = 'User Id'
-          break
-        case 'sessionId':
-          data = this.getSessionId
-          text = 'Session Id'
-          break
+        case "userId":
+          data = this.getUserId;
+          text = "User Id";
+          break;
+        case "sessionId":
+          data = this.getSessionId;
+          text = "Session Id";
+          break;
         default:
-          console.log('error while copying to clipboard')
+          console.log("error while copying to clipboard");
         // this.showAlert("Alert occurred while copying to clipboard", "e", 7000);
         // code block
       }
-      navigator.clipboard.writeText(data)
-      this.showAlert(`${text} copied to clipboard`, 's', 7000)
+      navigator.clipboard.writeText(data);
+      this.showAlert(`${text} copied to clipboard`, "s", 7000);
     },
-    createShareLink () {
-      const joinLink = this.getShareLink()
-      navigator.clipboard.writeText(joinLink)
-      this.$store.state.activeModal = true
-      this.showAlert('Shareable link copied to clipboard.', 's', 7000)
+    createShareLink() {
+      const joinLink = this.getShareLink();
+      navigator.clipboard.writeText(joinLink);
+      this.$store.state.activeModal = true;
+      this.showAlert("Shareable link copied to clipboard.", "s", 7000);
     },
-    getShareLink () {
-      return `${hostURL}/?join=${this.getSessionId}`
+    getShareLink() {
+      return `${hostURL}/?join=${this.getSessionId}`;
     },
-    shareLinkNatively () {
-      const joinLink = this.getShareLink()
+    shareLinkNatively() {
+      const joinLink = this.getShareLink();
       navigator
         .share({
-          title: 'SwipeHub Session Share',
+          title: "SwipeHub Session Share",
           text: `Come join my Swipehub session with Session Id: ${this.getSessionId}.`,
-          url: joinLink
+          url: joinLink,
         })
-        .then(() => console.log('Successful share! 🎉'))
-        .catch((err) => console.error(err))
+        .then(() => console.log("Successful share! 🎉"))
+        .catch((err) => console.error(err));
     },
-    getId (inputUrl) {
-      const movieId = inputUrl.split('?id=')[1]
-      return movieId
+    getId(inputUrl) {
+      const movieId = inputUrl.split("?id=")[1];
+      return movieId;
     },
-    globalSessionPoll () {
-      const localTotalSwipes = []
+    globalSessionPoll() {
+      const localTotalSwipes = [];
       for (const val of this.$store.state.swipeHistory) {
-        localTotalSwipes.push(this.getId(val.id))
+        localTotalSwipes.push(this.getId(val.id));
       }
-      const localLikedList = this.$store.state.likedList
+      const localLikedList = this.$store.state.likedList;
       const params = {
         totalSwipes: localTotalSwipes,
         likedList: localLikedList,
         sessionId: this.getSessionId,
-        userId: this.getUserId
-      }
+        userId: this.getUserId,
+      };
       const data = Object.keys(params)
         .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join('&')
+        .join("&");
       axios({
         url: `${this.backend}/polling`,
-        method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        data
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        data,
       })
         .then((response) => {
-          const numMatch = response.data.match
+          const numMatch = response.data.match;
           if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.showAlert(`You've got ${numMatch} matches`, 's', 4800)
+            this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
           }
-          this.$store.state.totalMatches = numMatch
-          const userData = response.data.userData
-          const userDataArray = []
+          this.$store.state.totalMatches = numMatch;
+          const userData = response.data.userData;
+          const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
             if (iterator !== this.getUserId) {
               userDataArray.push({
                 userId: iterator,
-                value: userData[iterator]
-              })
+                value: userData[iterator],
+              });
             }
           }
-          this.$store.state.usersData = userDataArray
+          this.$store.state.usersData = userDataArray;
           for (const iterator of localLikedList) {
-            const index = this.$store.state.likedList.indexOf(iterator)
+            const index = this.$store.state.likedList.indexOf(iterator);
             if (index > -1) {
-              this.$store.state.likedList.splice(index, 1)
+              this.$store.state.likedList.splice(index, 1);
             }
           }
         })
         .catch((response) => {
           // handle error
-          console.log(response)
-        })
-    }
-  }
-})
+          console.log(response);
+        });
+    },
+  },
+});
 
-function getType (types) {
-  types = types.toLowerCase().trim()
+function getType(types) {
+  types = types.toLowerCase().trim();
   switch (types) {
-    case 'success':
-    case 's':
-      return 'success'
-    case 'error':
-    case 'e':
-      return 'error'
-    case 'default':
-    case 'd':
-      return 'default'
-    case 'info':
-    case 'i':
-      return 'info'
-    case 'warning':
-    case 'w':
-      return 'warning'
+    case "success":
+    case "s":
+      return "success";
+    case "error":
+    case "e":
+      return "error";
+    case "default":
+    case "d":
+      return "default";
+    case "info":
+    case "i":
+      return "info";
+    case "warning":
+    case "w":
+      return "warning";
     default:
-      return 'success'
+      return "success";
   }
 }
 const options = {
-  position: 'top-center',
+  position: "top-center",
   maxToasts: 3,
   closeOnClick: false,
-  pauseOnHover: false
-}
+  pauseOnHover: false,
+};
 
-Vue.use(Toast, options)
-Vue.use(Vuelidate)
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-Vue.component(VueQrcode.name, VueQrcode)
-Vue.component('multiselect', Multiselect)
+Vue.use(Toast, options);
+Vue.use(Vuelidate);
+Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
+Vue.component(VueQrcode.name, VueQrcode);
+Vue.component("multiselect", Multiselect);
 
 new Vue({
   router,
   store,
-  render: (h) => h(App)
-}).$mount('#app')
+  render: (h) => h(App),
+}).$mount("#app");

@@ -29,14 +29,13 @@
 
 <script>
 export default {
-  name: 'ShareScreen',
+  name: "ShareScreen",
   computed: {
-    modalVisible () {
-      return this.$store.state.activeModal
-    }
-  }
-}
+    modalVisible() {
+      return this.$store.state.activeModal;
+    },
+  },
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

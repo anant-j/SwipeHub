@@ -132,33 +132,33 @@
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'jquery/src/jquery.js'
-import 'bootstrap/dist/js/bootstrap.min.js'
-import store from '../store/index.js'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "jquery/src/jquery.js";
+import "bootstrap/dist/js/bootstrap.min.js";
+import store from "../store/index.js";
 export default {
-  name: 'Navbar',
+  name: "Navbar",
   store,
   watch: {
-    $route () {
+    $route() {
       document
-        .getElementById('navbarSupportedContent')
-        .classList.remove('show')
-    }
+        .getElementById("navbarSupportedContent")
+        .classList.remove("show");
+    },
   },
   methods: {
-    hideModal () {
+    hideModal() {
       document
-        .getElementById('navbarSupportedContent')
-        .classList.toggle('show')
+        .getElementById("navbarSupportedContent")
+        .classList.toggle("show");
     },
-    checkPollPending () {
+    checkPollPending() {
       if (this.$store.state.likedList.length > 0) {
-        this.globalSessionPoll()
+        this.globalSessionPoll();
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

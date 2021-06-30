@@ -62,30 +62,30 @@
 </template>
 
 <script>
-import store from '@/store/index.js'
-import axios from 'axios'
+import store from "@/store/index.js";
+import axios from "axios";
 import {
   required,
   minLength,
   maxLength,
-  helpers
-} from 'vuelidate/lib/validators'
-const alphaNumAndDotValidator = helpers.regex('alphaNumAndDot', /^[a-z\d.]*$/i)
+  helpers,
+} from "vuelidate/lib/validators";
+const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
 
 export default {
-  name: 'JoinSessionPage',
+  name: "JoinSessionPage",
   store,
-  data () {
+  data() {
     return {
       form: {
         username: null,
-        sessionId: null
-      }
-    }
+        sessionId: null,
+      },
+    };
   },
-  mounted () {
+  mounted() {
     if (this.getSessionId !== null || this.getSessionId !== undefined) {
-      this.form.sessionId = this.getSessionId
+      this.form.sessionId = this.getSessionId;
     }
   },
   validations: {
@@ -93,53 +93,53 @@ export default {
       sessionId: {
         required,
         minLength: minLength(6),
-        maxLength: maxLength(6)
+        maxLength: maxLength(6),
       },
       username: {
         required,
-        alphaNumAndDotValidator
-      }
-    }
+        alphaNumAndDotValidator,
+      },
+    },
   },
   methods: {
-    validateState (state) {
-      const { $dirty, $error } = this.$v.form[state]
-      return $dirty ? !$error : null
+    validateState(state) {
+      const { $dirty, $error } = this.$v.form[state];
+      return $dirty ? !$error : null;
     },
-    onSubmit () {
-      this.$v.form.$touch()
+    onSubmit() {
+      this.$v.form.$touch();
 
       if (this.$v.form.$anyError) {
-        return
+        return;
       }
 
-      this.isSessionValid()
+      this.isSessionValid();
     },
-    isSessionValid () {
-      const username = this.form.username
-      const sessionId = this.form.sessionId
-      this.$store.state.loader = true
+    isSessionValid() {
+      const username = this.form.username;
+      const sessionId = this.form.sessionId;
+      this.$store.state.loader = true;
       axios
         .get(`${this.backend}/sessionValid?id=${sessionId}`, {
-          validateStatus: false
+          validateStatus: false,
         })
         .then((result) => {
           if (result.status === 200) {
-            this.setSessionId(sessionId)
-            this.setUserId(username)
-            this.$router.push({ name: 'Session' })
+            this.setSessionId(sessionId);
+            this.setUserId(username);
+            this.$router.push({ name: "Session" });
           } else {
-            this.showAlert('This session could not be found!', 'e', 5000)
-            this.$store.state.loader = false
+            this.showAlert("This session could not be found!", "e", 5000);
+            this.$store.state.loader = false;
           }
         })
         .catch(() => {
-          this.showAlert('This session could not be found!', 'e', 5000)
-          this.$store.state.loader = false
-        })
-    }
-  }
-}
+          this.showAlert("This session could not be found!", "e", 5000);
+          this.$store.state.loader = false;
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
