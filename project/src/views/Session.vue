@@ -46,9 +46,18 @@
               :title="`Synopsis: ${getTitle}`"
               ok-only
               ok-title="Done"
+              style="padding: 0; margin: 0"
             >
-              <div class="my-4 text-center">
-                <p style="height: 30vh; padding: 20px; overflow-y: scroll">
+              <div class="my-4 text-center" style="padding: 0; margin: 0">
+                <p
+                  style="
+                    height: 27vh;
+                    padding: 20px;
+                    padding-top: 0px;
+                    margin-top: 0px;
+                    overflow-y: scroll;
+                  "
+                >
                   {{ getDescription }}
                 </p>
                 <b>Released : {{ getReleaseDate }}</b>
@@ -56,22 +65,24 @@
                 <br />
                 <img
                   style="
-                    height: 55px;
+                    height: 50px;
                     border: 1px solid black;
                     border-radius: 100px;
                     cursor: pointer;
-                    margin-right: 5px;
+                    margin-right: 10px;
+                    margin-bottom: 0px;
                   "
                   src="../assets/nope.png"
                   @click="decide('nope')"
                 />
                 <img
                   style="
-                    height: 55px;
+                    height: 50px;
                     border: 1px solid black;
                     border-radius: 100px;
                     cursor: pointer;
-                    margin-left: 5px;
+                    margin-left: 10px;
+                    margin-bottom: 0px;
                   "
                   src="../assets/like.png"
                   @click="decide('like')"
@@ -184,7 +195,7 @@ export default {
       let res = 0;
       let showIcon = false;
       if (descLength <= 300) {
-        res = 20;
+        res = 18;
       } else if (descLength > 300 && descLength <= 500) {
         res = 15;
       } else {
