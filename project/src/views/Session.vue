@@ -34,8 +34,9 @@
             </button>
             <p :style="{ 'font-size': `${getFontSize[1]}` }" v-else>
               {{ getDescription }}
-              {{ getFontSize[0] }}
             </p>
+            <hr />
+            <p>Released : {{ getReleaseDate }}</p>
             <b-modal
               :visible="activeDescriptionModal"
               id="modal-center"
@@ -47,9 +48,11 @@
               ok-title="Done"
             >
               <div class="my-4 text-center">
-                {{ getDescription }}
-                <br />
+                <p style="height: 30vh; padding: 20px; overflow-y: scroll">
+                  {{ getDescription }}
+                </p>
                 <b>Released : {{ getReleaseDate }}</b>
+                <br />
                 <br />
                 <img
                   style="
@@ -57,7 +60,7 @@
                     border: 1px solid black;
                     border-radius: 100px;
                     cursor: pointer;
-                    margin: 10px;
+                    margin-right: 5px;
                   "
                   src="../assets/nope.png"
                   @click="decide('nope')"
@@ -68,15 +71,13 @@
                     border: 1px solid black;
                     border-radius: 100px;
                     cursor: pointer;
-                    margin: 10px;
+                    margin-left: 5px;
                   "
                   src="../assets/like.png"
                   @click="decide('like')"
                 />
               </div>
             </b-modal>
-            <hr />
-            <p>Released : {{ getReleaseDate }}</p>
           </div>
           <div
             class="pic_img"
