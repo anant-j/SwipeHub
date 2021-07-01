@@ -342,7 +342,7 @@ export default {
             this.showAlert(
               "This session could not be created!",
               "e",
-              5000,
+              4800,
               "sessionCreateAlert"
             );
           }

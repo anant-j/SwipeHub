@@ -4,9 +4,11 @@
       {{ omitted }}
       {{ sessionDataPresent }}
     </div>
-    <Navbar style="position: relative" />
+    <Navbar />
     <Loader v-if="this.$store.state.loader" />
     <ShareScreen />
+    <br />
+    <br />
     <div style="position: relative">
       <router-view />
     </div>

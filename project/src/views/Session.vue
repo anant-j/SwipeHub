@@ -25,11 +25,70 @@
             <p style="font-size: 23px">
               <b>{{ getTitle }}</b>
             </p>
-            <p :style="{ 'font-size': `${getFontSize}` }">
+            <button
+              class="btn btn-primary"
+              @click="activeDescriptionModal = true"
+              v-if="getFontSize[0]"
+            >
+              View Synopsis
+            </button>
+            <p :style="{ 'font-size': `${getFontSize[1]}` }" v-else>
               {{ getDescription }}
             </p>
             <hr />
             <p>Released : {{ getReleaseDate }}</p>
+            <b-modal
+              :visible="activeDescriptionModal"
+              id="modal-center"
+              @hide="activeDescriptionModal = false"
+              hide-header-close
+              centered
+              :title="`Synopsis: ${getTitle}`"
+              ok-only
+              ok-title="Done"
+              style="padding: 0; margin: 0"
+            >
+              <div class="my-4 text-center" style="padding: 0; margin: 0">
+                <p
+                  style="
+                    height: 27vh;
+                    padding: 20px;
+                    padding-top: 0px;
+                    margin-top: 0px;
+                    overflow-y: scroll;
+                  "
+                >
+                  {{ getDescription }}
+                </p>
+                <b>Released : {{ getReleaseDate }}</b>
+                <br />
+                <br />
+                <img
+                  style="
+                    height: 50px;
+                    border: 1px solid black;
+                    border-radius: 100px;
+                    cursor: pointer;
+                    margin-right: 10px;
+                    margin-bottom: 0px;
+                  "
+                  src="../assets/nope.png"
+                  @click="decide('nope')"
+                />
+                <img
+                  style="
+                    height: 50px;
+                    border: 1px solid black;
+                    border-radius: 100px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    margin-bottom: 0px;
+                  "
+                  src="../assets/like.png"
+                  @click="decide('like')"
+                />
+              </div>
+            </b-modal>
           </div>
           <div
             class="pic_img"
@@ -87,8 +146,10 @@ export default {
     queue: [],
     lastInteraction: 0,
     sessionPausedNotifications: true,
+    activeDescriptionModal: false,
+    timer: null,
   }),
-  created() {
+  mounted() {
     if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
@@ -101,10 +162,14 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
+    this.lastInteraction = 0;
     this.getCards(
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
     this.poll();
+  },
+  destroyed() {
+    clearTimeout(this.timer);
   },
   computed: {
     photoAvailable() {
@@ -133,16 +198,20 @@ export default {
     getFontSize() {
       const descLength = this.getDescription.length;
       let res = 0;
+      let showIcon = false;
       if (descLength <= 300) {
-        res = 20;
+        res = 18;
       } else if (descLength > 300 && descLength <= 500) {
         res = 15;
-      } else if (descLength > 500 && descLength < 700) {
-        res = 13;
       } else {
-        res = 17 - descLength / 150;
+        // } else if (descLength > 500 && descLength < 600) {
+        //   res = 13;
+        //   showIcon = true;
+        // } else {
+        //   res = 17 - descLength / 150;
+        showIcon = true;
       }
-      return `${res}px`;
+      return [showIcon, `${res}px`];
     },
     getReleaseDate() {
       const inputId = this.queue[0].id;
@@ -186,25 +255,22 @@ export default {
           this.showAlert(
             "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
             "e",
-            5000,
+            4800,
             "sessionLoadAlert"
           );
           let root = this;
           setTimeout(function () {
             root.clearSession();
             root.$router.push({ name: "Home" });
-          }, 5000);
+          }, 4800);
         });
     },
     poll() {
-      if (this.pollAllowed() && this.$store.state.activePage === 1) {
+      if (this.pollAllowed()) {
         this.sessionPausedNotifications = false;
         this.globalSessionPoll();
       } else {
-        if (
-          !this.sessionPausedNotifications &&
-          this.$store.state.activePage === 1
-        ) {
+        if (!this.sessionPausedNotifications) {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
             "w",
@@ -214,12 +280,13 @@ export default {
           this.sessionPausedNotifications = true;
         }
       }
-      setTimeout(() => this.poll(), 5000);
+      this.timer = setTimeout(() => this.poll(), 5000);
     },
     onSubmit(choice) {
       this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
+      this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       if (this.queue.length === 9) {
         this.getCards(
@@ -249,7 +316,7 @@ export default {
     pollAllowed() {
       const currentTime = new Date();
       if (
-        (currentTime - this.lastInteraction) / 1000 > 45 ||
+        (currentTime - this.lastInteraction) / 1000 > 60 ||
         this.lastInteraction === 0
       ) {
         return false;

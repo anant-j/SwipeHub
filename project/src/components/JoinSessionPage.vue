@@ -132,7 +132,7 @@ export default {
             this.showAlert(
               "This session could not be found!",
               "e",
-              5000,
+              4800,
               "sessionNotFound"
             );
             this.$store.state.loader = false;
@@ -142,7 +142,7 @@ export default {
           this.showAlert(
             "This session could not be found!",
             "e",
-            5000,
+            4800,
             "sessionNotFound"
           );
           this.$store.state.loader = false;

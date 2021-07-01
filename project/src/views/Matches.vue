@@ -51,6 +51,9 @@ import axios from "axios";
 export default {
   name: "Matches",
   store,
+  data: () => ({
+    timer: null,
+  }),
   created() {
     if (!this.sessionDataPresent) {
       this.showAlert(
@@ -65,6 +68,9 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
     this.matchPoll();
+  },
+  destroyed() {
+    clearTimeout(this.timer);
   },
   methods: {
     matchPoll() {
@@ -101,12 +107,24 @@ export default {
               release: movieData[iterator].release_date,
             });
           }
+          const userData = response.data.userData;
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (iterator !== this.getUserId) {
+              userDataArray.push({
+                userId: iterator,
+                value: userData[iterator],
+              });
+            }
+          }
+          this.$store.state.usersData = userDataArray;
           this.$store.state.matchData = movieList;
           this.$store.state.totalMatches = movieList.length;
         })
         .catch(() => {
           this.$store.state.loader = false;
         });
+      this.timer = setTimeout(() => this.matchPoll(), 10000);
     },
   },
 };
