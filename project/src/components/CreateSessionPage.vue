@@ -339,14 +339,20 @@ export default {
             this.setUserId(username);
             this.$router.push({ name: "Session" });
           } else {
-            this.showAlert("This session could not be created!", "e", 5000);
+            this.showAlert(
+              "This session could not be created!",
+              "e",
+              5000,
+              "sessionCreateAlert"
+            );
           }
         })
         .catch(() => {
           this.showAlert(
             "The session could not be created! Please try again later",
             "e",
-            5000
+            5000,
+            "sessionCreateAlert"
           );
           this.$store.state.loader = false;
         });

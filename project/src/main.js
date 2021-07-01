@@ -87,14 +87,26 @@ Vue.mixin({
      * @param  {string} message : Content of the alert
      * @param  {string} type="s" Type: success, warning, error, info, default
      * @param  {number} timeout=false : Add int in miliseconds, false for persistent
-     * @param  {boolean} icon=true : Show icon/symbol
      */
-    showAlert(message, type = "s", timeout = false, icon = true) {
-      this.$toast(message.toString(), {
-        type: getType(type),
-        timeout: parseInt(timeout),
-        icon: icon,
-      });
+    showAlert(message, type = "s", timeout = false, id) {
+      // this.$toast.dismiss(id);
+      // this.$toast(message.toString(), {
+      //   id: id,
+      //   type: getType(type),
+      //   timeout: parseInt(timeout),
+      //   icon: icon,
+      // });
+      this.$toast.update(
+        id,
+        {
+          content: message.toString(),
+          options: {
+            type: getType(type),
+            timeout: parseInt(timeout),
+          },
+        },
+        true
+      );
     },
     toHomePage() {
       this.$store.state.sessionState = 0;
@@ -162,13 +174,23 @@ Vue.mixin({
         // code block
       }
       navigator.clipboard.writeText(data);
-      this.showAlert(`${text} copied to clipboard`, "s", 7000);
+      this.showAlert(
+        `${text} copied to clipboard`,
+        "s",
+        5000,
+        "sessionIdCopidToClipboard"
+      );
     },
     createShareLink() {
       const joinLink = this.getShareLink();
       navigator.clipboard.writeText(joinLink);
       this.$store.state.activeModal = true;
-      this.showAlert("Shareable link copied to clipboard.", "s", 7000);
+      this.showAlert(
+        "Shareable link copied to clipboard.",
+        "s",
+        5000,
+        "shareableLinkCopidToClipboard"
+      );
     },
     getShareLink() {
       return `${hostURL}/?join=${this.getSessionId}`;
@@ -212,7 +234,12 @@ Vue.mixin({
         .then((response) => {
           const numMatch = response.data.match;
           if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.showAlert(`You've got ${numMatch} matches`, "s", 4800);
+            this.showAlert(
+              `You've got ${numMatch} matches`,
+              "s",
+              4800,
+              "matchesAlert"
+            );
           }
           this.$store.state.totalMatches = numMatch;
           const userData = response.data.userData;
@@ -233,20 +260,19 @@ Vue.mixin({
             }
           }
         })
-        .catch((response) => {
+        .catch(() => {
           // handle error
           this.showAlert(
             "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
             "e",
-            5000
+            5000,
+            "sessionLoadAlert"
           );
           let root = this;
           setTimeout(function () {
             root.clearSession();
             root.$router.push({ name: "Home" });
           }, 5000);
-
-          console.log(response);
         });
     },
   },

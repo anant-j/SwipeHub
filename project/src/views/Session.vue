@@ -84,7 +84,12 @@ export default {
   }),
   created() {
     if (!this.sessionDataPresent) {
-      this.showAlert("Please join or create a session", "w", 5000);
+      this.showAlert(
+        "Please join or create a session",
+        "w",
+        5000,
+        "sessionDataNotAvailable"
+      );
       this.$router.push({ name: "Home" });
       return;
     }
@@ -154,7 +159,8 @@ export default {
           this.showAlert(
             "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
             "e",
-            5000
+            5000,
+            "sessionLoadAlert"
           );
           let root = this;
           setTimeout(function () {
@@ -175,7 +181,8 @@ export default {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
             "w",
-            4900
+            4900,
+            "sessionPausedAlert"
           );
           this.sessionPausedNotifications = true;
         }
@@ -187,7 +194,7 @@ export default {
       this.rewindAllow = true;
       this.showInfo = false;
       this.$store.state.totalSwipes += 1;
-      if (this.queue.length === 5) {
+      if (this.queue.length === 9) {
         this.getCards(
           `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
         );

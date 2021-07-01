@@ -53,7 +53,12 @@ export default {
   store,
   created() {
     if (!this.sessionDataPresent) {
-      this.showAlert("Please join or create a session", "w", 5000);
+      this.showAlert(
+        "Please join or create a session",
+        "w",
+        5000,
+        "sessionDataNotAvailable"
+      );
       this.$router.push({ name: "Home" });
       return;
     }

@@ -129,12 +129,22 @@ export default {
             this.setUserId(username);
             this.$router.push({ name: "Session" });
           } else {
-            this.showAlert("This session could not be found!", "e", 5000);
+            this.showAlert(
+              "This session could not be found!",
+              "e",
+              5000,
+              "sessionNotFound"
+            );
             this.$store.state.loader = false;
           }
         })
         .catch(() => {
-          this.showAlert("This session could not be found!", "e", 5000);
+          this.showAlert(
+            "This session could not be found!",
+            "e",
+            5000,
+            "sessionNotFound"
+          );
           this.$store.state.loader = false;
         });
     },
