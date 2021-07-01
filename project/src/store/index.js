@@ -5,10 +5,11 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    devmode: 0,
     loader: false,
     userId: null,
     sessionId: null,
-    activePage: false,
+    activePage: 0,
     activeModal: false,
     isCreator: false,
     sessionState: 0,

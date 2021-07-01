@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <div v-if="this.$store.state.devmode == 2">
+      {{ omitted }}
+      {{ sessionDataPresent }}
+    </div>
     <Navbar style="position: relative" />
     <Loader v-if="this.$store.state.loader" />
     <ShareScreen />
@@ -23,6 +27,17 @@ export default {
     ShareScreen,
   },
   store,
+  computed: {
+    omitted() {
+      const temp = {};
+      for (const [key, value] of Object.entries(this.$store.state)) {
+        if (key != "movieData" && key != "swipeHistory") {
+          temp[key] = value;
+        }
+      }
+      return temp;
+    },
+  },
 };
 </script>
 

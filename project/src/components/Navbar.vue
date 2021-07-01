@@ -45,18 +45,24 @@
                 </span>
               </router-link>
             </li>
+            <li class="nav-item" v-if="this.$store.state.devmode > 0">
+              <a @click="toggleDevMode()" class="nav-link"
+                >Devmode : {{ this.$store.state.devmode }}</a
+              >
+            </li>
           </ul>
-          <ul class="navbar-nav" v-if="this.$store.state.activePage">
+          <ul class="navbar-nav">
             <li
               class="nav-item"
               @click="
                 createShareLink();
                 hideModal();
               "
+              v-if="this.$store.state.activePage"
             >
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" v-if="this.$store.state.activePage">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -110,7 +116,11 @@
                 </div>
               </ul>
             </li>
-            <li class="nav-item" @click="leaveSession()">
+            <li
+              class="nav-item"
+              @click="leaveSession()"
+              v-if="this.$store.state.activePage"
+            >
               <a
                 class="nav-link"
                 id="leaveSessionBtn"
@@ -155,6 +165,15 @@ export default {
     checkPollPending() {
       if (this.$store.state.likedList.length > 0) {
         this.globalSessionPoll();
+      }
+    },
+    toggleDevMode() {
+      if (this.$store.state.devmode == 1) {
+        this.$store.state.devmode = 2;
+      } else if (this.$store.state.devmode == 2) {
+        this.$store.state.devmode = 1;
+      } else {
+        console.log("Not in dev mode");
       }
     },
   },

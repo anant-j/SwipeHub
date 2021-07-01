@@ -14,12 +14,13 @@ import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 
-let productionMode = false;
+let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
 let hostURL = "http://localhost:" + window.location.port;
 document.title = "SwipeHub Dev Mode";
-if (window.location.hostname !== "localhost") {
-  productionMode = true;
+if (window.location.hostname === "localhost") {
+  productionMode = false;
+  store.state.devmode = 1;
 }
 
 Vue.config.productionTip = !productionMode;
@@ -132,7 +133,7 @@ Vue.mixin({
         loader: false,
         userId: null,
         sessionId: null,
-        activePage: false,
+        activePage: 0,
         activeModal: false,
         isCreator: false,
         sessionState: 0,
