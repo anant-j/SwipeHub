@@ -107,6 +107,17 @@ export default {
               release: movieData[iterator].release_date,
             });
           }
+          const userData = response.data.userData;
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (iterator !== this.getUserId) {
+              userDataArray.push({
+                userId: iterator,
+                value: userData[iterator],
+              });
+            }
+          }
+          this.$store.state.usersData = userDataArray;
           this.$store.state.matchData = movieList;
           this.$store.state.totalMatches = movieList.length;
         })

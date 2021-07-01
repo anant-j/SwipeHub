@@ -310,9 +310,13 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
       const element = matches[index];
       movieData[element] = data.mediaInfo[element];
     }
+    const participantData = {};
+    for (const [key, value] of Object.entries(data["participants"])) {
+      participantData[key] = value["totalSwipes"].length;
+    }
     res
         .status(200)
-        .send({movies: movieData, isCreator: doc.data().creator == username});
+        .send({movies: movieData, isCreator: doc.data().creator == username, userData: participantData} );
   }
   return;
 });
