@@ -10,7 +10,7 @@ export default new Vuex.Store({
     userId: null,
     sessionId: null,
     activePage: 0,
-    activeModal: false,
+    activeShareModal: false,
     isCreator: false,
     sessionState: 0,
     movieData: {},

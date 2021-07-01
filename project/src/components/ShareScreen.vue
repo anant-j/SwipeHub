@@ -1,8 +1,8 @@
 <template>
   <b-modal
-    :visible="modalVisible"
+    :visible="shareModalVisible"
     id="modal-center"
-    @hide="$store.state.activeModal = false"
+    @hide="$store.state.activeShareModal = false"
     hide-header-close
     centered
     title="Share via QR Code/Send Link"
@@ -31,8 +31,8 @@
 export default {
   name: "ShareScreen",
   computed: {
-    modalVisible() {
-      return this.$store.state.activeModal;
+    shareModalVisible() {
+      return this.$store.state.activeShareModal;
     },
   },
 };

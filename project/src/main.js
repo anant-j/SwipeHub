@@ -134,7 +134,7 @@ Vue.mixin({
         userId: null,
         sessionId: null,
         activePage: 0,
-        activeModal: false,
+        activeShareModal: false,
         isCreator: false,
         sessionState: 0,
         movieData: {},
@@ -185,7 +185,7 @@ Vue.mixin({
     createShareLink() {
       const joinLink = this.getShareLink();
       navigator.clipboard.writeText(joinLink);
-      this.$store.state.activeModal = true;
+      this.$store.state.activeShareModal = true;
       this.showAlert(
         "Shareable link copied to clipboard.",
         "s",
