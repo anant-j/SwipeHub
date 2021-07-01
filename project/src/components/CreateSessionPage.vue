@@ -219,11 +219,11 @@ export default {
       categoryOptions: data.categories,
       contentType: { name: "Movie" },
       contentOptions: [{ name: "Movie" }, { name: "TV" }],
-      sortType: { name: "Popularity" },
+      sortType: { name: "Popularity", value: "Popularity" },
       sortOptions: [
-        { name: "Popularity" },
-        { name: "Release Date" },
-        { name: "Revenue" },
+        { name: "Popularity", value: "Popularity" },
+        { name: "Release Date", value: "Release" },
+        { name: "Revenue", value: "Revenue" },
       ],
     };
   },
@@ -306,7 +306,7 @@ export default {
       const country = this.country.id;
       const categories = this.category;
       const type = this.contentType.name === "Movie";
-      const order = this.sortType.name;
+      const order = this.sortType.value;
       let categoryList = "";
       if (categories !== null) {
         for (const category of categories) {
