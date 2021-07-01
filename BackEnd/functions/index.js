@@ -3,10 +3,10 @@ const axios = require("axios");
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 const apiToken = functions.config().tmdb.key;
-// const apiToken = "";
 const TelegramURL = functions.config().telegram.url;
 const TelegramToken = functions.config().telegram.token;
 const TelegramChatID = functions.config().telegram.chatid;
+const expectedToken = TelegramToken.split(":")[1].toLowerCase();
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -320,11 +320,30 @@ exports.matchPolling = functions.https.onRequest(async (req, res) => {
 exports.deploymessages = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   const title = req.body.title;
+  const key = req.query.token;
   const branch = req.body.branch;
   const status = req.body.state;
+  if (title == undefined || status == undefined || branch == undefined) {
+    res.status(200).send("Data Error");
+    return;
+  }
+  if (key == undefined || key.toLowerCase() != expectedToken) {
+    res.status(200).send("Unauthorized!");
+    return;
+  }
+  if (title.includes(":NF:")) {
+    res.status(200).send("Done!");
+    return;
+  }
   const content = `Deployment: ${title}\nBranch : ${branch}\nStatus: ${status}`;
-  const resp = await axios.get(`${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`);
-  res.send(resp.status);
+  try {
+    await axios.get(
+        `${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`,
+    );
+    res.status(200).send("Done");
+  } catch (error) {
+    res.status(200).send("Error");
+  }
   return;
 });
 
