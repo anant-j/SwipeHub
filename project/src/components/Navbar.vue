@@ -92,7 +92,7 @@
                 </li>
                 <li>
                   <a class="dropdown-item" id="swipePlaceHolder"
-                    >Total Swipes : {{ $store.state.totalSwipes }}</a
+                    >My Swipes : {{ $store.state.totalSwipes }}</a
                   >
                 </li>
                 <div
