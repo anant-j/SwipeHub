@@ -22,8 +22,14 @@
           v-on:dblclick="cardClicked()"
         >
           <div class="pic_content">
-            <h2>{{ getTitle }}</h2>
-            <p>{{ getDescription }}</p>
+            <p style="font-size: 23px">
+              <b>{{ getTitle }}</b>
+            </p>
+            <p :style="{ 'font-size': `${getFontSize}` }">
+              {{ getDescription }}
+            </p>
+            <hr />
+            <p>Released : {{ getReleaseDate }}</p>
           </div>
           <div
             class="pic_img"
@@ -123,6 +129,19 @@ export default {
       const movieId = inputId.split("?id=")[1];
       const movieDescription = this.$store.state.movieData[movieId].description;
       return movieDescription;
+    },
+    getFontSize() {
+      const descLength = this.getDescription.length;
+      const res = 90 - descLength / 100;
+      this.showAlert(`${descLength},${res}`, "s", false, "res");
+      return `${res}%`;
+    },
+    getReleaseDate() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const movieReleaseDate =
+        this.$store.state.movieData[movieId].release_date;
+      return movieReleaseDate;
     },
   },
   methods: {
@@ -309,6 +328,11 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  animation: blurOut ease 1s;
+  -webkit-animation: blurOut ease 1s;
+  -moz-animation: blurOut ease 1s;
+  -o-animation: blurOut ease 1s;
+  -ms-animation: blurOut ease 1s;
   /* box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15); */
 }
 
@@ -323,7 +347,8 @@ body {
   right: 0px;
   bottom: 0px;
   left: 0px;
-  opacity: 0.3;
+  opacity: 0.75;
+  filter: blur(3px);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -333,15 +358,21 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 10%;
+  padding-top: 20px;
   /* word-break: break-all; */
   padding-left: 20px;
   padding-right: 20px;
   justify-content: center;
   align-items: center;
-  color: black;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 100;
   text-align: center;
+  animation: fadeIn ease 1s;
+  -webkit-animation: fadeIn ease 1s;
+  -moz-animation: fadeIn ease 1s;
+  -o-animation: fadeIn ease 1s;
+  -ms-animation: fadeIn ease 1s;
 }
 
 .btns {
@@ -377,6 +408,96 @@ body {
 
 .btns img:nth-last-child(1) {
   margin-right: 0;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes blurOut {
+  0% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+  }
+}
+
+@-moz-keyframes blurOut {
+  0% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+  }
+}
+
+@-webkit-keyframes blurOut {
+  0% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+  }
+}
+
+@-o-keyframes blurOut {
+  0% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+  }
+}
+
+@-ms-keyframes blurOut {
+  0% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0px);
+  }
 }
 
 @media only screen and (max-width: 600px) {
