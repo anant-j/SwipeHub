@@ -133,7 +133,7 @@ export default {
     getFontSize() {
       const descLength = this.getDescription.length;
       const res = 90 - descLength / 100;
-      this.showAlert(`${descLength},${res}`, "s", false, "res");
+      // this.showAlert(`${descLength},${res}`, "s", false, "res");
       return `${res}%`;
     },
     getReleaseDate() {
