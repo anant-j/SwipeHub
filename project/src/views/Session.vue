@@ -25,9 +25,56 @@
             <p style="font-size: 23px">
               <b>{{ getTitle }}</b>
             </p>
-            <p :style="{ 'font-size': `${getFontSize}` }">
+            <button
+              class="btn btn-primary"
+              @click="activeDescriptionModal = true"
+              v-if="getFontSize[0]"
+            >
+              View Synopsis
+            </button>
+            <p :style="{ 'font-size': `${getFontSize[1]}` }" v-else>
               {{ getDescription }}
+              {{ getFontSize[0] }}
             </p>
+            <b-modal
+              :visible="activeDescriptionModal"
+              id="modal-center"
+              @hide="activeDescriptionModal = false"
+              hide-header-close
+              centered
+              :title="`Synopsis: ${getTitle}`"
+              ok-only
+              ok-title="Done"
+            >
+              <div class="my-4 text-center">
+                {{ getDescription }}
+                <br />
+                <b>Released : {{ getReleaseDate }}</b>
+                <br />
+                <img
+                  style="
+                    height: 55px;
+                    border: 1px solid black;
+                    border-radius: 100px;
+                    cursor: pointer;
+                    margin: 10px;
+                  "
+                  src="../assets/nope.png"
+                  @click="decide('nope')"
+                />
+                <img
+                  style="
+                    height: 55px;
+                    border: 1px solid black;
+                    border-radius: 100px;
+                    cursor: pointer;
+                    margin: 10px;
+                  "
+                  src="../assets/like.png"
+                  @click="decide('like')"
+                />
+              </div>
+            </b-modal>
             <hr />
             <p>Released : {{ getReleaseDate }}</p>
           </div>
@@ -87,6 +134,7 @@ export default {
     queue: [],
     lastInteraction: 0,
     sessionPausedNotifications: true,
+    activeDescriptionModal: false,
   }),
   created() {
     if (!this.sessionDataPresent) {
@@ -133,16 +181,20 @@ export default {
     getFontSize() {
       const descLength = this.getDescription.length;
       let res = 0;
+      let showIcon = false;
       if (descLength <= 300) {
         res = 20;
       } else if (descLength > 300 && descLength <= 500) {
         res = 15;
-      } else if (descLength > 500 && descLength < 700) {
-        res = 13;
       } else {
-        res = 17 - descLength / 150;
+        // } else if (descLength > 500 && descLength < 600) {
+        //   res = 13;
+        //   showIcon = true;
+        // } else {
+        //   res = 17 - descLength / 150;
+        showIcon = true;
       }
-      return `${res}px`;
+      return [showIcon, `${res}px`];
     },
     getReleaseDate() {
       const inputId = this.queue[0].id;
@@ -220,6 +272,7 @@ export default {
       this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
+      this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       if (this.queue.length === 9) {
         this.getCards(
