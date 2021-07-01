@@ -132,9 +132,17 @@ export default {
     },
     getFontSize() {
       const descLength = this.getDescription.length;
-      const res = 90 - descLength / 100;
-      // this.showAlert(`${descLength},${res}`, "s", false, "res");
-      return `${res}%`;
+      let res = 0;
+      if (descLength <= 300) {
+        res = 20;
+      } else if (descLength > 300 && descLength <= 500) {
+        res = 15;
+      } else if (descLength > 500 && descLength < 700) {
+        res = 13;
+      } else {
+        res = 17 - descLength / 150;
+      }
+      return `${res}px`;
     },
     getReleaseDate() {
       const inputId = this.queue[0].id;
