@@ -161,6 +161,7 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
+    this.lastInteraction = 0;
     this.getCards(
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
@@ -314,7 +315,7 @@ export default {
     pollAllowed() {
       const currentTime = new Date();
       if (
-        (currentTime - this.lastInteraction) / 1000 > 45 ||
+        (currentTime - this.lastInteraction) / 1000 > 60 ||
         this.lastInteraction === 0
       ) {
         return false;
