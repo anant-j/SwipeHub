@@ -147,8 +147,9 @@ export default {
     lastInteraction: 0,
     sessionPausedNotifications: true,
     activeDescriptionModal: false,
+    timer: null,
   }),
-  created() {
+  mounted() {
     if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
@@ -166,6 +167,9 @@ export default {
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
     this.poll();
+  },
+  destroyed() {
+    clearTimeout(this.timer);
   },
   computed: {
     photoAvailable() {
@@ -251,25 +255,22 @@ export default {
           this.showAlert(
             "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
             "e",
-            5000,
+            4800,
             "sessionLoadAlert"
           );
           let root = this;
           setTimeout(function () {
             root.clearSession();
             root.$router.push({ name: "Home" });
-          }, 5000);
+          }, 4800);
         });
     },
     poll() {
-      if (this.pollAllowed() && this.$store.state.activePage === 1) {
+      if (this.pollAllowed()) {
         this.sessionPausedNotifications = false;
         this.globalSessionPoll();
       } else {
-        if (
-          !this.sessionPausedNotifications &&
-          this.$store.state.activePage === 1
-        ) {
+        if (!this.sessionPausedNotifications) {
           this.showAlert(
             "Session is paused. Swipe again to receive session updates",
             "w",
@@ -279,7 +280,7 @@ export default {
           this.sessionPausedNotifications = true;
         }
       }
-      setTimeout(() => this.poll(), 5000);
+      this.timer = setTimeout(() => this.poll(), 5000);
     },
     onSubmit(choice) {
       this.lastInteraction = new Date();

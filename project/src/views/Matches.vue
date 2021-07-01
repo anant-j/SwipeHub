@@ -51,6 +51,9 @@ import axios from "axios";
 export default {
   name: "Matches",
   store,
+  data: () => ({
+    timer: null,
+  }),
   created() {
     if (!this.sessionDataPresent) {
       this.showAlert(
@@ -65,6 +68,9 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
     this.matchPoll();
+  },
+  destroyed() {
+    clearTimeout(this.timer);
   },
   methods: {
     matchPoll() {
@@ -107,6 +113,7 @@ export default {
         .catch(() => {
           this.$store.state.loader = false;
         });
+      this.timer = setTimeout(() => this.matchPoll(), 10000);
     },
   },
 };
