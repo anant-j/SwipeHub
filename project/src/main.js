@@ -137,7 +137,7 @@ Vue.mixin({
         sessionState: 0,
         movieData: {},
         totalSwipes: 0,
-        likedList: [],
+        likedSet: new Set(),
         swipeHistory: [],
         matchData: {},
         totalMatches: 0,
@@ -214,7 +214,7 @@ Vue.mixin({
       for (const val of this.$store.state.swipeHistory) {
         localTotalSwipes.push(this.getId(val.id));
       }
-      const localLikedList = this.$store.state.likedList;
+      const localLikedList = Array.from(this.$store.state.likedSet);
       const params = {
         totalSwipes: localTotalSwipes,
         likedList: localLikedList,
@@ -245,14 +245,13 @@ Vue.mixin({
                 userId: iterator,
                 value: userData[iterator],
               });
+            } else {
+              this.$store.state.totalSwipes = userData[iterator];
             }
           }
-          this.$store.state.usersData = userDataArray;
-          for (const iterator of localLikedList) {
-            const index = this.$store.state.likedList.indexOf(iterator);
-            if (index > -1) {
-              this.$store.state.likedList.splice(index, 1);
-            }
+          for (let index = 0; index < localTotalSwipes.length; index++) {
+            const element = localTotalSwipes[index];
+            this.$store.state.likedSet.delete(element);
           }
         })
         .catch(() => {

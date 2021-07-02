@@ -115,6 +115,8 @@ export default {
                 userId: iterator,
                 value: userData[iterator],
               });
+            } else {
+              this.$store.state.totalSwipes = userData[iterator];
             }
           }
           this.$store.state.usersData = userDataArray;
