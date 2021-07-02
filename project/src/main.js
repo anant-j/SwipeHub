@@ -13,6 +13,7 @@ import Multiselect from "vue-multiselect";
 import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
+import MatchNotification from "@/components/MatchNotification";
 
 let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -90,17 +91,14 @@ Vue.mixin({
      * @param  {number} timeout=false : Add int in miliseconds, false for persistent
      */
     showAlert(message, type = "s", timeout = false, id) {
-      // this.$toast.dismiss(id);
-      // this.$toast(message.toString(), {
-      //   id: id,
-      //   type: getType(type),
-      //   timeout: parseInt(timeout),
-      //   icon: icon,
-      // });
+      let final_message = MatchNotification;
+      if (id !== "matchesAlert") {
+        final_message = message.toString();
+      }
       this.$toast.update(
         id,
         {
-          content: message.toString(),
+          content: final_message,
           options: {
             type: getType(type),
             timeout: parseInt(timeout),
@@ -235,12 +233,8 @@ Vue.mixin({
         .then((response) => {
           const numMatch = response.data.match;
           if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.showAlert(
-              `You've got ${numMatch} matches`,
-              "s",
-              4800,
-              "matchesAlert"
-            );
+            this.$store.state.totalMatches = numMatch;
+            this.showAlert(`temp`, "s", 4800, "matchesAlert");
           }
           this.$store.state.totalMatches = numMatch;
           const userData = response.data.userData;
