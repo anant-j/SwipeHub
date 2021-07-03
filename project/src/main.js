@@ -107,6 +107,12 @@ Vue.mixin({
         true
       );
     },
+    hideAlert(id) {
+      this.$toast.dismiss(id);
+    },
+    hideAllAlerts() {
+      this.$toast.clear();
+    },
     toHomePage() {
       this.$store.state.sessionState = 0;
     },
@@ -137,7 +143,7 @@ Vue.mixin({
         sessionState: 0,
         movieData: {},
         totalSwipes: 0,
-        likedList: [],
+        likedSet: new Set(),
         swipeHistory: [],
         matchData: {},
         totalMatches: 0,
@@ -146,11 +152,28 @@ Vue.mixin({
     },
     leaveSession() {
       const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
+      if (this.$store.state.isCreator) {
+        this.showAlert(
+          "Please wait. Ending Session...",
+          "i",
+          false,
+          "leaveSession"
+        );
+      } else {
+        this.showAlert(
+          "Please wait. Leaving Session...",
+          "i",
+          false,
+          "leaveSession"
+        );
+      }
+
       axios
         .get(url, {
           validateStatus: false,
         })
         .then(() => {
+          this.hideAllAlerts();
           this.clearSession();
           this.$router.push({ name: "Home" });
         });
@@ -214,7 +237,7 @@ Vue.mixin({
       for (const val of this.$store.state.swipeHistory) {
         localTotalSwipes.push(this.getId(val.id));
       }
-      const localLikedList = this.$store.state.likedList;
+      const localLikedList = Array.from(this.$store.state.likedSet);
       const params = {
         totalSwipes: localTotalSwipes,
         likedList: localLikedList,
@@ -245,14 +268,14 @@ Vue.mixin({
                 userId: iterator,
                 value: userData[iterator],
               });
+            } else {
+              this.$store.state.totalSwipes = userData[iterator];
             }
           }
           this.$store.state.usersData = userDataArray;
-          for (const iterator of localLikedList) {
-            const index = this.$store.state.likedList.indexOf(iterator);
-            if (index > -1) {
-              this.$store.state.likedList.splice(index, 1);
-            }
+          for (let index = 0; index < localTotalSwipes.length; index++) {
+            const element = localTotalSwipes[index];
+            this.$store.state.likedSet.delete(element);
           }
         })
         .catch(() => {

@@ -163,7 +163,7 @@ export default {
         .classList.toggle("show");
     },
     checkPollPending() {
-      if (this.$store.state.likedList.length > 0) {
+      if (this.$store.state.likedSet.size > 0) {
         this.globalSessionPoll();
       }
     },

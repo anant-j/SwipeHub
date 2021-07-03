@@ -33,8 +33,12 @@ export default {
     omitted() {
       const temp = {};
       for (const [key, value] of Object.entries(this.$store.state)) {
-        if (key != "movieData" && key != "swipeHistory") {
+        if (key != "movieData" && key != "swipeHistory" && key != "likedList") {
           temp[key] = value;
+        }
+        if (key == "likedList") {
+          // console.log(this.$store.state.likedList);
+          temp[key] = Array.from(this.$store.state.likedList);
         }
       }
       return temp;

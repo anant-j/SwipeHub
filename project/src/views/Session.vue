@@ -295,7 +295,7 @@ export default {
       }
       if (choice.type === "like" || choice.type === "super") {
         const id = this.getId(choice.item.id);
-        this.$store.state.likedList.push(id);
+        this.$store.state.likedSet.add(id);
       }
       this.$store.state.swipeHistory.push(choice.item);
     },
