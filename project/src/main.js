@@ -249,6 +249,7 @@ Vue.mixin({
               this.$store.state.totalSwipes = userData[iterator];
             }
           }
+          this.$store.state.usersData = userDataArray;
           for (let index = 0; index < localTotalSwipes.length; index++) {
             const element = localTotalSwipes[index];
             this.$store.state.likedSet.delete(element);
