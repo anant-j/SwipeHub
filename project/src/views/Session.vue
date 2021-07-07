@@ -32,11 +32,13 @@
             >
               View Synopsis
             </button>
-            <p :style="{ 'font-size': `${getFontSize[1]}` }" v-else>
-              {{ getDescription }}
-            </p>
+            <p
+              :style="{ 'font-size': `${getFontSize[1]}` }"
+              v-html="getDescription"
+              v-else
+            ></p>
             <hr />
-            <p>Released : {{ getReleaseDate }}</p>
+            <p v-if="!isLastCard">Released : {{ getReleaseDate }}</p>
             <b-modal
               :visible="activeDescriptionModal"
               id="modal-center"
@@ -128,7 +130,6 @@
       /> -->
       <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
       <img src="../assets/like.png" @click="decide('like')" />
-      <!-- <img src="../assets/help.png" @click="decide('help')" /> -->
     </div>
   </div>
 </template>
@@ -148,6 +149,10 @@ export default {
     sessionPausedNotifications: true,
     activeDescriptionModal: false,
     timer: null,
+    subsequentPollAllowed: true,
+    noCardUrl: "https://i.imgur.com/8MfHjli.png",
+    noImageUrl: "https://i.imgur.com/Sql8s2M.png",
+    TMDBNull: "http://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -176,12 +181,18 @@ export default {
       const inputId = this.queue[0].id;
       const posterlink = inputId.split("?id=")[0];
       if (
-        posterlink === "http://image.tmdb.org/t/p/originalnull" ||
-        posterlink === "https://i.imgur.com/Sql8s2M.png"
+        posterlink === this.TMDBNull ||
+        posterlink === this.noImageUrl ||
+        posterlink === this.noCardUrl
       ) {
         return false;
       }
       return true;
+    },
+    isLastCard() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      return movieId == -1;
     },
     getTitle() {
       const inputId = this.queue[0].id;
@@ -204,11 +215,6 @@ export default {
       } else if (descLength > 300 && descLength <= 500) {
         res = 15;
       } else {
-        // } else if (descLength > 500 && descLength < 600) {
-        //   res = 13;
-        //   showIcon = true;
-        // } else {
-        //   res = 17 - descLength / 150;
         showIcon = true;
       }
       return [showIcon, `${res}px`];
@@ -222,6 +228,24 @@ export default {
     },
   },
   methods: {
+    addLastCard() {
+      const list = [];
+      const posterLink = this.noCardUrl;
+      this.$store.state.movieData[-1] = {
+        adult: false,
+        description:
+          "We've run out of cards to show you!<br><br><h3 style='color: red;'>Swipe Left to Leave Session</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
+        poster: posterLink,
+        release_date: "N/A",
+        title: "Uh-oh",
+      };
+      list.push({
+        id: posterLink + `?id=-1`,
+      });
+      this.queue = this.queue.concat(list);
+      this.subsequentPollAllowed = false;
+      return;
+    },
     getCards(url) {
       axios
         .get(url, {
@@ -236,33 +260,35 @@ export default {
             this.$store.state.isCreator = result.data.isCreator;
           }
           const order = result.data.movies.order;
+          if (order.length == 0) {
+            this.addLastCard();
+            return;
+          }
           const list = [];
           for (let i = 0; i < order.length; i++) {
-            let posterlink = result.data.movies[order[i]].poster;
-            if (posterlink === "http://image.tmdb.org/t/p/originalnull") {
-              posterlink = "https://i.imgur.com/Sql8s2M.png";
+            if (order[i] == null) {
+              this.addLastCard();
+              return;
             }
-            posterlink = posterlink.replace("http://", "https://");
-            list.push({
-              id: posterlink + `?id=${order[i]}`,
-            });
+            // if (!(order[i] in this.$store.state.movieData)) {
             this.$store.state.movieData[order[i]] =
               result.data.movies[order[i]];
+            let posterlink = result.data.movies[order[i]].poster;
+            if (posterlink === this.TMDBNull) {
+              posterlink = this.noImageUrl;
+            }
+            posterlink = posterlink.replace("http://", "https://");
+            const finalPosterLink = posterlink + `?id=${order[i]}`;
+            if (!this.queue.includes(finalPosterLink)) {
+              list.push({
+                id: finalPosterLink,
+              });
+            }
           }
           this.queue = this.queue.concat(list);
         })
         .catch(() => {
-          this.showAlert(
-            "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
-            "e",
-            4800,
-            "sessionLoadAlert"
-          );
-          let root = this;
-          setTimeout(function () {
-            root.clearSession();
-            root.$router.push({ name: "Home" });
-          }, 4800);
+          this.addLastCard();
         });
     },
     poll() {
@@ -288,13 +314,22 @@ export default {
       this.showInfo = false;
       this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
-      if (this.queue.length === 9) {
+      const id = this.getId(choice.item.id);
+      if (id == "-1") {
+        if (choice.type === "nope") {
+          this.leaveSession();
+        }
+        if (choice.type === "like" || choice.type === "super") {
+          this.$router.push({ name: "Matches" });
+        }
+        return;
+      }
+      if (this.queue.length === 9 && this.subsequentPollAllowed) {
         this.getCards(
           `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
         );
       }
       if (choice.type === "like" || choice.type === "super") {
-        const id = this.getId(choice.item.id);
         this.$store.state.likedSet.add(id);
       }
       this.$store.state.swipeHistory.push(choice.item);
