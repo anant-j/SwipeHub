@@ -137,6 +137,7 @@ export default {
                 this.$store.state.totalSwipes = userData[iterator];
               }
             }
+            this.updateUsersJoinLeaveNotification(Object.keys(userData));
             this.$store.state.usersData = userDataArray;
             this.$store.state.matchData = movieList;
             this.$store.state.totalMatches = movieList.length;
