@@ -243,22 +243,21 @@ Vue.mixin({
         let joinMessage = "";
         for (const joiner of NotificationStore["joined"]) {
           joinMessage += joiner + ", ";
-          joinMessage = joinMessage.slice(0, -2);
         }
+        joinMessage = joinMessage.slice(0, -2);
         NotificationMessage += `${joinMessage} has joined the session`;
       }
       if (NotificationStore["left"].length > 0) {
         let leaveMessage = "";
         for (const leaver of NotificationStore["left"]) {
           leaveMessage += leaver + ", ";
-          leaveMessage = leaveMessage.slice(0, -2);
         }
+        leaveMessage = leaveMessage.slice(0, -2);
         NotificationMessage += `${leaveMessage} has left the session`;
       }
       if (NotificationMessage != "") {
         this.showAlert(NotificationMessage, "i", 4000, "userNotification");
       }
-      // this.showAlert();
       return;
     },
     globalSessionPoll() {
