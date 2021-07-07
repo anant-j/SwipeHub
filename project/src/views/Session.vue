@@ -270,16 +270,18 @@ export default {
               this.addLastCard();
               return;
             }
-            if (!(order[i] in this.$store.state.movieData)) {
-              this.$store.state.movieData[order[i]] =
-                result.data.movies[order[i]];
-              let posterlink = result.data.movies[order[i]].poster;
-              if (posterlink === this.TMDBNull) {
-                posterlink = this.noImageUrl;
-              }
-              posterlink = posterlink.replace("http://", "https://");
+            // if (!(order[i] in this.$store.state.movieData)) {
+            this.$store.state.movieData[order[i]] =
+              result.data.movies[order[i]];
+            let posterlink = result.data.movies[order[i]].poster;
+            if (posterlink === this.TMDBNull) {
+              posterlink = this.noImageUrl;
+            }
+            posterlink = posterlink.replace("http://", "https://");
+            const finalPosterLink = posterlink + `?id=${order[i]}`;
+            if (!this.queue.includes(finalPosterLink)) {
               list.push({
-                id: posterlink + `?id=${order[i]}`,
+                id: finalPosterLink,
               });
             }
           }
