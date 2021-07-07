@@ -152,30 +152,15 @@ Vue.mixin({
     },
     leaveSession() {
       const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
-      if (this.$store.state.isCreator) {
-        this.showAlert(
-          "Please wait. Ending Session...",
-          "i",
-          false,
-          "leaveSession"
-        );
-      } else {
-        this.showAlert(
-          "Please wait. Leaving Session...",
-          "i",
-          false,
-          "leaveSession"
-        );
-      }
-
+      this.$store.state.loader = true;
       axios
         .get(url, {
           validateStatus: false,
         })
         .then(() => {
-          this.hideAllAlerts();
           this.clearSession();
           this.$router.push({ name: "Home" });
+          this.$store.state.loader = false;
         });
     },
     copyToClipboard(item) {
