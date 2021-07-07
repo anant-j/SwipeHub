@@ -16,7 +16,11 @@
         >
       </div>
     </div>
-    <div id="cardHolder" class="row row-cols-1 row-cols-md-4 g-3 mt-3 mb-3">
+    <div
+      id="cardHolder"
+      class="row row-cols-1 row-cols-md-4 g-3 mt-3 mb-3"
+      @click="pageActivity()"
+    >
       <div
         class="col"
         v-for="item in this.$store.state.matchData"
@@ -53,8 +57,10 @@ export default {
   store,
   data: () => ({
     timer: null,
+    lastInteraction: new Date(),
   }),
   created() {
+    window.addEventListener("scroll", this.pageActivity);
     if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
@@ -70,62 +76,75 @@ export default {
     this.matchPoll();
   },
   destroyed() {
+    window.removeEventListener("scroll", this.pageActivity);
     clearTimeout(this.timer);
   },
   methods: {
+    pageActivity() {
+      this.lastInteraction = new Date();
+    },
+    pollAllowed() {
+      const currentTime = new Date();
+      if ((currentTime - this.lastInteraction) / 1000 > 60) {
+        return false;
+      }
+      return true;
+    },
     matchPoll() {
-      const params = {
-        sessionId: this.getSessionId,
-        userId: this.getUserId,
-      };
-      const data = Object.keys(params)
-        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join("&");
-      axios({
-        url: `${this.backend}/matchPolling`,
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data,
-      })
-        .then((response) => {
-          this.$store.state.loader = false;
-          const movieData = response.data.movies;
-          const movieList = [];
-          for (const iterator of Object.keys(movieData)) {
-            let posterlink = movieData[iterator].poster.replace(
-              "http://",
-              "https://"
-            );
-            if (posterlink === "https://image.tmdb.org/t/p/originalnull") {
-              posterlink = "https://i.imgur.com/Sql8s2M.png";
-            }
-            movieList.push({
-              movieId: iterator,
-              title: movieData[iterator].title,
-              posterURL: posterlink,
-              description: movieData[iterator].description,
-              release: movieData[iterator].release_date,
-            });
-          }
-          const userData = response.data.userData;
-          const userDataArray = [];
-          for (const iterator of Object.keys(userData)) {
-            if (iterator !== this.getUserId) {
-              userDataArray.push({
-                userId: iterator,
-                value: userData[iterator],
-              });
-            } else {
-              this.$store.state.totalSwipes = userData[iterator];
-            }
-          }
-          this.$store.state.usersData = userDataArray;
-          this.$store.state.matchData = movieList;
-          this.$store.state.totalMatches = movieList.length;
+      if (this.pollAllowed()) {
+        const params = {
+          sessionId: this.getSessionId,
+          userId: this.getUserId,
+        };
+        const data = Object.keys(params)
+          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+          .join("&");
+        axios({
+          url: `${this.backend}/matchPolling`,
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          data,
         })
-        .catch(() => {
-          this.$store.state.loader = false;
-        });
+          .then((response) => {
+            this.$store.state.loader = false;
+            const movieData = response.data.movies;
+            const movieList = [];
+            for (const iterator of Object.keys(movieData)) {
+              let posterlink = movieData[iterator].poster.replace(
+                "http://",
+                "https://"
+              );
+              if (posterlink === "https://image.tmdb.org/t/p/originalnull") {
+                posterlink = "https://i.imgur.com/Sql8s2M.png";
+              }
+              movieList.push({
+                movieId: iterator,
+                title: movieData[iterator].title,
+                posterURL: posterlink,
+                description: movieData[iterator].description,
+                release: movieData[iterator].release_date,
+              });
+            }
+            const userData = response.data.userData;
+            const userDataArray = [];
+            for (const iterator of Object.keys(userData)) {
+              if (iterator !== this.getUserId) {
+                userDataArray.push({
+                  userId: iterator,
+                  value: userData[iterator],
+                });
+              } else {
+                this.$store.state.totalSwipes = userData[iterator];
+              }
+            }
+            this.$store.state.usersData = userDataArray;
+            this.$store.state.matchData = movieList;
+            this.$store.state.totalMatches = movieList.length;
+          })
+          .catch(() => {
+            this.$store.state.loader = false;
+          });
+      }
       this.timer = setTimeout(() => this.matchPoll(), 10000);
     },
   },
