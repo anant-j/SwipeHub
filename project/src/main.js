@@ -245,7 +245,7 @@ Vue.mixin({
           joinMessage += joiner + ", ";
         }
         joinMessage = joinMessage.slice(0, -2);
-        NotificationMessage += `${joinMessage} has joined the session`;
+        NotificationMessage += `${joinMessage} has joined the session. `;
       }
       if (NotificationStore["left"].length > 0) {
         let leaveMessage = "";
@@ -253,7 +253,7 @@ Vue.mixin({
           leaveMessage += leaver + ", ";
         }
         leaveMessage = leaveMessage.slice(0, -2);
-        NotificationMessage += `${leaveMessage} has left the session`;
+        NotificationMessage += `${leaveMessage} has left the session. `;
       }
       if (NotificationMessage != "") {
         this.showAlert(NotificationMessage, "i", 4000, "userNotification");
