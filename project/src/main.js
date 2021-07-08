@@ -14,6 +14,7 @@ import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 import MatchNotification from "@/components/MatchNotification";
+import VueLazyload from "vue-lazyload";
 
 let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -358,6 +359,7 @@ Vue.use(Toast, options);
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.use(VueLazyload);
 Vue.component(VueQrcode.name, VueQrcode);
 Vue.component("multiselect", Multiselect);
 
