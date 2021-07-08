@@ -16,12 +16,25 @@
         >
       </div>
     </div>
-    <div>
-      <input
+    <div v-else>
+      <b-form-input
+        v-model="searchField"
+        style="width: 95%; margin: auto; margin-top: 20px"
+        placeholder="Search via Title, Synopsis or Release Date"
+      ></b-form-input>
+      <!-- <input
         v-model="searchField"
         placeholder="Enter Search Field"
-        style="width: 90%; margin: 10px; padding: 5px"
-      />
+        class="align-self-center"
+        style="
+          width: 97%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 10px;
+          padding: 5px;
+        "
+      /> -->
       <div
         id="cardHolder"
         class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3 mt-3 mb-3"
@@ -86,7 +99,6 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
     this.matchPoll();
-    this.localMatchStore = this.$store.state.matchData;
   },
   destroyed() {
     window.removeEventListener("scroll", this.pageActivity);
@@ -94,18 +106,19 @@ export default {
   },
   watch: {
     searchField(value) {
+      this.pageActivity();
       if (value == "") {
         this.localMatchStore = this.$store.state.matchData;
       } else {
         // searchAlgorithm(value)
         this.localMatchStore = [];
-        const searchValue = value.toLowerCase();
+        const searchValue = value.toLowerCase().trim();
         const localMovieData = this.$store.state.matchData;
         for (const movie of localMovieData) {
           if (
-            movie.title.toLowerCase().includes(searchValue) ||
-            movie.description.toLowerCase().includes(searchValue) ||
-            movie.release.toLowerCase().includes(searchValue)
+            movie.title.toLowerCase().trim().includes(searchValue) ||
+            movie.description.toLowerCase().trim().includes(searchValue) ||
+            movie.release.toLowerCase().trim().includes(searchValue)
           )
             this.localMatchStore.push(movie);
         }
@@ -173,7 +186,9 @@ export default {
             this.updateUsersJoinLeaveNotification(Object.keys(userData));
             this.$store.state.usersData = userDataArray;
             this.$store.state.matchData = movieList;
-            this.localMatchData = movieList;
+            if (this.searchField == "") {
+              this.localMatchStore = this.$store.state.matchData;
+            }
             this.$store.state.totalMatches = movieList.length;
           })
           .catch(() => {

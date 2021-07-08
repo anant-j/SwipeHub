@@ -17,7 +17,7 @@ export default new Vuex.Store({
     totalSwipes: 0,
     likedSet: new Set(),
     swipeHistory: [],
-    matchData: {},
+    matchData: [],
     totalMatches: 0,
     usersData: [],
   },
