@@ -31,7 +31,10 @@
             class="card-img-top"
             style="max-height: 50vh; object-fit: contain; margin-top: 30px"
             alt="..."
-            v-lazy="item.posterURL"
+            v-lazy="{
+              src: item.posterURL,
+              loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+            }"
           />
           <div class="card-body">
             <h5 class="card-title">
