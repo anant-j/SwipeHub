@@ -14,6 +14,7 @@ import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 import MatchNotification from "@/components/MatchNotification";
+import VueLazyload from "vue-lazyload";
 
 let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -217,6 +218,49 @@ Vue.mixin({
       const movieId = inputUrl.split("?id=")[1];
       return movieId;
     },
+    updateUsersJoinLeaveNotification(newData) {
+      const NotificationStore = {
+        joined: [],
+        left: [],
+      };
+      const oldUserDataPair = this.$store.state.usersData;
+      const oldData = [];
+      for (const userData of oldUserDataPair) {
+        oldData.push(userData["userId"]);
+      }
+      for (const user of oldData) {
+        if (!newData.includes(user) && user != this.getUserId) {
+          NotificationStore["left"].push(user);
+        }
+      }
+      for (const user of newData) {
+        if (!oldData.includes(user) && user != this.getUserId) {
+          NotificationStore["joined"].push(user);
+        }
+      }
+      // console.log(NotificationStore);
+      let NotificationMessage = "";
+      if (NotificationStore["joined"].length > 0) {
+        let joinMessage = "";
+        for (const joiner of NotificationStore["joined"]) {
+          joinMessage += joiner + ", ";
+        }
+        joinMessage = joinMessage.slice(0, -2);
+        NotificationMessage += `${joinMessage} has joined the session. `;
+      }
+      if (NotificationStore["left"].length > 0) {
+        let leaveMessage = "";
+        for (const leaver of NotificationStore["left"]) {
+          leaveMessage += leaver + ", ";
+        }
+        leaveMessage = leaveMessage.slice(0, -2);
+        NotificationMessage += `${leaveMessage} has left the session. `;
+      }
+      if (NotificationMessage != "") {
+        this.showAlert(NotificationMessage, "i", 4000, "userNotification");
+      }
+      return;
+    },
     globalSessionPoll() {
       const localTotalSwipes = [];
       for (const val of this.$store.state.swipeHistory) {
@@ -257,6 +301,7 @@ Vue.mixin({
               this.$store.state.totalSwipes = userData[iterator];
             }
           }
+          this.updateUsersJoinLeaveNotification(Object.keys(userData));
           this.$store.state.usersData = userDataArray;
           for (let index = 0; index < localTotalSwipes.length; index++) {
             const element = localTotalSwipes[index];
@@ -314,6 +359,7 @@ Vue.use(Toast, options);
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.use(VueLazyload);
 Vue.component(VueQrcode.name, VueQrcode);
 Vue.component("multiselect", Multiselect);
 
