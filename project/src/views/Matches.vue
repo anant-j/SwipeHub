@@ -134,6 +134,9 @@ export default {
       if ((currentTime - this.lastInteraction) / 1000 > 60) {
         return false;
       }
+      if (!document.hasFocus()) {
+        return false;
+      }
       return true;
     },
     matchPoll() {
