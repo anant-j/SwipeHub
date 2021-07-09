@@ -269,13 +269,9 @@ export default {
     validUsername(username) {
       if (
         username.length != 0 &&
-        !data.reservedKeywords.includes(username.trim().toLowerCase())
+        !data.reservedKeywords.includes(username.trim().toLowerCase()) &&
+        username.split("").every((char) => data.alphaNumeric.includes(char))
       ) {
-        for (const char of username) {
-          if (!data.alphaNumeric.includes(char.toLowerCase())) {
-            return false;
-          }
-        }
         return true;
       }
       return false;
