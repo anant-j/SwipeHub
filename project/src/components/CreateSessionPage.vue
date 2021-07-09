@@ -15,17 +15,19 @@
                   id="username"
                   name="username"
                   placeholder="Enter Username"
-                  v-model="$v.form.username.$model"
-                  :state="validateState('username')"
-                  aria-describedby="username-feedback"
-                  maxlength="30"
-                ></b-form-input>
-
-                <!-- <b-form-valid-feedback id="username-feedback"
-                  >Looks good</b-form-valid-feedback
-                > -->
+                  v-model="username"
+                  v-bind:class="{
+                    'form-control': true,
+                    'is-invalid':
+                      !this.validUsername(username) && usernameBlurred,
+                  }"
+                  v-on:blur="usernameBlurred = true"
+                >
+                  aria-describedby="username-feedback" maxlength="30"
+                  ></b-form-input
+                >
                 <b-form-invalid-feedback id="username-feedback"
-                  >User ID is required and cannot conatin special
+                  >User ID is required and cannot contain special
                   characters.</b-form-invalid-feedback
                 >
               </b-form-group>
@@ -189,10 +191,10 @@ import "vue-multiselect/dist/vue-multiselect.min.css";
 import axios from "axios";
 
 import store from "@/store/index.js";
-import { required, helpers, not } from "vuelidate/lib/validators";
+// import { required, helpers, not } from "vuelidate/lib/validators";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
-const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
+// const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
 export default {
   name: "CreateSessionPage",
   store,
@@ -201,9 +203,9 @@ export default {
   },
   data() {
     return {
-      form: {
-        username: null,
-      },
+      username: "",
+      usernameBlurred: false,
+      usernameValid: false,
       localState: 0,
       submitButton: "Next",
       backButton: "Back",
@@ -227,19 +229,6 @@ export default {
       ],
     };
   },
-  validations() {
-    return {
-      form: {
-        username: {
-          required,
-          alphaNumAndDotValidator,
-          isValid: not((model) => {
-            return data.reservedKeywords.includes(model.trim().toLowerCase());
-          }),
-        },
-      },
-    };
-  },
   watch: {
     localState(value) {
       if (value >= 3) {
@@ -253,8 +242,8 @@ export default {
         this.backButton = "Home";
       }
     },
-    "form.username": function (value) {
-      this.form.username = value.trim();
+    username(value) {
+      this.username = value.trim();
     },
     country() {
       const tempPlatformOptions = this.platformOptions.filter((platform) =>
@@ -268,28 +257,45 @@ export default {
   },
   methods: {
     validateState(state) {
-      const { $dirty, $error } = this.$v.form[state];
-      return $dirty ? !$error : null;
+      if (state == "username") {
+        this.usernameBlurred = true;
+        if (this.validUsername(this.username)) {
+          this.usernameValid = true;
+        } else {
+          this.usernameValid = false;
+        }
+      }
+    },
+    validUsername(username) {
+      if (
+        username.length != 0 &&
+        !data.reservedKeywords.includes(username.trim().toLowerCase())
+      ) {
+        for (const char of username) {
+          if (!data.alphaNumeric.includes(char.toLowerCase())) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
     },
     resetForm() {
-      this.form = {
-        username: null,
-      };
       this.localState = 0;
+      this.username = "";
+      this.usernameBlurred = false;
+      this.usernameValid = false;
       this.language = data.defaultLanguage;
       this.platform = data.defaultPlatform;
       this.country = data.defaultCountry;
       this.category = null;
-      this.$nextTick(() => {
-        this.$v.$reset();
-      });
     },
     nextPage() {
-      this.$v.form.$touch();
-      if (this.$v.form.$anyError) {
+      this.validateState("username");
+      if (!this.usernameValid) {
         return;
       }
-      if (this.form.username !== null && this.localState < 3) {
+      if (this.localState < 3) {
         this.localState += 1;
         return;
       }
@@ -305,7 +311,7 @@ export default {
     },
     createSession() {
       this.$store.state.loader = true;
-      const username = this.form.username;
+      const username = this.username;
       const language = this.language.id;
       const platform = this.platform.id;
       const country = this.country.id;
