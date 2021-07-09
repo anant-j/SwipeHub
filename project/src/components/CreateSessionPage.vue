@@ -270,7 +270,10 @@ export default {
       if (
         username.length != 0 &&
         !data.reservedKeywords.includes(username.trim().toLowerCase()) &&
-        username.toLowerCase().split("").every((char) => data.alphaNumeric.includes(char))
+        username
+          .toLowerCase()
+          .split("")
+          .every((char) => data.alphaNumeric.includes(char))
       ) {
         return true;
       }
