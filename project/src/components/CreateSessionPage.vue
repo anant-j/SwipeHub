@@ -20,12 +20,12 @@
                     'form-control': true,
                     'is-invalid':
                       !this.validUsername(username) && usernameBlurred,
+                    'is-valid': this.validUsername(username) && usernameBlurred,
                   }"
                   v-on:blur="usernameBlurred = true"
-                >
-                  aria-describedby="username-feedback" maxlength="30"
-                  ></b-form-input
-                >
+                  aria-describedby="username-feedback"
+                  maxlength="30"
+                ></b-form-input>
                 <b-form-invalid-feedback id="username-feedback"
                   >User ID is required and cannot contain special
                   characters.</b-form-invalid-feedback
