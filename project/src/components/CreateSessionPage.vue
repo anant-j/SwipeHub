@@ -2,7 +2,7 @@
   <div class="vertical-center">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
-        <b-form @submit.stop.prevent="onSubmit">
+        <b-form @submit.stop.prevent="nextPage">
           <b-row>
             <b-col>
               <b-form-group
@@ -187,7 +187,6 @@
 <script>
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import axios from "axios";
-import $ from "jquery/src/jquery.js";
 
 import store from "@/store/index.js";
 import { required, helpers, not } from "vuelidate/lib/validators";
@@ -363,15 +362,17 @@ export default {
           this.$store.state.loader = false;
         });
     },
+    enterKeyListener: function (evt) {
+      if (evt.keyCode === 13) {
+        this.nextPage();
+      }
+    },
   },
   mounted: function () {
-    const root = this;
-    $(document).keypress(function (e) {
-      if (e.which == 13) {
-        // enter pressed
-        root.nextPage();
-      }
-    });
+    document.addEventListener("keyup", this.enterKeyListener);
+  },
+  destroyed: function () {
+    document.removeEventListener("keyup", this.enterKeyListener);
   },
 };
 </script>
