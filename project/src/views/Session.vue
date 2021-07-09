@@ -293,8 +293,10 @@ export default {
     },
     poll() {
       if (this.pollAllowed()) {
-        this.sessionPausedNotifications = false;
-        this.globalSessionPoll();
+        if (document.hasFocus()) {
+          this.sessionPausedNotifications = false;
+          this.globalSessionPoll();
+        }
       } else {
         if (!this.sessionPausedNotifications) {
           this.showAlert(

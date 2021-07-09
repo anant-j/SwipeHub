@@ -146,7 +146,7 @@ Vue.mixin({
         totalSwipes: 0,
         likedSet: new Set(),
         swipeHistory: [],
-        matchData: {},
+        matchData: [],
         totalMatches: 0,
         usersData: [],
       });

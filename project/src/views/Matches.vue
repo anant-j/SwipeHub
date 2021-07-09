@@ -16,34 +16,54 @@
         >
       </div>
     </div>
-    <div
-      id="cardHolder"
-      class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3 mt-3 mb-3"
-      @click="pageActivity()"
-    >
+    <div v-else>
+      <b-form-input
+        v-model="searchField"
+        style="width: 95%; margin: auto; margin-top: 20px"
+        placeholder="Search via Title, Synopsis or Release Date"
+      ></b-form-input>
+      <!-- <input
+        v-model="searchField"
+        placeholder="Enter Search Field"
+        class="align-self-center"
+        style="
+          width: 97%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 10px;
+          padding: 5px;
+        "
+      /> -->
       <div
-        class="col"
-        v-for="item in this.$store.state.matchData"
-        :key="item.movieId"
+        id="cardHolder"
+        class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3 mt-3 mb-3"
+        @click="pageActivity()"
       >
-        <div class="card text-white bg-dark h-100 text-center">
-          <img
-            class="card-img-top"
-            style="max-height: 50vh; object-fit: contain; margin-top: 30px"
-            alt="..."
-            v-lazy="{
-              src: item.posterURL,
-              loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
-            }"
-          />
-          <div class="card-body">
-            <h5 class="card-title">
-              <b>{{ item.title }}</b>
-            </h5>
-            <p class="card-text">{{ item.description }}</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Released on {{ item.release }}</small>
+        <div
+          class="col"
+          v-for="item in this.localMatchStore"
+          :key="item.movieId"
+        >
+          <div class="card text-white bg-dark h-100 text-center">
+            <img
+              class="card-img-top"
+              style="max-height: 50vh; object-fit: contain; margin-top: 30px"
+              alt="..."
+              v-lazy="{
+                src: item.posterURL,
+                loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+              }"
+            />
+            <div class="card-body">
+              <h5 class="card-title">
+                <b>{{ item.title }}</b>
+              </h5>
+              <p class="card-text">{{ item.description }}</p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Released on {{ item.release }}</small>
+            </div>
           </div>
         </div>
       </div>
@@ -61,6 +81,8 @@ export default {
   data: () => ({
     timer: null,
     lastInteraction: new Date(),
+    localMatchStore: [],
+    searchField: "",
   }),
   created() {
     window.addEventListener("scroll", this.pageActivity);
@@ -82,6 +104,27 @@ export default {
     window.removeEventListener("scroll", this.pageActivity);
     clearTimeout(this.timer);
   },
+  watch: {
+    searchField(value) {
+      this.pageActivity();
+      if (value == "") {
+        this.localMatchStore = this.$store.state.matchData;
+      } else {
+        // searchAlgorithm(value)
+        this.localMatchStore = [];
+        const searchValue = value.toLowerCase().trim();
+        const localMovieData = this.$store.state.matchData;
+        for (const movie of localMovieData) {
+          if (
+            movie.title.toLowerCase().trim().includes(searchValue) ||
+            movie.description.toLowerCase().trim().includes(searchValue) ||
+            movie.release.toLowerCase().trim().includes(searchValue)
+          )
+            this.localMatchStore.push(movie);
+        }
+      }
+    },
+  },
   methods: {
     pageActivity() {
       this.lastInteraction = new Date();
@@ -89,6 +132,9 @@ export default {
     pollAllowed() {
       const currentTime = new Date();
       if ((currentTime - this.lastInteraction) / 1000 > 60) {
+        return false;
+      }
+      if (!document.hasFocus()) {
         return false;
       }
       return true;
@@ -143,6 +189,9 @@ export default {
             this.updateUsersJoinLeaveNotification(Object.keys(userData));
             this.$store.state.usersData = userDataArray;
             this.$store.state.matchData = movieList;
+            if (this.searchField == "") {
+              this.localMatchStore = this.$store.state.matchData;
+            }
             this.$store.state.totalMatches = movieList.length;
           })
           .catch(() => {
