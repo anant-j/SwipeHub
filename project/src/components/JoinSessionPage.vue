@@ -68,6 +68,7 @@ import { reservedKeywords } from "@/assets/data.js";
 import {
   required,
   minLength,
+  alphaNum,
   maxLength,
   helpers,
   not,
@@ -95,6 +96,7 @@ export default {
       form: {
         sessionId: {
           required,
+          alphaNum,
           minLength: minLength(6),
           maxLength: maxLength(6),
           isValid: not((model) => {
