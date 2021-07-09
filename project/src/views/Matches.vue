@@ -117,8 +117,8 @@ export default {
         for (const movie of localMovieData) {
           if (
             movie.title.toLowerCase().trim().includes(searchValue) ||
-            movie.description.toLowerCase().trim().includes(searchValue) ||
-            movie.release.toLowerCase().trim().includes(searchValue)
+            movie.release.toLowerCase().trim().includes(searchValue) ||
+            movie.description.toLowerCase().trim().includes(searchValue)
           )
             this.localMatchStore.push(movie);
         }
