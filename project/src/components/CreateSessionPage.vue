@@ -187,9 +187,10 @@
 <script>
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import axios from "axios";
+import $ from "jquery/src/jquery.js";
 
 import store from "@/store/index.js";
-import { required, helpers } from "vuelidate/lib/validators";
+import { required, helpers, not } from "vuelidate/lib/validators";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
 const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
@@ -227,13 +228,18 @@ export default {
       ],
     };
   },
-  validations: {
-    form: {
-      username: {
-        required,
-        alphaNumAndDotValidator,
+  validations() {
+    return {
+      form: {
+        username: {
+          required,
+          alphaNumAndDotValidator,
+          isValid: not((model) => {
+            return data.reservedKeywords.includes(model.trim().toLowerCase());
+          }),
+        },
       },
-    },
+    };
   },
   watch: {
     localState(value) {
@@ -357,6 +363,15 @@ export default {
           this.$store.state.loader = false;
         });
     },
+  },
+  mounted: function () {
+    const root = this;
+    $(document).keypress(function (e) {
+      if (e.which == 13) {
+        // enter pressed
+        root.nextPage();
+      }
+    });
   },
 };
 </script>

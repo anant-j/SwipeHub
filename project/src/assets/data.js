@@ -1,3 +1,5 @@
+export const reservedKeywords = ["null", "undefined"];
+
 export const defaultLanguage = { name: "English", id: "en" };
 export const languages = [
   defaultLanguage,

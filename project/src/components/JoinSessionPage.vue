@@ -64,11 +64,13 @@
 <script>
 import store from "@/store/index.js";
 import axios from "axios";
+import { reservedKeywords } from "@/assets/data.js";
 import {
   required,
   minLength,
   maxLength,
   helpers,
+  not,
 } from "vuelidate/lib/validators";
 const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
 
@@ -88,18 +90,26 @@ export default {
       this.form.sessionId = this.getSessionId;
     }
   },
-  validations: {
-    form: {
-      sessionId: {
-        required,
-        minLength: minLength(6),
-        maxLength: maxLength(6),
+  validations() {
+    return {
+      form: {
+        sessionId: {
+          required,
+          minLength: minLength(6),
+          maxLength: maxLength(6),
+          isValid: not((model) => {
+            return reservedKeywords.includes(model.trim().toLowerCase());
+          }),
+        },
+        username: {
+          required,
+          alphaNumAndDotValidator,
+          isValid: not((model) => {
+            return reservedKeywords.includes(model.trim().toLowerCase());
+          }),
+        },
       },
-      username: {
-        required,
-        alphaNumAndDotValidator,
-      },
-    },
+    };
   },
   methods: {
     validateState(state) {
