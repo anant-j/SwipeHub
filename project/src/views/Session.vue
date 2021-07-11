@@ -152,7 +152,7 @@ export default {
     subsequentPollAllowed: true,
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
     noImageUrl: "https://i.imgur.com/Sql8s2M.png",
-    TMDBNull: "http://image.tmdb.org/t/p/originalnull",
+    TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
     if (!this.sessionDataPresent) {
