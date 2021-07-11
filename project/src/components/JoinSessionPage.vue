@@ -9,8 +9,13 @@
               id="username"
               name="username"
               placeholder="Enter Username"
-              v-model="$v.form.username.$model"
-              :state="validateState('username')"
+              v-model="username"
+              v-bind:class="{
+                'form-control': true,
+                'is-invalid': !this.validUsername(username) && usernameBlurred,
+                'is-valid': this.validUsername(username) && usernameBlurred,
+              }"
+              v-on:blur="usernameBlurred = true"
               aria-describedby="username-feedback"
               maxlength="30"
             ></b-form-input>
@@ -29,8 +34,14 @@
               id="sessionId"
               name="sessionId"
               placeholder="Enter Session ID"
-              v-model="$v.form.sessionId.$model"
-              :state="validateState('sessionId')"
+              v-model="sessionId"
+              v-bind:class="{
+                'form-control': true,
+                'is-invalid':
+                  !this.validSessionId(sessionId) && sessionIdBlurred,
+                'is-valid': this.validSessionId(sessionId) && sessionIdBlurred,
+              }"
+              v-on:blur="sessionIdBlurred = true"
               aria-describedby="sessionId-feedback"
               minlength="6"
               maxlength="6"
@@ -38,13 +49,21 @@
             <b-form-valid-feedback id="sessionId-feedback"
               >Looks good</b-form-valid-feedback
             >
-            <b-form-invalid-feedback id="sessionId-feedback"
-              >Session ID is required and must be 6 characters.<br />Don't have
-              a session ID?
+            <b-form-invalid-feedback id="sessionId-feedback">
+              Session ID is required and must be 6 characters.<br />Don't have a
+              session ID?
               <span class="errorLink" @click="toCreateSessionPage()"
                 ><u><b>Create a Session</b></u></span
-              ></b-form-invalid-feedback
-            >
+              >
+            </b-form-invalid-feedback>
+            <!-- <span
+              v-if="
+                this.sessionId != null &&
+                !this.validSessionId(this.sessionId) &&
+                this.sessionId.length > 0
+              "
+              >Test</span
+            > -->
           </b-form-group>
           <br />
           <div class="button-center">
@@ -64,72 +83,79 @@
 <script>
 import store from "@/store/index.js";
 import axios from "axios";
-import { reservedKeywords } from "@/assets/data.js";
-import {
-  required,
-  minLength,
-  alphaNum,
-  maxLength,
-  helpers,
-  not,
-} from "vuelidate/lib/validators";
-const alphaNumAndDotValidator = helpers.regex("alphaNumAndDot", /^[a-z\d.]*$/i);
+import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
 
 export default {
   name: "JoinSessionPage",
   store,
   data() {
     return {
-      form: {
-        username: null,
-        sessionId: null,
-      },
+      username: null,
+      usernameBlurred: false,
+      usernameValid: false,
+      sessionId: null,
+      sessionIdBlurred: false,
+      sessionIdValid: false,
     };
   },
   mounted() {
     if (this.getSessionId !== null || this.getSessionId !== undefined) {
-      this.form.sessionId = this.getSessionId;
+      this.sessionId = this.getSessionId;
     }
   },
-  validations() {
-    return {
-      form: {
-        sessionId: {
-          required,
-          alphaNum,
-          minLength: minLength(6),
-          maxLength: maxLength(6),
-          isValid: not((model) => {
-            return reservedKeywords.includes(model.trim().toLowerCase());
-          }),
-        },
-        username: {
-          required,
-          alphaNumAndDotValidator,
-          isValid: not((model) => {
-            return reservedKeywords.includes(model.trim().toLowerCase());
-          }),
-        },
-      },
-    };
-  },
   methods: {
-    validateState(state) {
-      const { $dirty, $error } = this.$v.form[state];
-      return $dirty ? !$error : null;
+    validateState() {
+      this.usernameBlurred = true;
+      this.sessionIdBlurred = true;
+      if (this.validUsername(this.username)) {
+        this.usernameValid = true;
+      } else {
+        this.usernameValid = false;
+      }
+      if (this.validSessionId(this.sessionId)) {
+        this.sessionIdValid = true;
+      } else {
+        this.sessionIdValid = false;
+      }
+    },
+    validUsername(username) {
+      if (
+        username != null &&
+        username.length != 0 &&
+        !reservedKeywords.includes(username.trim().toLowerCase()) &&
+        username
+          .toLowerCase()
+          .split("")
+          .every((char) => alphaNumeric.includes(char))
+      ) {
+        return true;
+      }
+      return false;
+    },
+    validSessionId(sessionId) {
+      if (
+        sessionId != null &&
+        sessionId.length == 6 &&
+        !reservedKeywords.includes(sessionId.trim().toLowerCase()) &&
+        sessionId
+          .toLowerCase()
+          .split("")
+          .every((char) => alphaNumeric.includes(char))
+      ) {
+        return true;
+      }
+      return false;
     },
     onSubmit() {
-      this.$v.form.$touch();
-
-      if (this.$v.form.$anyError) {
+      this.validateState();
+      if (!this.usernameValid || !this.sessionIdValid) {
         return;
       }
-
       this.isSessionValid();
     },
     isSessionValid() {
-      const username = this.form.username;
-      const sessionId = this.form.sessionId;
+      const username = this.username;
+      const sessionId = this.sessionId;
       this.$store.state.loader = true;
       axios
         .get(`${this.backend}/sessionValid?id=${sessionId}`, {
