@@ -5,7 +5,6 @@ import store from "./store";
 import Toast from "vue-toastification";
 import "./assets/alert.css";
 import VueGtag from "vue-gtag";
-import Vuelidate from "vuelidate";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -309,7 +308,6 @@ Vue.mixin({
           }
         })
         .catch(() => {
-          // handle error
           this.showAlert(
             "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
             "e",
@@ -356,7 +354,6 @@ const options = {
 };
 
 Vue.use(Toast, options);
-Vue.use(Vuelidate);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(VueLazyload);

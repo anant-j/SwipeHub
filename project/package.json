@@ -22,7 +22,6 @@
     "vue-router": "^3.2.0",
     "vue-tinder": "^2.0.3",
     "vue-toastification": "^1.7.11",
-    "vuelidate": "^0.7.6",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
