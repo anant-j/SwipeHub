@@ -97,6 +97,7 @@ export const alphaNumeric = [
   "x",
   "y",
   "z",
+  "0",
   "1",
   "2",
   "3",
