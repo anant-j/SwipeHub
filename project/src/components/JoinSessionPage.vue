@@ -13,9 +13,10 @@
               v-bind:class="{
                 'form-control': true,
                 'is-invalid':
-                  (!this.validUsername(username) && usernameBlurred) ||
-                  usernameNullTriggerBlur,
-                'is-valid': this.validUsername(username) && usernameBlurred,
+                  (this.validUsername(username) != 3 && usernameBlurred) ||
+                  usernameNullTrigger,
+                'is-valid':
+                  this.validUsername(username) == 3 && usernameBlurred,
               }"
               aria-describedby="username-feedback"
               maxlength="30"
@@ -23,9 +24,19 @@
             <b-form-valid-feedback id="username-feedback"
               >Looks good</b-form-valid-feedback
             >
-            <b-form-invalid-feedback id="username-feedback"
-              >User ID is required and cannot conatin special
-              characters.</b-form-invalid-feedback
+            <b-form-invalid-feedback
+              id="username-feedback"
+            ></b-form-invalid-feedback>
+            <span
+              class="invalid-form-error"
+              v-show="this.usernameState == 0 && usernameNullTrigger"
+              >User ID cannot be empty.</span
+            >
+            <span class="invalid-form-error" v-if="this.usernameState == 1"
+              >User ID cannot be: {{ username }}.</span
+            >
+            <span class="invalid-form-error" v-show="this.usernameState == 2"
+              >User ID cannot contain special characters.</span
             >
           </b-form-group>
           <br />
@@ -39,28 +50,44 @@
               v-bind:class="{
                 'form-control': true,
                 'is-invalid':
-                  (!this.validSessionId(sessionId) && sessionIdBlurred) ||
-                  sessionIdNullTriggerBlur,
-                'is-valid': this.validSessionId(sessionId) && sessionIdBlurred,
+                  (this.validSessionId(sessionId) != 4 && sessionIdBlurred) ||
+                  sessionIdNullTrigger,
+                'is-valid':
+                  this.validSessionId(sessionId) == 4 && sessionIdBlurred,
               }"
               aria-describedby="sessionId-feedback"
-              minlength="6"
               maxlength="6"
             ></b-form-input>
             <b-form-valid-feedback id="sessionId-feedback"
               >Looks good</b-form-valid-feedback
             >
             <b-form-invalid-feedback id="sessionId-feedback">
-              Session ID is required and must be 6 characters.<br />Don't have a
-              session ID?
+            </b-form-invalid-feedback>
+            <span
+              class="invalid-form-error"
+              v-show="this.sessionIdState == 0 && sessionIdNullTrigger"
+              >Session ID cannot be empty.</span
+            >
+            <span class="invalid-form-error" v-show="this.sessionIdState == 1"
+              >Session ID must be 6 characters.</span
+            >
+            <span class="invalid-form-error" v-if="this.sessionIdState == 2"
+              >Session ID cannot be : {{ sessionId }}</span
+            >
+            <span class="invalid-form-error" v-show="this.sessionIdState == 3"
+              >Session ID cannot contain special characters.</span
+            >
+            <span
+              class="invalid-form-error"
+              v-show="
+                (this.sessionIdState > 0 && this.sessionIdState < 4) ||
+                (this.sessionIdState == 0 && sessionIdNullTrigger)
+              "
+              ><br />Don't have a session ID?
               <span class="errorLink" @click="toCreateSessionPage()"
                 ><u><b>Create a Session</b></u></span
-              >
-            </b-form-invalid-feedback>
-            <!-- <span
-              v-if="sessionIdBlurred && !this.validSessionId(this.sessionId)"
-              >Test</span
-            > -->
+              ></span
+            >
           </b-form-group>
           <br />
           <div class="button-center">
@@ -88,13 +115,13 @@ export default {
   data() {
     return {
       username: null,
+      usernameState: 0,
       usernameBlurred: false,
-      usernameValid: false,
       sessionId: null,
+      sessionIdState: 0,
       sessionIdBlurred: false,
-      sessionIdValid: false,
-      usernameNullTriggerBlur: false,
-      sessionIdNullTriggerBlur: false,
+      usernameNullTrigger: false,
+      sessionIdNullTrigger: false,
     };
   },
   mounted() {
@@ -102,66 +129,81 @@ export default {
       this.sessionId = this.getSessionId;
     }
   },
+  watch: {
+    username(value) {
+      this.username = value.trim();
+    },
+    sessionId(value) {
+      this.sessionId = value.trim();
+    },
+  },
   methods: {
     validateState() {
-      if (this.validUsername(this.username)) {
-        this.usernameValid = true;
-      } else {
-        this.usernameNullTriggerBlur = true;
-        this.usernameValid = false;
+      if (this.usernameState != 3) {
+        this.usernameNullTrigger = true;
       }
-      if (this.validSessionId(this.sessionId)) {
-        this.sessionIdValid = true;
-      } else {
-        this.sessionIdNullTriggerBlur = true;
-        this.sessionIdValid = false;
+      if (this.sessionIdState != 4) {
+        this.sessionIdNullTrigger = true;
       }
+      if (this.usernameState == 3 && this.sessionIdState == 4) {
+        return true;
+      }
+      return false;
     },
     validUsername(username) {
       if (username == null || username.length == 0) {
         this.usernameBlurred = false;
-        return false;
+        this.usernameState = 0;
+        return 0;
+      }
+      this.usernameNullTrigger = false;
+      this.usernameBlurred = true;
+      if (reservedKeywords.includes(username.trim().toLowerCase())) {
+        this.usernameState = 1;
+        return 1;
       }
       if (
-        username.length != 0 &&
-        !reservedKeywords.includes(username.trim().toLowerCase()) &&
-        username
+        !username
           .toLowerCase()
           .split("")
           .every((char) => alphaNumeric.includes(char))
       ) {
-        this.usernameNullTriggerBlur = false;
-        this.usernameBlurred = true;
-        return true;
+        this.usernameState = 2;
+        return 2;
       }
-      this.usernameNullTriggerBlur = false;
-      this.usernameBlurred = true;
-      return false;
+      this.usernameState = 3;
+      return 3;
     },
     validSessionId(sessionId) {
       if (sessionId == null || sessionId.length == 0) {
         this.sessionIdBlurred = false;
-        return false;
+        this.sessionIdState = 0;
+        return 0;
+      }
+      this.sessionIdNullTrigger = false;
+      this.sessionIdBlurred = true;
+      if (sessionId.length != 6) {
+        this.sessionIdState = 1;
+        return 1;
+      }
+      if (reservedKeywords.includes(sessionId.trim().toLowerCase())) {
+        this.sessionIdState = 2;
+        return 2;
       }
       if (
-        sessionId.length == 6 &&
-        !reservedKeywords.includes(sessionId.trim().toLowerCase()) &&
-        sessionId
+        !sessionId
           .toLowerCase()
           .split("")
           .every((char) => alphaNumeric.includes(char))
       ) {
-        this.sessionIdNullTriggerBlur = false;
-        this.sessionIdBlurred = true;
-        return true;
+        this.sessionIdState = 3;
+        return 3;
       }
-      this.sessionIdNullTriggerBlur = false;
-      this.sessionIdBlurred = true;
-      return false;
+      this.sessionIdState = 4;
+      return 4;
     },
     onSubmit() {
-      this.validateState();
-      if (!this.usernameValid || !this.sessionIdValid) {
+      if (!this.validateState()) {
         return;
       }
       this.isSessionValid();
@@ -204,6 +246,10 @@ export default {
 </script>
 
 <style scoped>
+.invalid-form-error {
+  font-size: 15px;
+  color: #dc3545;
+}
 .vertical-center {
   height: 70vh;
   /* text-align: center; */
