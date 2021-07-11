@@ -12,10 +12,11 @@
               v-model="username"
               v-bind:class="{
                 'form-control': true,
-                'is-invalid': !this.validUsername(username) && usernameBlurred,
+                'is-invalid':
+                  (!this.validUsername(username) && usernameBlurred) ||
+                  usernameNullTriggerBlur,
                 'is-valid': this.validUsername(username) && usernameBlurred,
               }"
-              v-on:blur="usernameBlurred = true"
               aria-describedby="username-feedback"
               maxlength="30"
             ></b-form-input>
@@ -38,10 +39,10 @@
               v-bind:class="{
                 'form-control': true,
                 'is-invalid':
-                  !this.validSessionId(sessionId) && sessionIdBlurred,
+                  (!this.validSessionId(sessionId) && sessionIdBlurred) ||
+                  sessionIdNullTriggerBlur,
                 'is-valid': this.validSessionId(sessionId) && sessionIdBlurred,
               }"
-              v-on:blur="sessionIdBlurred = true"
               aria-describedby="sessionId-feedback"
               minlength="6"
               maxlength="6"
@@ -57,11 +58,7 @@
               >
             </b-form-invalid-feedback>
             <!-- <span
-              v-if="
-                this.sessionId != null &&
-                !this.validSessionId(this.sessionId) &&
-                this.sessionId.length > 0
-              "
+              v-if="sessionIdBlurred && !this.validSessionId(this.sessionId)"
               >Test</span
             > -->
           </b-form-group>
@@ -96,6 +93,8 @@ export default {
       sessionId: null,
       sessionIdBlurred: false,
       sessionIdValid: false,
+      usernameNullTriggerBlur: false,
+      sessionIdNullTriggerBlur: false,
     };
   },
   mounted() {
@@ -105,22 +104,25 @@ export default {
   },
   methods: {
     validateState() {
-      this.usernameBlurred = true;
-      this.sessionIdBlurred = true;
       if (this.validUsername(this.username)) {
         this.usernameValid = true;
       } else {
+        this.usernameNullTriggerBlur = true;
         this.usernameValid = false;
       }
       if (this.validSessionId(this.sessionId)) {
         this.sessionIdValid = true;
       } else {
+        this.sessionIdNullTriggerBlur = true;
         this.sessionIdValid = false;
       }
     },
     validUsername(username) {
+      if (username == null || username.length == 0) {
+        this.usernameBlurred = false;
+        return false;
+      }
       if (
-        username != null &&
         username.length != 0 &&
         !reservedKeywords.includes(username.trim().toLowerCase()) &&
         username
@@ -128,13 +130,20 @@ export default {
           .split("")
           .every((char) => alphaNumeric.includes(char))
       ) {
+        this.usernameNullTriggerBlur = false;
+        this.usernameBlurred = true;
         return true;
       }
+      this.usernameNullTriggerBlur = false;
+      this.usernameBlurred = true;
       return false;
     },
     validSessionId(sessionId) {
+      if (sessionId == null || sessionId.length == 0) {
+        this.sessionIdBlurred = false;
+        return false;
+      }
       if (
-        sessionId != null &&
         sessionId.length == 6 &&
         !reservedKeywords.includes(sessionId.trim().toLowerCase()) &&
         sessionId
@@ -142,8 +151,12 @@ export default {
           .split("")
           .every((char) => alphaNumeric.includes(char))
       ) {
+        this.sessionIdNullTriggerBlur = false;
+        this.sessionIdBlurred = true;
         return true;
       }
+      this.sessionIdNullTriggerBlur = false;
+      this.sessionIdBlurred = true;
       return false;
     },
     onSubmit() {
