@@ -25,6 +25,7 @@
                   v-on:blur="usernameBlurred = true"
                   aria-describedby="username-feedback"
                   maxlength="30"
+                  v-on:keyup.enter="nextPage"
                 ></b-form-input>
                 <b-form-invalid-feedback id="username-feedback"
                   >User ID is required and cannot contain special
@@ -365,17 +366,6 @@ export default {
           this.$store.state.loader = false;
         });
     },
-    enterKeyListener: function (evt) {
-      if (evt.keyCode === 13) {
-        this.nextPage();
-      }
-    },
-  },
-  mounted: function () {
-    document.addEventListener("keyup", this.enterKeyListener);
-  },
-  destroyed: function () {
-    document.removeEventListener("keyup", this.enterKeyListener);
   },
 };
 </script>
