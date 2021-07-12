@@ -438,7 +438,7 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
     tempDict["title"] = data[i]["title"];
     tempDict["description"] = data[i]["overview"];
     tempDict["poster"] =
-      "http://image.tmdb.org/t/p/original" + data[i]["poster_path"];
+      "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
     tempDict["release_date"] = data[i]["release_date"];
     tempDict["adult"] = data[i]["adult"];
     final[data[i]["id"]] = tempDict;
@@ -470,7 +470,7 @@ async function generateTVList(lang, genres, platform, region, sort, page) {
     tempDict["title"] = data[i]["original_name"];
     tempDict["description"] = data[i]["overview"];
     tempDict["poster"] =
-      "http://image.tmdb.org/t/p/original" + data[i]["poster_path"];
+      "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
     tempDict["release_date"] = data[i]["first_air_date"];
     tempDict["adult"] = false;
     final[data[i]["id"]] = tempDict;

@@ -152,7 +152,7 @@ export default {
     subsequentPollAllowed: true,
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
     noImageUrl: "https://i.imgur.com/Sql8s2M.png",
-    TMDBNull: "http://image.tmdb.org/t/p/originalnull",
+    TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -172,8 +172,10 @@ export default {
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
     this.poll();
+    document.addEventListener("keyup", this.keyListener);
   },
   destroyed() {
+    document.removeEventListener("keyup", this.keyListener);
     clearTimeout(this.timer);
   },
   computed: {
@@ -359,6 +361,14 @@ export default {
         return false;
       }
       return true;
+    },
+    keyListener: function (evt) {
+      if (evt.keyCode === 37) {
+        this.decide("nope");
+      }
+      if (evt.keyCode === 39) {
+        this.decide("like");
+      }
     },
   },
 };
