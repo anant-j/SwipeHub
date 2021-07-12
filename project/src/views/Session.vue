@@ -172,8 +172,10 @@ export default {
       `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     );
     this.poll();
+    document.addEventListener("keyup", this.keyListener);
   },
   destroyed() {
+    document.removeEventListener("keyup", this.keyListener);
     clearTimeout(this.timer);
   },
   computed: {
@@ -359,6 +361,14 @@ export default {
         return false;
       }
       return true;
+    },
+    keyListener: function (evt) {
+      if (evt.keyCode === 37) {
+        this.decide("nope");
+      }
+      if (evt.keyCode === 39) {
+        this.decide("like");
+      }
     },
   },
 };
