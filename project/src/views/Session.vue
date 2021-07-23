@@ -1,5 +1,6 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
+    <h1>{{ tempInfo }}</h1>
     <Tinder
       ref="tinder"
       key-name="id"
@@ -137,13 +138,15 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import db from "../firebase_config";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { sessionDb, movieDb } from "../firebase_config";
+import { doc, onSnapshot } from "firebase/firestore";
+import { ref, onValue } from "firebase/database";
 
 export default {
   name: "Session",
   components: { Tinder },
   data: () => ({
+    tempInfo: "",
     showInfo: false,
     rewindAllow: false,
     queue: [],
@@ -157,7 +160,6 @@ export default {
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
-    this.addTestData();
     // if (!this.sessionDataPresent) {
     //   this.showAlert(
     //     "Please join or create a session",
@@ -176,7 +178,8 @@ export default {
     // );
     // this.poll();
     // document.addEventListener("keyup", this.keyListener);
-    this.getFirebaseData();
+    // this.getMovieData();
+    this.getSessionData();
   },
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
@@ -234,30 +237,16 @@ export default {
     },
   },
   methods: {
-    async getFirebaseData() {
-      onSnapshot(doc(db, "cities", "LA"), (doc) => {
-        console.log("Current data: ", doc.data());
+    async getMovieData() {
+      onSnapshot(doc(movieDb, "cities", "LA"), (doc) => {
+        console.log("Current firestore data: ", doc.data());
       });
     },
-    async addTestData() {
-      console.log("Adding");
-      // db.collection("users")
-      //   .add({
-      //     first: "Alan",
-      //     middle: "Mathison",
-      //     last: "Turing",
-      //     born: 1912,
-      //   })
-      //   .then((docRef) => {
-      //     console.log("Document written with ID: ", docRef.id);
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error adding document: ", error);
-      //   });
-      await setDoc(doc(db, "cities", "LA"), {
-        name: "Los Angeles",
-        state: "CA",
-        country: "USA",
+    async getSessionData() {
+      const dbRef = ref(sessionDb, "123456/sessionInfo");
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        this.tempInfo = JSON.stringify(data);
       });
     },
     addLastCard() {
