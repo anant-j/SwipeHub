@@ -137,6 +137,8 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
+import db from "../firebase_config";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
 export default {
   name: "Session",
@@ -155,24 +157,26 @@ export default {
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
-    if (!this.sessionDataPresent) {
-      this.showAlert(
-        "Please join or create a session",
-        "w",
-        5000,
-        "sessionDataNotAvailable"
-      );
-      this.$router.push({ name: "Home" });
-      return;
-    }
-    this.$store.state.loader = true;
-    this.$store.state.activePage = 1;
-    this.lastInteraction = 0;
-    this.getCards(
-      `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
-    );
-    this.poll();
-    document.addEventListener("keyup", this.keyListener);
+    this.addTestData();
+    // if (!this.sessionDataPresent) {
+    //   this.showAlert(
+    //     "Please join or create a session",
+    //     "w",
+    //     5000,
+    //     "sessionDataNotAvailable"
+    //   );
+    //   this.$router.push({ name: "Home" });
+    //   return;
+    // }
+    // this.$store.state.loader = true;
+    // this.$store.state.activePage = 1;
+    // this.lastInteraction = 0;
+    // this.getCards(
+    //   `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
+    // );
+    // this.poll();
+    // document.addEventListener("keyup", this.keyListener);
+    this.getFirebaseData();
   },
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
@@ -230,6 +234,32 @@ export default {
     },
   },
   methods: {
+    async getFirebaseData() {
+      onSnapshot(doc(db, "cities", "LA"), (doc) => {
+        console.log("Current data: ", doc.data());
+      });
+    },
+    async addTestData() {
+      console.log("Adding");
+      // db.collection("users")
+      //   .add({
+      //     first: "Alan",
+      //     middle: "Mathison",
+      //     last: "Turing",
+      //     born: 1912,
+      //   })
+      //   .then((docRef) => {
+      //     console.log("Document written with ID: ", docRef.id);
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error adding document: ", error);
+      //   });
+      await setDoc(doc(db, "cities", "LA"), {
+        name: "Los Angeles",
+        state: "CA",
+        country: "USA",
+      });
+    },
     addLastCard() {
       const list = [];
       const posterLink = this.noCardUrl;
