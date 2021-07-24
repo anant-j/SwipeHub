@@ -138,9 +138,10 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import { sessionDb, movieDb } from "../firebase_config";
+import { sessionDb, movieDb, auth } from "../firebase_config";
 import { doc, onSnapshot } from "firebase/firestore";
 import { ref, onValue } from "firebase/database";
+import { signInWithCustomToken } from "firebase/auth";
 
 export default {
   name: "Session",
@@ -160,6 +161,7 @@ export default {
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
+    this.signIn();
     // if (!this.sessionDataPresent) {
     //   this.showAlert(
     //     "Please join or create a session",
@@ -237,13 +239,34 @@ export default {
     },
   },
   methods: {
+    signIn() {
+      signInWithCustomToken(auth, this.getJWT)
+        .then(() => {
+          this.$store.state.loader = false;
+          // const user = userCredential.user;
+          // console.log(userCredential.user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          this.$store.state.loader = false;
+          this.showAlert(
+            "Please join a session first",
+            "e",
+            5000,
+            "loginFailed"
+          );
+          this.$router.push({ name: "Home" });
+        });
+    },
     async getMovieData() {
       onSnapshot(doc(movieDb, "cities", "LA"), (doc) => {
         console.log("Current firestore data: ", doc.data());
       });
     },
     async getSessionData() {
-      const dbRef = ref(sessionDb, "123456/sessionInfo");
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         this.tempInfo = JSON.stringify(data);

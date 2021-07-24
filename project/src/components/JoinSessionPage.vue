@@ -106,8 +106,12 @@
 
 <script>
 import store from "@/store/index.js";
-import axios from "axios";
+// import axios from "axios";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
+import { functions } from "@/firebase_config.js";
+import { httpsCallable } from "firebase/functions";
+
+const signIn = httpsCallable(functions, "signIn");
 
 export default {
   name: "JoinSessionPage",
@@ -212,34 +216,45 @@ export default {
       const username = this.username;
       const sessionId = this.sessionId;
       this.$store.state.loader = true;
-      axios
-        .get(`${this.backend}/sessionValid?id=${sessionId}`, {
-          validateStatus: false,
-        })
+      signIn({ username: username, sessionId: sessionId })
         .then((result) => {
-          if (result.status === 200) {
-            this.setSessionId(sessionId);
-            this.setUserId(username);
-            this.$router.push({ name: "Session" });
-          } else {
-            this.showAlert(
-              "This session could not be found!",
-              "e",
-              4800,
-              "sessionNotFound"
-            );
-            this.$store.state.loader = false;
-          }
+          this.setSessionId(sessionId);
+          this.setUserId(username);
+          this.setJWT(result.data);
+          this.$router.push({ name: "Session" });
         })
-        .catch(() => {
-          this.showAlert(
-            "This session could not be found!",
-            "e",
-            4800,
-            "sessionNotFound"
-          );
-          this.$store.state.loader = false;
+        .catch((error) => {
+          console.log(error);
         });
+
+      // axios
+      //   .get(`${this.backend}/sessionValid?id=${sessionId}`, {
+      //     validateStatus: false,
+      //   })
+      //   .then((result) => {
+      //     if (result.status === 200) {
+      //       this.setSessionId(sessionId);
+      //       this.setUserId(username);
+      //       this.$router.push({ name: "Session" });
+      //     } else {
+      //       this.showAlert(
+      //         "This session could not be found!",
+      //         "e",
+      //         4800,
+      //         "sessionNotFound"
+      //       );
+      //       this.$store.state.loader = false;
+      //     }
+      //   })
+      //   .catch(() => {
+      //     this.showAlert(
+      //       "This session could not be found!",
+      //       "e",
+      //       4800,
+      //       "sessionNotFound"
+      //     );
+      //     this.$store.state.loader = false;
+      //   });
     },
   },
 };

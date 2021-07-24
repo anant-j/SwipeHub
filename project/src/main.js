@@ -72,6 +72,20 @@ Vue.mixin({
         return this.$store.state.userId;
       }
     },
+    getJWT() {
+      if (this.$store.state.JWT === null) {
+        if (
+          storage.getItem("SwipeHub_JWT") === undefined ||
+          storage.getItem("SwipeHub_JWT") === null
+        ) {
+          return null;
+        } else {
+          return storage.getItem("SwipeHub_JWT");
+        }
+      } else {
+        return this.$store.state.JWT;
+      }
+    },
     sessionDataPresent() {
       if (
         this.getSessionId === null ||
@@ -125,6 +139,10 @@ Vue.mixin({
     setSessionId(sessionId) {
       this.$store.state.sessionId = sessionId;
       storage.setItem("sessionId", sessionId.toUpperCase());
+    },
+    setJWT(token) {
+      this.$store.state.JWT = token;
+      storage.setItem("SwipeHub_JWT", token);
     },
     setUserId(userId) {
       this.$store.state.userId = userId;

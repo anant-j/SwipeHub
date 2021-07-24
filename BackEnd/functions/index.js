@@ -8,6 +8,14 @@ const TelegramToken = functions.config().telegram.token;
 const TelegramChatID = functions.config().telegram.chatid;
 const expectedToken = TelegramToken.split(":")[1].toLowerCase();
 
+
+exports.signIn = functions.https.onCall((data, context) => {
+  return new Promise((resolve, reject) => {
+    const token = generateJWTToken(data.username, data.sessionId);
+    resolve(token);
+  });
+});
+
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   try {
     res.set("Access-Control-Allow-Origin", "*");
@@ -590,4 +598,23 @@ function upperValue(numberOfCards) {
     val = (ceiledNum + 1) * 10;
   }
   return val;
+}
+
+/**
+ * @param  {String} userId
+ * @param  {String} sessionId
+ * @param  {Boolean} isCreator
+*/
+async function generateJWTToken(userId, sessionId, isCreator = false) {
+  const additionalClaims = {
+    isCreator: isCreator,
+  };
+  const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}`, additionalClaims);
+  // .then((customToken) => {
+  //   return {"Test": customToken};
+  // })
+  // .catch((error) => {
+  //   return {"Test": 404};
+  // });
+  return customToken;
 }

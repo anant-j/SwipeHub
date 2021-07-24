@@ -9,6 +9,7 @@ export default new Vuex.Store({
     loader: false,
     userId: null,
     sessionId: null,
+    JWT: null,
     activePage: 0,
     activeShareModal: false,
     isCreator: false,
