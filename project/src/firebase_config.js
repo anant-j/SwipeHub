@@ -3,17 +3,25 @@ import { getFirestore, useFirestoreEmulator } from "firebase/firestore";
 import { getDatabase, useDatabaseEmulator } from "firebase/database";
 import { getAuth, useAuthEmulator } from "firebase/auth";
 import { getFunctions, useFunctionsEmulator } from "firebase/functions";
+// if (location.hostname === "localhost") {
+//   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+// }
+// import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 const firebaseApp = initializeApp({
-  apiKey: process.env.VUE_APP_apiKey,
-  authDomain: process.env.VUE_APP_authDomain,
-  projectId: process.env.VUE_APP_projectId,
-  databaseURL: process.env.VUE_APP_databaseURL,
-  storageBucket: process.env.VUE_APP_storageBucket,
-  messagingSenderId: process.env.VUE_APP_messagingSenderId,
-  appId: process.env.VUE_APP_appId,
+  apiKey: process.env.VUE_APP_API_KEY,
+  authDomain: process.env.VUE_APP_AUTH_DOMAIN,
+  projectId: process.env.VUE_APP_PROJECT_ID,
+  databaseURL: process.env.VUE_APP_DATABASE_URL,
+  storageBucket: process.env.VUE_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_MESSAGING_SENDER_ID,
+  appId: process.env.VUE_APP_ID,
 });
 
+// const options = {};
+// options.isTokenAutoRefreshEnabled = true;
+// options.provider = new ReCaptchaV3Provider(process.env.VUE_APP_APP_CHECK_KEY);
+// initializeAppCheck(firebaseApp, options);
 export const movieDb = getFirestore(firebaseApp);
 export const sessionDb = getDatabase(firebaseApp);
 export const auth = getAuth(firebaseApp);
