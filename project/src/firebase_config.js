@@ -5,11 +5,13 @@ import { getAuth, useAuthEmulator } from "firebase/auth";
 import { getFunctions, useFunctionsEmulator } from "firebase/functions";
 
 const firebaseApp = initializeApp({
-  // apiKey: process.env.VUE_APP_API_KEY,
-  // authDomain: process.env.VUE_APP_AUTH_DOMAIN,
-  // projectId: process.env.VUE_APP_PROJECT_ID,
-  // databaseURL: process.env.VUE_APP_DATABASE_URL,
-  // storageBucket: process.env.VUE_APP_STORAGE_BUCKET,
+  apiKey: process.env.VUE_APP_apiKey,
+  authDomain: process.env.VUE_APP_authDomain,
+  projectId: process.env.VUE_APP_projectId,
+  databaseURL: process.env.VUE_APP_databaseURL,
+  storageBucket: process.env.VUE_APP_storageBucket,
+  messagingSenderId: process.env.VUE_APP_messagingSenderId,
+  appId: process.env.VUE_APP_appId,
 });
 
 export const movieDb = getFirestore(firebaseApp);
