@@ -86,7 +86,7 @@ export default {
   }),
   created() {
     window.addEventListener("scroll", this.pageActivity);
-    if (!this.sessionDataPresent) {
+    if (!this.sessionDataPresent()) {
       this.showAlert(
         "Please join or create a session",
         "w",
@@ -142,8 +142,8 @@ export default {
     matchPoll() {
       if (this.pollAllowed()) {
         const params = {
-          sessionId: this.getSessionId,
-          userId: this.getUserId,
+          sessionId: this.getSessionId(),
+          userId: this.getUserId(),
         };
         const data = Object.keys(params)
           .map((key) => `${key}=${encodeURIComponent(params[key])}`)
@@ -177,7 +177,7 @@ export default {
             const userData = response.data.userData;
             const userDataArray = [];
             for (const iterator of Object.keys(userData)) {
-              if (iterator !== this.getUserId) {
+              if (iterator !== this.getUserId()) {
                 userDataArray.push({
                   userId: iterator,
                   value: userData[iterator],

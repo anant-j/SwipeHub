@@ -43,7 +43,7 @@ Vue.mixin({
       backend: backendUrl,
     };
   },
-  computed: {
+  methods: {
     getSessionId() {
       if (this.$store.state.sessionId === null) {
         if (
@@ -87,18 +87,11 @@ Vue.mixin({
       }
     },
     sessionDataPresent() {
-      if (
-        this.getSessionId === null ||
-        this.getSessionId === undefined ||
-        this.getUserId === null ||
-        this.getUserId === undefined
-      ) {
+      if (!this.getSessionId() || !this.getUserId() || !this.getJWT()) {
         return false;
       }
       return true;
     },
-  },
-  methods: {
     /**
      * @param  {string} message : Content of the alert
      * @param  {string} type="s" Type: success, warning, error, info, default
@@ -137,8 +130,9 @@ Vue.mixin({
       this.$store.state.sessionState = 2;
     },
     setSessionId(sessionId) {
-      this.$store.state.sessionId = sessionId;
-      storage.setItem("sessionId", sessionId.toUpperCase());
+      const validatedSessionId = sessionId.toString().toUpperCase();
+      this.$store.state.sessionId = validatedSessionId;
+      storage.setItem("sessionId", validatedSessionId);
     },
     setJWT(token) {
       this.$store.state.JWT = token;
@@ -169,7 +163,9 @@ Vue.mixin({
       });
     },
     leaveSession() {
-      const url = `${this.backend}/leaveSession?id=${this.getSessionId}&user=${this.getUserId}`;
+      const url = `${
+        this.backend
+      }/leaveSession?id=${this.getSessionId()}&user=${this.getUserId()}`;
       this.$store.state.loader = true;
       axios
         .get(url, {
@@ -186,11 +182,11 @@ Vue.mixin({
       let text = "";
       switch (item) {
         case "userId":
-          data = this.getUserId;
+          data = this.getUserId();
           text = "User Id";
           break;
         case "sessionId":
-          data = this.getSessionId;
+          data = this.getSessionId();
           text = "Session Id";
           break;
         default:
@@ -218,14 +214,14 @@ Vue.mixin({
       );
     },
     getShareLink() {
-      return `${hostURL}/?join=${this.getSessionId}`;
+      return `${hostURL}/?join=${this.getSessionId()}`;
     },
     shareLinkNatively() {
       const joinLink = this.getShareLink();
       navigator
         .share({
           title: "SwipeHub Session Share",
-          text: `Come join my Swipehub session with Session Id: ${this.getSessionId}.`,
+          text: `Come join my Swipehub session with Session Id: ${this.getSessionId()}.`,
           url: joinLink,
         })
         .then(() => console.log("Successful share! 🎉"))
@@ -246,12 +242,12 @@ Vue.mixin({
         oldData.push(userData["userId"]);
       }
       for (const user of oldData) {
-        if (!newData.includes(user) && user != this.getUserId) {
+        if (!newData.includes(user) && user != this.getUserId()) {
           NotificationStore["left"].push(user);
         }
       }
       for (const user of newData) {
-        if (!oldData.includes(user) && user != this.getUserId) {
+        if (!oldData.includes(user) && user != this.getUserId()) {
           NotificationStore["joined"].push(user);
         }
       }
@@ -287,8 +283,8 @@ Vue.mixin({
       const params = {
         totalSwipes: localTotalSwipes,
         likedList: localLikedList,
-        sessionId: this.getSessionId,
-        userId: this.getUserId,
+        sessionId: this.getSessionId(),
+        userId: this.getUserId(),
       };
       const data = Object.keys(params)
         .map((key) => `${key}=${encodeURIComponent(params[key])}`)
@@ -309,7 +305,7 @@ Vue.mixin({
           const userData = response.data.userData;
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
-            if (iterator !== this.getUserId) {
+            if (iterator !== this.getUserId()) {
               userDataArray.push({
                 userId: iterator,
                 value: userData[iterator],

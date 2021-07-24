@@ -1,13 +1,13 @@
 const functions = require("firebase-functions");
 const axios = require("axios");
 const admin = require("firebase-admin");
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp({databaseURL: "https://theswipehub.firebaseio.com"});
 const apiToken = functions.config().tmdb.key;
 const TelegramURL = functions.config().telegram.url;
 const TelegramToken = functions.config().telegram.token;
 const TelegramChatID = functions.config().telegram.chatid;
 const expectedToken = TelegramToken.split(":")[1].toLowerCase();
-
+const sessionDb = admin.database();
 
 exports.signIn = functions.https.onCall((data, context) => {
   return new Promise((resolve, reject) => {
@@ -36,75 +36,170 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
   }
 });
 
-exports.createSession = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const id = await generateSessionId();
-    const username = req.body.username;
-    const categories = req.body.categories;
-    const languages = req.body.languages;
-    const platform = req.body.platform;
-    const region = req.body.region;
-    const date = new Date();
-    const movie = req.body.type;
-    const order = req.body.order;
-    let sortby = "";
-    let dataSet = [];
-    if (movie === "true") {
-      if (order == "Popularity") {
-        sortby = "popularity.desc";
-      } else if (order == "Release") {
-        sortby = "primary_release_date.desc";
-      } else if (order == "Revenue") {
-        sortby = "revenue.desc";
-      }
-      dataSet = await generateMovieList(
-          languages,
-          categories,
-          platform,
-          region,
-          sortby,
-          1,
-      );
-    }
-    if (movie != "true") {
-      if (order == "Popularity") {
-        sortby = "popularity.desc";
-      } else if (order == "Release") {
-        sortby = "first_air_date.desc";
-      } else if (order == "Revenue") {
-        sortby = "popularity.desc";
-      }
-      dataSet = await generateTVList(
-          languages,
-          categories,
-          platform,
-          region,
-          sortby,
-          1,
-      );
-    }
-    const data = {
-      created: date,
-      creator: username,
-      categories: categories,
-      languages: languages,
-      platform: platform,
-      region: region,
-      mediaInfo: dataSet,
-      order: sortby,
-      isMovie: movie,
-      isValid: true,
-      likes: {},
-      participants: {},
-    };
-    await admin.firestore().collection("sessions").doc(id).set(data);
-    res.status(200).send({sessionId: id});
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("createSession", error);
-    res.status(500).send("error");
-  }
+// exports.createSession = functions.https.onRequest(async (req, res) => {
+//   try {
+//     res.set("Access-Control-Allow-Origin", "*");
+//     const id = await generateSessionId();
+//     const username = req.body.username;
+//     const categories = req.body.categories;
+//     const languages = req.body.languages;
+//     const platform = req.body.platform;
+//     const region = req.body.region;
+//     const date = new Date();
+//     const movie = req.body.type;
+//     const order = req.body.order;
+//     let sortby = "";
+//     let dataSet = [];
+//     if (movie === "true") {
+//       if (order == "Popularity") {
+//         sortby = "popularity.desc";
+//       } else if (order == "Release") {
+//         sortby = "primary_release_date.desc";
+//       } else if (order == "Revenue") {
+//         sortby = "revenue.desc";
+//       }
+//       dataSet = await generateMovieList(
+//           languages,
+//           categories,
+//           platform,
+//           region,
+//           sortby,
+//           1,
+//       );
+//     }
+//     if (movie != "true") {
+//       if (order == "Popularity") {
+//         sortby = "popularity.desc";
+//       } else if (order == "Release") {
+//         sortby = "first_air_date.desc";
+//       } else if (order == "Revenue") {
+//         sortby = "popularity.desc";
+//       }
+//       dataSet = await generateTVList(
+//           languages,
+//           categories,
+//           platform,
+//           region,
+//           sortby,
+//           1,
+//       );
+//     }
+//     const data = {
+//       created: date,
+//       creator: username,
+//       categories: categories,
+//       languages: languages,
+//       platform: platform,
+//       region: region,
+//       mediaInfo: dataSet,
+//       order: sortby,
+//       isMovie: movie,
+//       isValid: true,
+//       likes: {},
+//       participants: {},
+//     };
+//     await admin.firestore().collection("sessions").doc(id).set(data);
+//     res.status(200).send({sessionId: id});
+//   } catch (error) {
+//     console.error(error);
+//     sendErrorNotification("createSession", error);
+//     res.status(500).send("error");
+//   }
+// });
+
+exports.createSession = functions.https.onCall(async (data, context) => {
+  const sessionId = await generateSessionId();
+  sessionDb.ref(sessionId).set({
+    sessionInfo: {
+      categories: "xyz",
+      languages: "xyz",
+    },
+    sessionActivity: {
+      matches: [],
+      contentOrder: [],
+      users:
+      {
+        [data.username]: {
+          swipes: 0,
+          joinedAt: new Date(),
+        },
+      },
+    },
+    users: {
+      [data.username]: {
+        likes: [],
+        dislikes: [],
+        isActive: true,
+      },
+    },
+  });
+  const token = await generateJWTToken(data.username, sessionId, true);
+  return ({token: token, sessionId: sessionId, userId: data.username});
+  //   const username = data.username;
+  //   const categories = data.categories;
+  //   const languages = data.languages;
+  //   const platform = data.platform;
+  //   const region = data.region;
+  //   const date = new Date();
+  //   const movie = data.type;
+  //   const order = data.order;
+  //   let sortby = "";
+  //   let dataSet = [];
+  //   if (movie === "true") {
+  //     if (order == "Popularity") {
+  //       sortby = "popularity.desc";
+  //     } else if (order == "Release") {
+  //       sortby = "primary_release_date.desc";
+  //     } else if (order == "Revenue") {
+  //       sortby = "revenue.desc";
+  //     }
+  //     dataSet = await generateMovieList(
+  //         languages,
+  //         categories,
+  //         platform,
+  //         region,
+  //         sortby,
+  //         1,
+  //     );
+  //   }
+  //   if (movie != "true") {
+  //     if (order == "Popularity") {
+  //       sortby = "popularity.desc";
+  //     } else if (order == "Release") {
+  //       sortby = "first_air_date.desc";
+  //     } else if (order == "Revenue") {
+  //       sortby = "popularity.desc";
+  //     }
+  //     dataSet = await generateTVList(
+  //         languages,
+  //         categories,
+  //         platform,
+  //         region,
+  //         sortby,
+  //         1,
+  //     );
+  //   }
+  //   const data = {
+  //     created: date,
+  //     creator: username,
+  //     categories: categories,
+  //     languages: languages,
+  //     platform: platform,
+  //     region: region,
+  //     mediaInfo: dataSet,
+  //     order: sortby,
+  //     isMovie: movie,
+  //     isValid: true,
+  //     likes: {},
+  //     participants: {},
+  //   };
+  //   await admin.firestore().collection("sessions").doc(id).set(data);
+  //   res.status(200).send({sessionId: id});
+  // } catch (error) {
+  //   console.error(error);
+  //   sendErrorNotification("createSession", error);
+  //   res.status(500).send("error");
+  // }
 });
 
 exports.joinSession = functions.https.onRequest(async (req, res) => {
@@ -490,17 +585,13 @@ async function generateTVList(lang, genres, platform, region, sort, page) {
  */
 async function generateSessionId() {
   let id = randomSessionCode();
-  const idExists = true;
-  while (idExists === true) {
-    const docSnapshot = await admin
-        .firestore()
-        .collection("sessions")
-        .doc(id)
-        .get();
-    if (docSnapshot.exists) {
-      id = randomSessionCode();
-    } else {
+  const validId = true;
+  while (validId) {
+    const snap = await sessionDb.ref(id).get();
+    if (!snap.val()) {
       return id;
+    } else {
+      id = randomSessionCode();
     }
   }
 }

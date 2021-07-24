@@ -2,7 +2,7 @@
   <div id="app">
     <div v-if="this.$store.state.devmode == 2">
       {{ omitted }}
-      {{ sessionDataPresent }}
+      {{ sessionDataPresent() }}
     </div>
     <Navbar />
     <Loader v-if="this.$store.state.loader" />

@@ -129,8 +129,8 @@ export default {
     };
   },
   mounted() {
-    if (this.getSessionId !== null || this.getSessionId !== undefined) {
-      this.sessionId = this.getSessionId;
+    if (this.getSessionId()) {
+      this.sessionId = this.getSessionId();
     }
   },
   watch: {
@@ -218,6 +218,7 @@ export default {
       this.$store.state.loader = true;
       signIn({ username: username, sessionId: sessionId })
         .then((result) => {
+          console.log(result);
           this.setSessionId(sessionId);
           this.setUserId(username);
           this.setJWT(result.data);

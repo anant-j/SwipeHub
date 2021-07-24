@@ -161,20 +161,21 @@ export default {
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
+    if (!this.sessionDataPresent()) {
+      console.log("Session Data Not Present");
+      this.showAlert(
+        "Please join or create a session",
+        "w",
+        5000,
+        "sessionDataNotAvailable"
+      );
+      this.$router.push({ name: "Home" });
+      return;
+    }
+    this.$store.state.loader = true;
+    this.$store.state.activePage = 1;
+    this.lastInteraction = 0;
     this.signIn();
-    // if (!this.sessionDataPresent) {
-    //   this.showAlert(
-    //     "Please join or create a session",
-    //     "w",
-    //     5000,
-    //     "sessionDataNotAvailable"
-    //   );
-    //   this.$router.push({ name: "Home" });
-    //   return;
-    // }
-    // this.$store.state.loader = true;
-    // this.$store.state.activePage = 1;
-    // this.lastInteraction = 0;
     // this.getCards(
     //   `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
     // );
@@ -240,11 +241,9 @@ export default {
   },
   methods: {
     signIn() {
-      signInWithCustomToken(auth, this.getJWT)
+      signInWithCustomToken(auth, this.getJWT())
         .then(() => {
           this.$store.state.loader = false;
-          // const user = userCredential.user;
-          // console.log(userCredential.user);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -266,7 +265,7 @@ export default {
       });
     },
     async getSessionData() {
-      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
+      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         this.tempInfo = JSON.stringify(data);
@@ -372,7 +371,11 @@ export default {
       }
       if (this.queue.length === 9 && this.subsequentPollAllowed) {
         this.getCards(
-          `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
+          `${
+            this.backend
+          }/subsequentCards?id=${this.getSessionId()}&userId=${this.getUserId()}&totalCards=${
+            this.$store.state.totalSwipes
+          }`
         );
       }
       if (choice.type === "like" || choice.type === "super") {
