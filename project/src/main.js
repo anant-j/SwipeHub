@@ -4,7 +4,6 @@ import router from "./router";
 import store from "./store";
 import Toast from "vue-toastification";
 import "./assets/alert.css";
-import VueGtag from "vue-gtag";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -26,13 +25,6 @@ if (window.location.hostname === "localhost") {
 
 Vue.config.productionTip = !productionMode;
 if (productionMode) {
-  Vue.use(
-    VueGtag,
-    {
-      config: { id: "G-7V3PX5TM85" },
-    },
-    router
-  );
   document.title = "SwipeHub";
   backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
   hostURL = "https://" + window.location.hostname;

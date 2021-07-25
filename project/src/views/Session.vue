@@ -138,7 +138,7 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import { sessionDb, movieDb, auth } from "../firebase_config";
+import { sessionDb, movieDb, auth, eventLogger } from "../firebase_config";
 import { doc, onSnapshot } from "firebase/firestore";
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
@@ -183,6 +183,7 @@ export default {
     // document.addEventListener("keyup", this.keyListener);
     // this.getMovieData();
     this.getSessionData();
+    eventLogger("Session Page Loaded");
   },
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
