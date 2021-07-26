@@ -9,12 +9,55 @@ const TelegramChatID = functions.config().telegram.chatid;
 const expectedToken = TelegramToken.split(":")[1].toLowerCase();
 const sessionDb = admin.database();
 
-exports.signIn = functions.https.onCall((data, context) => {
-  return new Promise((resolve, reject) => {
-    const token = generateJWTToken(data.username, data.sessionId);
-    resolve(token);
+exports.signIn = functions.https.onCall(async (data, context) => {
+  // return new Promise((resolve, reject) => {
+  //   const token = generateJWTToken(data.username, data.sessionId);
+  //   resolve(token);
+  // });
+  const token = await generateJWTToken(data.username, data.sessionId);
+  sessionDb.ref(data.sessionId).child("sessionActivity/users").update({
+    [data.username]: {
+      "swipes": 0,
+    },
   });
+  return (token);
 });
+
+exports.generateInitialData = functions.database.ref("{sessionId}")
+    .onCreate(async (snapshot, context) => {
+      const sessionInfo = snapshot.val().sessionInfo;
+      const sessionId = snapshot.key;
+      const categories = sessionInfo.categories;
+      const languages = sessionInfo.languages;
+      const platform = sessionInfo.platform;
+      const region = sessionInfo.region;
+      const sortby = sessionInfo.order;
+      let dataSet = [];
+      const movie = sessionInfo.isMovie;
+      if (movie === true) {
+        dataSet = await generateMovieList(
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+            1,
+        );
+      } else {
+        dataSet = await generateTVList(
+            languages,
+            categories,
+            platform,
+            region,
+            sortby,
+            1,
+        );
+      }
+      return sessionDb.ref(sessionId).child("sessionActivity").update({
+        mediaOrder: dataSet,
+      });
+    });
+
 
 exports.sessionValid = functions.https.onRequest(async (req, res) => {
   try {
@@ -109,24 +152,37 @@ exports.sessionValid = functions.https.onRequest(async (req, res) => {
 
 exports.createSession = functions.https.onCall(async (data, context) => {
   const sessionId = await generateSessionId();
+  const username=data.username;
+  const categories=data.categories;
+  const languages=data.language;
+  const platform=data.platform;
+  const region=data.region;
+  const type=data.type;
+  const order=data.order;
   sessionDb.ref(sessionId).set({
     sessionInfo: {
-      categories: "xyz",
-      languages: "xyz",
+      categories: categories,
+      creator: username,
+      languages: languages,
+      platform: platform,
+      region: region,
+      isMovie: type,
+      order: order,
     },
     sessionActivity: {
       matches: [],
       contentOrder: [],
+      isValid: true,
       users:
       {
-        [data.username]: {
+        [username]: {
           swipes: 0,
           joinedAt: new Date(),
         },
       },
     },
     users: {
-      [data.username]: {
+      [username]: {
         likes: [],
         dislikes: [],
         isActive: true,
@@ -526,27 +582,28 @@ async function sendErrorNotification(caller, error) {
  * @param  {number} page
  */
 async function generateMovieList(lang, genres, platform, region, sort, page) {
-  const final = {};
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
       `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
+  const res = [];
   for (let i = 0; i < data.length; i++) {
-    if (!("order" in final)) {
-      final["order"] = [];
-    }
-    final["order"].push(data[i]["id"]);
-    const tempDict = {};
-    tempDict["title"] = data[i]["title"];
-    tempDict["description"] = data[i]["overview"];
-    tempDict["poster"] =
-      "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
-    tempDict["release_date"] = data[i]["release_date"];
-    tempDict["adult"] = data[i]["adult"];
-    final[data[i]["id"]] = tempDict;
+    // if (!("order" in final)) {
+    //   final["order"] = [];
+    // }
+    // final["order"].push(data[i]["id"]);
+    // const tempDict = {};
+    // tempDict["title"] = data[i]["title"];
+    // tempDict["description"] = data[i]["overview"];
+    // tempDict["poster"] =
+    //   "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
+    // tempDict["release_date"] = data[i]["release_date"];
+    // tempDict["adult"] = data[i]["adult"];
+    // final[data[i]["id"]] = tempDict;
+    res.push(data[i]["id"]);
   }
-  return final;
+  return res;
 }
 
 /**

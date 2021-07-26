@@ -314,19 +314,19 @@ export default {
     createSession() {
       this.$store.state.loader = true;
       const username = this.username;
-      // const language = this.language.id;
-      // const platform = this.platform.id;
-      // const country = this.country.id;
-      // const categories = this.category;
-      // const type = this.contentType.name === "Movie";
-      // const order = this.sortType.value;
-      // let categoryList = "";
-      // if (categories !== null) {
-      //   for (const category of categories) {
-      //     categoryList += category.id.toString() + "|";
-      //   }
-      //   categoryList = categoryList.substring(0, categoryList.length - 1);
-      // }
+      const language = this.language.id;
+      const platform = this.platform.id;
+      const country = this.country.id;
+      const categories = this.category;
+      const type = this.contentType.name === "Movie";
+      const order = this.sortType.value;
+      let categoryList = "";
+      if (categories !== null) {
+        for (const category of categories) {
+          categoryList += category.id.toString() + "|";
+        }
+        categoryList = categoryList.substring(0, categoryList.length - 1);
+      }
       // const params = {
       //   username: username,
       //   categories: categoryList,
@@ -336,7 +336,15 @@ export default {
       //   type: type,
       //   order: order,
       // };
-      createSession({ username: username })
+      createSession({
+        username: username,
+        categories: categoryList,
+        language: language,
+        platform: platform,
+        region: country,
+        type: type,
+        order: order,
+      })
         .then((result) => {
           this.setSessionId(result.data.sessionId);
           this.setUserId(result.data.userId);

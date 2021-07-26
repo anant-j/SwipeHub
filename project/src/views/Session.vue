@@ -1,6 +1,7 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
-    <h1>{{ tempInfo }}</h1>
+    <br />
+    <h4>{{ tempInfo }}</h4>
     <Tinder
       ref="tinder"
       key-name="id"
@@ -182,7 +183,6 @@ export default {
     // this.poll();
     // document.addEventListener("keyup", this.keyListener);
     // this.getMovieData();
-    this.getSessionData();
     eventLogger("Session Page Loaded");
   },
   destroyed() {
@@ -244,6 +244,7 @@ export default {
     signIn() {
       signInWithCustomToken(auth, this.getJWT())
         .then(() => {
+          this.getSessionData();
           this.$store.state.loader = false;
         })
         .catch((error) => {
