@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "$sessionId":{
+      "sessionActivity":{
+    ".read": "auth != null && auth.token.sessionId == $sessionId",
+    ".write": false
+    }}
+  }
+}
