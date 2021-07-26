@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const axios = require("axios");
 const admin = require("firebase-admin");
-admin.initializeApp({databaseURL: "https://theswipehub.firebaseio.com"});
+admin.initializeApp({databaseURL: "https://theswipehub-default-rtdb.firebaseio.com/"});
 const apiToken = functions.config().tmdb.key;
 const TelegramURL = functions.config().telegram.url;
 const TelegramToken = functions.config().telegram.token;
@@ -699,6 +699,8 @@ function upperValue(numberOfCards) {
 async function generateJWTToken(userId, sessionId, isCreator = false) {
   const additionalClaims = {
     isCreator: isCreator,
+    sessionId: sessionId,
+    userId: userId,
   };
   const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}`, additionalClaims);
   // .then((customToken) => {
