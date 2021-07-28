@@ -140,7 +140,7 @@
 import Tinder from "vue-tinder";
 import axios from "axios";
 import { sessionDb, movieDb, auth, eventLogger } from "../firebase_config";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 
@@ -182,7 +182,6 @@ export default {
     // );
     // this.poll();
     // document.addEventListener("keyup", this.keyListener);
-    // this.getMovieData();
     eventLogger("Session Page Loaded");
   },
   destroyed() {
@@ -261,16 +260,33 @@ export default {
           this.$router.push({ name: "Home" });
         });
     },
-    async getMovieData() {
-      onSnapshot(doc(movieDb, "cities", "LA"), (doc) => {
-        console.log("Current firestore data: ", doc.data());
-      });
+    async getMovieData(id) {
+      const docRef = doc(movieDb, "media", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        return null;
+      }
     },
     async getSessionData() {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         this.tempInfo = JSON.stringify(data);
+        for (const id of data.mediaOrder) {
+          if (
+            !Object.prototype.hasOwnProperty.call(
+              this.$store.state.movieData,
+              id
+            )
+          ) {
+            this.getMovieData(id).then((movieData) => {
+              this.$store.state.movieData[id] = movieData;
+              this.addCard(id);
+            });
+          }
+        }
       });
     },
     addLastCard() {
@@ -290,6 +306,23 @@ export default {
       this.queue = this.queue.concat(list);
       this.subsequentPollAllowed = false;
       return;
+    },
+    addCard(id) {
+      const cardData = this.$store.state.movieData[id];
+      const list = [];
+      let posterlink =
+        "https://image.tmdb.org/t/p/original" + cardData.poster_path;
+      if (posterlink === this.TMDBNull) {
+        posterlink = this.noImageUrl;
+      }
+      posterlink = posterlink.replace("http://", "https://");
+      const finalPosterLink = posterlink + `?id=${id}`;
+      if (!this.queue.includes(finalPosterLink)) {
+        list.push({
+          id: finalPosterLink,
+        });
+      }
+      this.queue = this.queue.concat(list);
     },
     getCards(url) {
       axios

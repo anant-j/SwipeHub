@@ -589,19 +589,17 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
   const data = resp.data.results;
   const res = [];
   for (let i = 0; i < data.length; i++) {
-    // if (!("order" in final)) {
-    //   final["order"] = [];
-    // }
-    // final["order"].push(data[i]["id"]);
-    // const tempDict = {};
-    // tempDict["title"] = data[i]["title"];
-    // tempDict["description"] = data[i]["overview"];
-    // tempDict["poster"] =
-    //   "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
-    // tempDict["release_date"] = data[i]["release_date"];
-    // tempDict["adult"] = data[i]["adult"];
-    // final[data[i]["id"]] = tempDict;
-    res.push(data[i]["id"]);
+    const id = data[i].id.toString();
+    const sessionDb = admin.firestore().collection("media").doc(id);
+    const doc = await sessionDb.get();
+    if (!doc.exists) {
+      await admin
+          .firestore()
+          .collection("media")
+          .doc(id)
+          .set(data[i]);
+    }
+    res.push(id);
   }
   return res;
 }
