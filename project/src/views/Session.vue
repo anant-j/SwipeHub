@@ -280,6 +280,7 @@ export default {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
+        console.log(data);
         const mySwipes = data.users[this.getUserId()].swipes;
         this.$store.state.totalSwipes = mySwipes;
         this.tempInfo = JSON.stringify(data);
