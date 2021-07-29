@@ -194,9 +194,7 @@ import "vue-multiselect/dist/vue-multiselect.min.css";
 import store from "@/store/index.js";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
-import { functions } from "@/firebase_config.js";
-import { httpsCallable } from "firebase/functions";
-const createSession = httpsCallable(functions, "createSession");
+import { JWTService } from "@/firebase_config.js";
 
 export default {
   name: "CreateSessionPage",
@@ -336,7 +334,8 @@ export default {
       //   type: type,
       //   order: order,
       // };
-      createSession({
+      JWTService({
+        requestType: "create",
         username: username,
         categories: categoryList,
         language: language,

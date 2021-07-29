@@ -9,18 +9,99 @@ const TelegramChatID = functions.config().telegram.chatid;
 const expectedToken = TelegramToken.split(":")[1].toLowerCase();
 const sessionDb = admin.database();
 
-exports.signIn = functions.https.onCall(async (data, context) => {
-  // return new Promise((resolve, reject) => {
-  //   const token = generateJWTToken(data.username, data.sessionId);
-  //   resolve(token);
-  // });
-  const token = await generateJWTToken(data.username, data.sessionId);
-  sessionDb.ref(data.sessionId).child("sessionActivity/users").update({
-    [data.username]: {
-      "swipes": 0,
-    },
-  });
-  return (token);
+exports.registerTenant = functions.https.onCall(async (data, context) => {
+  if (data.requestType === "join") {
+    const token = await generateJWTToken(data.username, data.sessionId);
+    sessionDb.ref(data.sessionId).child("sessionActivity/users").update({
+      [data.username]: {
+        "swipes": 0,
+      },
+    });
+    return (token);
+  } else if (data.requestType === "create") {
+    const sessionId = await generateSessionId();
+    const username=data.username;
+    const categories=data.categories;
+    const languages=data.language;
+    const platform=data.platform;
+    const region=data.region;
+    const type=data.type;
+    const order=data.order;
+    sessionDb.ref(sessionId).set({
+      sessionInfo: {
+        categories: categories,
+        creator: username,
+        languages: languages,
+        platform: platform,
+        region: region,
+        isMovie: type,
+        order: order,
+      },
+      sessionActivity: {
+        matches: [],
+        contentOrder: [],
+        isValid: true,
+        users:
+      {
+        [username]: {
+          swipes: 0,
+          joinedAt: new Date(),
+        },
+      },
+      },
+      users: {
+        [username]: {
+          likes: [],
+          dislikes: [],
+          isActive: true,
+        },
+      },
+    });
+    const token = await generateJWTToken(data.username, sessionId, true);
+    return ({token: token, sessionId: sessionId, userId: data.username});
+  } else {
+    throw new functions.https.HttpsError("invalid-argument", "The function must be called with correct request type");
+  }
+});
+
+exports.swipeHandler = functions.https.onCall(async (data, context) => {
+  const sessionId = context.auth.token.sessionId;
+  const userId = context.auth.token.userId;
+  const snap = await sessionDb.ref(sessionId).child("users").child(userId).get();
+  let updateVariable = "";
+  let likeLength = 0;
+  let dislikeLength = 0;
+  const movieId = data.id;
+  if (snap.val()) {
+    if (data.requestType === "like") {
+      updateVariable = "likes";
+    } else if ( data.requestType === "dislike") {
+      updateVariable = "dislikes";
+    } else {
+      return;
+    }
+    if ((!snap.val().likes || !(snap.val().likes.includes(movieId))) && ( !snap.val().dislikes || !(snap.val().dislikes.includes(movieId)))) {
+      sessionDb.ref(sessionId).child("users").child(userId).update({
+        [updateVariable]: (snap.val()[updateVariable] || []).concat(movieId),
+      });
+      if (snap.val().likes) {
+        likeLength = parseInt(snap.val().likes.length);
+      }
+      if (snap.val().dislikes) {
+        dislikeLength = parseInt(snap.val().dislikes.length);
+      }
+      const matches=["123", "435"];
+      sessionDb.ref(sessionId).child("sessionActivity").update({
+        users: {
+          [userId]: {
+            swipes: likeLength + dislikeLength + 1,
+          },
+        },
+        matches: matches,
+      });
+    }
+    return;
+  }
 });
 
 exports.generateInitialData = functions.database.ref("{sessionId}")
@@ -59,466 +140,214 @@ exports.generateInitialData = functions.database.ref("{sessionId}")
     });
 
 
-exports.sessionValid = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const id = req.query.id.toUpperCase();
-    const sessionDb = admin.firestore().collection("sessions").doc(id);
-    const doc = await sessionDb.get();
-    if (isValidSession(doc)) {
-      res.status(200).send("Allowed");
-      return;
-    } else {
-      res.status(404).send("Session doesn't exist");
-      return;
-    }
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("sessionValid", error);
-    res.status(500).send("error");
-  }
-});
-
-// exports.createSession = functions.https.onRequest(async (req, res) => {
+// exports.leaveSession = functions.https.onRequest(async (req, res) => {
 //   try {
 //     res.set("Access-Control-Allow-Origin", "*");
-//     const id = await generateSessionId();
-//     const username = req.body.username;
-//     const categories = req.body.categories;
-//     const languages = req.body.languages;
-//     const platform = req.body.platform;
-//     const region = req.body.region;
-//     const date = new Date();
-//     const movie = req.body.type;
-//     const order = req.body.order;
-//     let sortby = "";
-//     let dataSet = [];
-//     if (movie === "true") {
-//       if (order == "Popularity") {
-//         sortby = "popularity.desc";
-//       } else if (order == "Release") {
-//         sortby = "primary_release_date.desc";
-//       } else if (order == "Revenue") {
-//         sortby = "revenue.desc";
+//     const id = req.query.id.toUpperCase();
+//     const userId = req.query.user;
+//     const sessionDb = admin.firestore().collection("sessions").doc(id);
+//     const doc = await sessionDb.get();
+//     if (!isValidSession(doc)) {
+//       res.status(404).send("Session doesn't exist");
+//       return;
+//     } else {
+//       const users = doc.data().participants;
+//       if (users[userId] != undefined) {
+//         if (userId == doc.data().creator) {
+//           await endSession(id);
+//         } else {
+//           await leaveSession(id, userId, doc.data());
+//         }
+//       } else {
+//         res.status(404).send("Session does not exist");
 //       }
-//       dataSet = await generateMovieList(
-//           languages,
-//           categories,
-//           platform,
-//           region,
-//           sortby,
-//           1,
-//       );
+//       res.status(200).send({
+//         movies: doc.data().mediaInfo,
+//         isCreator: doc.data().creator == userId,
+//       });
 //     }
-//     if (movie != "true") {
-//       if (order == "Popularity") {
-//         sortby = "popularity.desc";
-//       } else if (order == "Release") {
-//         sortby = "first_air_date.desc";
-//       } else if (order == "Revenue") {
-//         sortby = "popularity.desc";
-//       }
-//       dataSet = await generateTVList(
-//           languages,
-//           categories,
-//           platform,
-//           region,
-//           sortby,
-//           1,
-//       );
-//     }
-//     const data = {
-//       created: date,
-//       creator: username,
-//       categories: categories,
-//       languages: languages,
-//       platform: platform,
-//       region: region,
-//       mediaInfo: dataSet,
-//       order: sortby,
-//       isMovie: movie,
-//       isValid: true,
-//       likes: {},
-//       participants: {},
-//     };
-//     await admin.firestore().collection("sessions").doc(id).set(data);
-//     res.status(200).send({sessionId: id});
 //   } catch (error) {
 //     console.error(error);
-//     sendErrorNotification("createSession", error);
+//     sendErrorNotification("leaveSession", error);
 //     res.status(500).send("error");
 //   }
 // });
 
-exports.createSession = functions.https.onCall(async (data, context) => {
-  const sessionId = await generateSessionId();
-  const username=data.username;
-  const categories=data.categories;
-  const languages=data.language;
-  const platform=data.platform;
-  const region=data.region;
-  const type=data.type;
-  const order=data.order;
-  sessionDb.ref(sessionId).set({
-    sessionInfo: {
-      categories: categories,
-      creator: username,
-      languages: languages,
-      platform: platform,
-      region: region,
-      isMovie: type,
-      order: order,
-    },
-    sessionActivity: {
-      matches: [],
-      contentOrder: [],
-      isValid: true,
-      users:
-      {
-        [username]: {
-          swipes: 0,
-          joinedAt: new Date(),
-        },
-      },
-    },
-    users: {
-      [username]: {
-        likes: [],
-        dislikes: [],
-        isActive: true,
-      },
-    },
-  });
-  const token = await generateJWTToken(data.username, sessionId, true);
-  return ({token: token, sessionId: sessionId, userId: data.username});
-  //   const username = data.username;
-  //   const categories = data.categories;
-  //   const languages = data.languages;
-  //   const platform = data.platform;
-  //   const region = data.region;
-  //   const date = new Date();
-  //   const movie = data.type;
-  //   const order = data.order;
-  //   let sortby = "";
-  //   let dataSet = [];
-  //   if (movie === "true") {
-  //     if (order == "Popularity") {
-  //       sortby = "popularity.desc";
-  //     } else if (order == "Release") {
-  //       sortby = "primary_release_date.desc";
-  //     } else if (order == "Revenue") {
-  //       sortby = "revenue.desc";
-  //     }
-  //     dataSet = await generateMovieList(
-  //         languages,
-  //         categories,
-  //         platform,
-  //         region,
-  //         sortby,
-  //         1,
-  //     );
-  //   }
-  //   if (movie != "true") {
-  //     if (order == "Popularity") {
-  //       sortby = "popularity.desc";
-  //     } else if (order == "Release") {
-  //       sortby = "first_air_date.desc";
-  //     } else if (order == "Revenue") {
-  //       sortby = "popularity.desc";
-  //     }
-  //     dataSet = await generateTVList(
-  //         languages,
-  //         categories,
-  //         platform,
-  //         region,
-  //         sortby,
-  //         1,
-  //     );
-  //   }
-  //   const data = {
-  //     created: date,
-  //     creator: username,
-  //     categories: categories,
-  //     languages: languages,
-  //     platform: platform,
-  //     region: region,
-  //     mediaInfo: dataSet,
-  //     order: sortby,
-  //     isMovie: movie,
-  //     isValid: true,
-  //     likes: {},
-  //     participants: {},
-  //   };
-  //   await admin.firestore().collection("sessions").doc(id).set(data);
-  //   res.status(200).send({sessionId: id});
-  // } catch (error) {
-  //   console.error(error);
-  //   sendErrorNotification("createSession", error);
-  //   res.status(500).send("error");
-  // }
-});
+// exports.subsequentCards = functions.https.onRequest(async (req, res) => {
+//   try {
+//     res.set("Access-Control-Allow-Origin", "*");
+//     const id = req.query.id.toUpperCase();
+//     let totalCards = parseInt(req.query.totalCards);
+//     const sessionDb = admin.firestore().collection("sessions").doc(id);
+//     const doc = await sessionDb.get();
+//     if (!isValidSession(doc)) {
+//       res.status(404).send("Session doesn't exist");
+//       return;
+//     } else {
+//       const currentMovieSize = Object.keys(doc.data().mediaInfo).length - 1;
+//       const movie = doc.data().isMovie;
+//       const languages = doc.data().languages;
+//       const categories = doc.data().categories;
+//       const platform = doc.data().platform;
+//       const region = doc.data().region;
+//       const sortby = doc.data().order;
+//       let dataSet = {};
+//       const oldDataSet = doc.data().mediaInfo;
+//       totalCards = upperValue(totalCards);
+//       if (totalCards >= currentMovieSize) {
+//         const pageNum = totalCards / 20 + 1;
+//         if (movie === "true") {
+//           dataSet = await generateMovieList(
+//               languages,
+//               categories,
+//               platform,
+//               region,
+//               sortby,
+//               pageNum,
+//           );
+//         }
+//         if (movie != "true") {
+//           dataSet = await generateTVList(
+//               languages,
+//               categories,
+//               platform,
+//               region,
+//               sortby,
+//               pageNum,
+//           );
+//         }
+//         const newOrder = dataSet["order"];
+//         for (let index = 0; index < newOrder.length; index++) {
+//           const key = newOrder[index];
+//           oldDataSet["order"].push(key);
+//           oldDataSet[key] = dataSet[key];
+//         }
+//         const data = {
+//           mediaInfo: oldDataSet,
+//         };
+//         await admin
+//             .firestore()
+//             .collection("sessions")
+//             .doc(id)
+//             .set(data, {merge: true});
+//       } else {
+//         let lower = totalCards;
+//         const upper = totalCards + 19;
+//         const oldOrder = oldDataSet["order"];
+//         dataSet["order"] = [];
+//         for (lower; lower <= upper; lower++) {
+//           const key = oldOrder[lower];
+//           dataSet[key] = oldDataSet[key];
+//           dataSet["order"].push(key);
+//         }
+//       }
+//       res.status(200).send({movies: dataSet});
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     sendErrorNotification("subsequentCards", error);
+//     res.status(500).send("error");
+//   }
+// });
 
-exports.joinSession = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const date = new Date();
-    const id = req.query.id.toUpperCase();
-    const userId = req.query.user;
-    const sessionDb = admin.firestore().collection("sessions").doc(id);
-    const doc = await sessionDb.get();
-    if (!isValidSession(doc)) {
-      res.status(404).send("Session doesn't exist");
-      return;
-    } else {
-      const users = doc.data().participants;
-      if (!(userId in users)) {
-        users[userId] = {};
-      }
-      users[userId]["joined_at"] = date;
-      if (users[userId]["totalSwipes"] == undefined) {
-        users[userId]["totalSwipes"] = [];
-      }
-      const data = {
-        participants: users,
-      };
-      const oldMovieData = doc.data().mediaInfo;
-      const newMovieData = {order: []};
-      const totalSwipeLength = users[userId]["totalSwipes"].length;
-      const oldMovieLength = oldMovieData["order"].length;
-      let upper = totalSwipeLength + 20;
-      if (totalSwipeLength + 20 > oldMovieLength) {
-        upper = oldMovieLength;
-      }
-      for (let index = totalSwipeLength; index < upper; index++) {
-        const key = oldMovieData["order"][index];
-        newMovieData["order"].push(key);
-        newMovieData[key] = oldMovieData[key];
-      }
-      await admin
-          .firestore()
-          .collection("sessions")
-          .doc(id)
-          .set(data, {merge: true});
-      res.status(200).send({
-        movies: newMovieData,
-        isCreator: doc.data().creator == userId,
-        totalSwipes: users[userId]["totalSwipes"].length,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("joinSession", error);
-    res.status(500).send("error");
-  }
-});
 
-exports.leaveSession = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const id = req.query.id.toUpperCase();
-    const userId = req.query.user;
-    const sessionDb = admin.firestore().collection("sessions").doc(id);
-    const doc = await sessionDb.get();
-    if (!isValidSession(doc)) {
-      res.status(404).send("Session doesn't exist");
-      return;
-    } else {
-      const users = doc.data().participants;
-      if (users[userId] != undefined) {
-        if (userId == doc.data().creator) {
-          await endSession(id);
-        } else {
-          await leaveSession(id, userId, doc.data());
-        }
-      } else {
-        res.status(404).send("Session does not exist");
-      }
-      res.status(200).send({
-        movies: doc.data().mediaInfo,
-        isCreator: doc.data().creator == userId,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("leaveSession", error);
-    res.status(500).send("error");
-  }
-});
+// exports.polling = functions.https.onRequest(async (req, res) => {
+//   try {
+//     res.set("Access-Control-Allow-Origin", "*");
+//     const username = req.body.userId;
+//     const sessionId = req.body.sessionId.toUpperCase();
+//     let totalSwipes = req.body.totalSwipes;
+//     let likedList = req.body.likedList;
+//     const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
+//     const doc = await sessionDb.get();
+//     if (!isValidSession(doc)) {
+//       res.status(404).send("Session doesn't exist");
+//       return;
+//     } else {
+//       const data = doc.data();
+//       const matches = new Set();
+//       const active = Object.keys(doc.data().participants).length;
+//       if (likedList != "") {
+//         likedList = likedList.split(",");
+//         likedList.forEach((element) => {
+//           element = element.toString();
+//           const newdata = toSet(data["likes"][element]);
+//           newdata.add(username);
+//           const sendBuffer = [];
+//           newdata.forEach((v) => sendBuffer.push(v));
+//           data["likes"][element] = sendBuffer;
+//         });
+//       }
+//       for (const [key, value] of Object.entries(data["likes"])) {
+//         if (value.length == active && active > 1) {
+//           matches.add(key);
+//         }
+//       }
+//       const results = [];
+//       matches.forEach((v) => results.push(v));
+//       data["matches"] = results;
+//       let currentSwipes = doc.data().participants[username]["totalSwipes"];
+//       if (totalSwipes != "") {
+//         totalSwipes = totalSwipes.split(",");
+//         currentSwipes = toSet(currentSwipes);
+//         totalSwipes.forEach((element) => {
+//           currentSwipes = currentSwipes.add(element);
+//         });
+//         currentSwipes = toArray(currentSwipes);
+//       }
+//       data["participants"][username]["totalSwipes"] = currentSwipes;
+//       const participantData = {};
+//       for (const [key, value] of Object.entries(data["participants"])) {
+//         participantData[key] = value["totalSwipes"].length;
+//       }
+//       await admin
+//           .firestore()
+//           .collection("sessions")
+//           .doc(sessionId)
+//           .set(data, {merge: true});
+//       res.status(200).send({match: results.length, userData: participantData});
+//       return;
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     sendErrorNotification("polling", error);
+//     res.status(500).send("error");
+//   }
+// });
 
-exports.subsequentCards = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const id = req.query.id.toUpperCase();
-    let totalCards = parseInt(req.query.totalCards);
-    const sessionDb = admin.firestore().collection("sessions").doc(id);
-    const doc = await sessionDb.get();
-    if (!isValidSession(doc)) {
-      res.status(404).send("Session doesn't exist");
-      return;
-    } else {
-      const currentMovieSize = Object.keys(doc.data().mediaInfo).length - 1;
-      const movie = doc.data().isMovie;
-      const languages = doc.data().languages;
-      const categories = doc.data().categories;
-      const platform = doc.data().platform;
-      const region = doc.data().region;
-      const sortby = doc.data().order;
-      let dataSet = {};
-      const oldDataSet = doc.data().mediaInfo;
-      totalCards = upperValue(totalCards);
-      if (totalCards >= currentMovieSize) {
-        const pageNum = totalCards / 20 + 1;
-        if (movie === "true") {
-          dataSet = await generateMovieList(
-              languages,
-              categories,
-              platform,
-              region,
-              sortby,
-              pageNum,
-          );
-        }
-        if (movie != "true") {
-          dataSet = await generateTVList(
-              languages,
-              categories,
-              platform,
-              region,
-              sortby,
-              pageNum,
-          );
-        }
-        const newOrder = dataSet["order"];
-        for (let index = 0; index < newOrder.length; index++) {
-          const key = newOrder[index];
-          oldDataSet["order"].push(key);
-          oldDataSet[key] = dataSet[key];
-        }
-        const data = {
-          mediaInfo: oldDataSet,
-        };
-        await admin
-            .firestore()
-            .collection("sessions")
-            .doc(id)
-            .set(data, {merge: true});
-      } else {
-        let lower = totalCards;
-        const upper = totalCards + 19;
-        const oldOrder = oldDataSet["order"];
-        dataSet["order"] = [];
-        for (lower; lower <= upper; lower++) {
-          const key = oldOrder[lower];
-          dataSet[key] = oldDataSet[key];
-          dataSet["order"].push(key);
-        }
-      }
-      res.status(200).send({movies: dataSet});
-    }
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("subsequentCards", error);
-    res.status(500).send("error");
-  }
-});
-
-exports.polling = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const username = req.body.userId;
-    const sessionId = req.body.sessionId.toUpperCase();
-    let totalSwipes = req.body.totalSwipes;
-    let likedList = req.body.likedList;
-    const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
-    const doc = await sessionDb.get();
-    if (!isValidSession(doc)) {
-      res.status(404).send("Session doesn't exist");
-      return;
-    } else {
-      const data = doc.data();
-      const matches = new Set();
-      const active = Object.keys(doc.data().participants).length;
-      if (likedList != "") {
-        likedList = likedList.split(",");
-        likedList.forEach((element) => {
-          element = element.toString();
-          const newdata = toSet(data["likes"][element]);
-          newdata.add(username);
-          const sendBuffer = [];
-          newdata.forEach((v) => sendBuffer.push(v));
-          data["likes"][element] = sendBuffer;
-        });
-      }
-      for (const [key, value] of Object.entries(data["likes"])) {
-        if (value.length == active && active > 1) {
-          matches.add(key);
-        }
-      }
-      const results = [];
-      matches.forEach((v) => results.push(v));
-      data["matches"] = results;
-      let currentSwipes = doc.data().participants[username]["totalSwipes"];
-      if (totalSwipes != "") {
-        totalSwipes = totalSwipes.split(",");
-        currentSwipes = toSet(currentSwipes);
-        totalSwipes.forEach((element) => {
-          currentSwipes = currentSwipes.add(element);
-        });
-        currentSwipes = toArray(currentSwipes);
-      }
-      data["participants"][username]["totalSwipes"] = currentSwipes;
-      const participantData = {};
-      for (const [key, value] of Object.entries(data["participants"])) {
-        participantData[key] = value["totalSwipes"].length;
-      }
-      await admin
-          .firestore()
-          .collection("sessions")
-          .doc(sessionId)
-          .set(data, {merge: true});
-      res.status(200).send({match: results.length, userData: participantData});
-      return;
-    }
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("polling", error);
-    res.status(500).send("error");
-  }
-});
-
-exports.matchPolling = functions.https.onRequest(async (req, res) => {
-  try {
-    res.set("Access-Control-Allow-Origin", "*");
-    const username = req.body.userId;
-    const sessionId = req.body.sessionId.toUpperCase();
-    const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
-    const doc = await sessionDb.get();
-    if (!isValidSession(doc)) {
-      res.status(404).send("Session doesn't exist");
-      return;
-    } else {
-      const data = doc.data();
-      const matches = data.matches;
-      const movieData = {};
-      for (let index = 0; index < matches.length; index++) {
-        const element = matches[index];
-        movieData[element] = data.mediaInfo[element];
-      }
-      const participantData = {};
-      for (const [key, value] of Object.entries(data["participants"])) {
-        participantData[key] = value["totalSwipes"].length;
-      }
-      res
-          .status(200)
-          .send({movies: movieData, isCreator: doc.data().creator == username, userData: participantData} );
-    }
-    return;
-  } catch (error) {
-    console.error(error);
-    sendErrorNotification("matchPolling", error);
-    res.status(500).send("error");
-  }
-});
+// exports.matchPolling = functions.https.onRequest(async (req, res) => {
+//   try {
+//     res.set("Access-Control-Allow-Origin", "*");
+//     const username = req.body.userId;
+//     const sessionId = req.body.sessionId.toUpperCase();
+//     const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
+//     const doc = await sessionDb.get();
+//     if (!isValidSession(doc)) {
+//       res.status(404).send("Session doesn't exist");
+//       return;
+//     } else {
+//       const data = doc.data();
+//       const matches = data.matches;
+//       const movieData = {};
+//       for (let index = 0; index < matches.length; index++) {
+//         const element = matches[index];
+//         movieData[element] = data.mediaInfo[element];
+//       }
+//       const participantData = {};
+//       for (const [key, value] of Object.entries(data["participants"])) {
+//         participantData[key] = value["totalSwipes"].length;
+//       }
+//       res
+//           .status(200)
+//           .send({movies: movieData, isCreator: doc.data().creator == username, userData: participantData} );
+//     }
+//     return;
+//   } catch (error) {
+//     console.error(error);
+//     sendErrorNotification("matchPolling", error);
+//     res.status(500).send("error");
+//   }
+// });
 
 exports.deploymessages = functions.https.onRequest(async (req, res) => {
   try {
@@ -664,87 +493,71 @@ function randomSessionCode() {
   return result;
 }
 
-/**
- * @param {any} sessionId
- * @param {any} userId
- * @param {any} sessionData
- * @return {any}
- */
-async function leaveSession(sessionId, userId, sessionData) {
-  for (const [key, value] of Object.entries(sessionData["likes"])) {
-    // value is the array of userIds who liked the movieId(key)
-    // {key -> [value], key -> [value]}
-    // for each key, take value, find index of user, remove that index from value, set new value to that key
-    const index = value.indexOf(userId);
-    if (index > -1) {
-      value.splice(index, 1);
-    }
-    sessionData["likes"][key] = value;
-  }
-  delete sessionData["participants"][userId];
-  await admin
-      .firestore()
-      .collection("sessions")
-      .doc(sessionId)
-      .set(sessionData);
-}
+// /**
+//  * @param {any} sessionId
+//  * @param {any} userId
+//  * @param {any} sessionData
+//  * @return {any}
+//  */
+// async function leaveSession(sessionId, userId, sessionData) {
+//   for (const [key, value] of Object.entries(sessionData["likes"])) {
+//     // value is the array of userIds who liked the movieId(key)
+//     // {key -> [value], key -> [value]}
+//     // for each key, take value, find index of user, remove that index from value, set new value to that key
+//     const index = value.indexOf(userId);
+//     if (index > -1) {
+//       value.splice(index, 1);
+//     }
+//     sessionData["likes"][key] = value;
+//   }
+//   delete sessionData["participants"][userId];
+//   await admin
+//       .firestore()
+//       .collection("sessions")
+//       .doc(sessionId)
+//       .set(sessionData);
+// }
 
-/**
- * @param {any} sessionId
- * @return {any}
- */
-async function endSession(sessionId) {
-  const data = {
-    isValid: false,
-  };
-  await admin
-      .firestore()
-      .collection("sessions")
-      .doc(sessionId)
-      .set(data, {merge: true});
-}
+// /**
+//  * @param {any} sessionId
+//  * @return {any}
+//  */
+// async function endSession(sessionId) {
+//   const data = {
+//     isValid: false,
+//   };
+//   await admin
+//       .firestore()
+//       .collection("sessions")
+//       .doc(sessionId)
+//       .set(data, {merge: true});
+// }
 
-/**
- * @param  {object} doc
- * @return {boolean}
- */
-function isValidSession(doc) {
-  if (doc.exists && doc.data().isValid) {
-    return true;
-  }
-  return false;
-}
+// /**
+//  * @param  {object} doc
+//  * @return {boolean}
+//  */
+// function isValidSession(doc) {
+//   if (doc.exists && doc.data().isValid) {
+//     return true;
+//   }
+//   return false;
+// }
 
-/**
- * @param {any} inp
- * @return {any}
- */
-function toArray(inp) {
-  return Array.from(inp);
-}
-
-/**
- * @param {any} inp
- * @return {any}
- */
-function toSet(inp) {
-  return new Set(inp);
-}
-
-/**
- * @param  {number} numberOfCards
- * @return {number} val
- */
-function upperValue(numberOfCards) {
-  const ceiledNum = Math.ceil(numberOfCards / 10);
-  let val = 0;
-  if (ceiledNum % 2 == 0) {
-    val = ceiledNum * 10;
-  } else {
-    val = (ceiledNum + 1) * 10;
-  }
-  return val;
-}
+// /**
+//  * @param  {number} numberOfCards
+//  * @return {number} val
+//  */
+// function upperValue(numberOfCards) {
+//   const ceiledNum = Math.ceil(numberOfCards / 10);
+//   let val = 0;
+//   if (ceiledNum % 2 == 0) {
+//     val = ceiledNum * 10;
+//   } else {
+//     val = (ceiledNum + 1) * 10;
+//   }
+//   return val;
+// }
 
 /**
  * @param  {String} userId
@@ -758,11 +571,5 @@ async function generateJWTToken(userId, sessionId, isCreator = false) {
     userId: userId,
   };
   const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}`, additionalClaims);
-  // .then((customToken) => {
-  //   return {"Test": customToken};
-  // })
-  // .catch((error) => {
-  //   return {"Test": 404};
-  // });
   return customToken;
 }

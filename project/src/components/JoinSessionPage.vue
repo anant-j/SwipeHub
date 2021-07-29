@@ -108,10 +108,7 @@
 import store from "@/store/index.js";
 // import axios from "axios";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
-import { functions } from "@/firebase_config.js";
-import { httpsCallable } from "firebase/functions";
-
-const signIn = httpsCallable(functions, "signIn");
+import { JWTService } from "@/firebase_config.js";
 
 export default {
   name: "JoinSessionPage",
@@ -216,7 +213,11 @@ export default {
       const username = this.username;
       const sessionId = this.sessionId;
       this.$store.state.loader = true;
-      signIn({ username: username, sessionId: sessionId })
+      JWTService({
+        requestType: "join",
+        username: username,
+        sessionId: sessionId,
+      })
         .then((result) => {
           console.log(result);
           this.setSessionId(sessionId);

@@ -5,6 +5,7 @@ import { getAuth, useAuthEmulator } from "firebase/auth";
 import { getFunctions, useFunctionsEmulator } from "firebase/functions";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { httpsCallable } from "firebase/functions";
 let localMode = false;
 
 const firebaseApp = initializeApp({
@@ -22,6 +23,9 @@ export const movieDb = getFirestore(firebaseApp);
 export const sessionDb = getDatabase(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const functions = getFunctions(firebaseApp);
+export const JWTService = httpsCallable(functions, "registerTenant");
+export const swipe = httpsCallable(functions, "swipeHandler");
+
 let analytics;
 
 if (location.hostname === "localhost") {

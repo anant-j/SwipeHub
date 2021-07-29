@@ -1,7 +1,7 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
-    <br />
-    <h4>{{ tempInfo }}</h4>
+    <!-- <br />
+    <h4>{{ tempInfo }}</h4> -->
     <Tinder
       ref="tinder"
       key-name="id"
@@ -139,7 +139,13 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import { sessionDb, movieDb, auth, eventLogger } from "../firebase_config";
+import {
+  sessionDb,
+  movieDb,
+  auth,
+  eventLogger,
+  swipe,
+} from "../firebase_config";
 import { doc, getDoc } from "firebase/firestore";
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
@@ -215,7 +221,7 @@ export default {
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
-      const movieDescription = this.$store.state.movieData[movieId].description;
+      const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
     getFontSize() {
@@ -414,7 +420,11 @@ export default {
         );
       }
       if (choice.type === "like" || choice.type === "super") {
+        swipe({ requestType: "like", id: id });
         this.$store.state.likedSet.add(id);
+      }
+      if (choice.type === "nope") {
+        swipe({ requestType: "dislike", id: id });
       }
       this.$store.state.swipeHistory.push(choice.item);
     },
