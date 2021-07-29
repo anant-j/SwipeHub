@@ -281,9 +281,31 @@ export default {
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         console.log(data);
-        const mySwipes = data.users[this.getUserId()].swipes;
-        this.$store.state.totalSwipes = mySwipes;
-        this.tempInfo = JSON.stringify(data);
+        const userData = data.users;
+        const mySwipes = userData[this.getUserId()].swipes;
+        if (userData) {
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (iterator !== this.getUserId()) {
+              userDataArray.push({
+                userId: iterator,
+                value: userData[iterator].swipes,
+              });
+            } else {
+              this.$store.state.totalSwipes = mySwipes;
+            }
+          }
+          this.$store.state.usersData = userDataArray;
+        }
+        const matches = data.matches;
+        if (matches) {
+          const numMatch = matches.length;
+          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
+            this.$store.state.totalMatches = numMatch;
+            this.showAlert(`temp`, "s", 4800, "matchesAlert");
+          }
+          this.$store.state.totalMatches = numMatch;
+        }
         const allMovies = data.mediaOrder;
         if (allMovies) {
           const movieOrder = allMovies.slice(mySwipes, allMovies.length);
@@ -409,7 +431,7 @@ export default {
       this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
-      // this.$store.state.totalSwipes += 1;
+      this.$store.state.totalSwipes += 1;
       const id = this.getId(choice.item.id);
       if (id == "-1") {
         if (choice.type === "nope") {
