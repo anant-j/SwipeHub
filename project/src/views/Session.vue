@@ -158,6 +158,7 @@ export default {
     showInfo: false,
     rewindAllow: false,
     queue: [],
+    shown: new Set(),
     lastInteraction: 0,
     sessionPausedNotifications: true,
     activeDescriptionModal: false,
@@ -279,18 +280,25 @@ export default {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
+        const mySwipes = data.users[this.getUserId()].swipes;
+        this.$store.state.totalSwipes = mySwipes;
         this.tempInfo = JSON.stringify(data);
-        for (const id of data.mediaOrder) {
-          if (
-            !Object.prototype.hasOwnProperty.call(
-              this.$store.state.movieData,
-              id
-            )
-          ) {
-            this.getMovieData(id).then((movieData) => {
-              this.$store.state.movieData[id] = movieData;
+        const allMovies = data.mediaOrder;
+        if (allMovies) {
+          const movieOrder = allMovies.slice(mySwipes, allMovies.length);
+          for (const id of movieOrder) {
+            if (!this.$store.state.movieData[id]) {
+              this.getMovieData(id).then((movieData) => {
+                this.$store.state.movieData[id] = movieData;
+                this.addCard(id);
+              });
+            } else {
               this.addCard(id);
-            });
+            }
+          }
+          // console.log(allMovies.length);
+          if (allMovies.length === mySwipes) {
+            this.addLastCard();
           }
         }
       });
@@ -299,8 +307,7 @@ export default {
       const list = [];
       const posterLink = this.noCardUrl;
       this.$store.state.movieData[-1] = {
-        adult: false,
-        description:
+        overview:
           "We've run out of cards to show you!<br><br><h3 style='color: red;'>Swipe Left to Leave Session</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
         poster: posterLink,
         release_date: "N/A",
@@ -314,6 +321,9 @@ export default {
       return;
     },
     addCard(id) {
+      if (this.shown.has(id)) {
+        return;
+      }
       const cardData = this.$store.state.movieData[id];
       const list = [];
       let posterlink =
@@ -323,12 +333,11 @@ export default {
       }
       posterlink = posterlink.replace("http://", "https://");
       const finalPosterLink = posterlink + `?id=${id}`;
-      if (!this.queue.includes(finalPosterLink)) {
-        list.push({
-          id: finalPosterLink,
-        });
-      }
+      list.push({
+        id: finalPosterLink,
+      });
       this.queue = this.queue.concat(list);
+      this.shown.add(id);
     },
     getCards(url) {
       axios
@@ -399,7 +408,7 @@ export default {
       this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
-      this.$store.state.totalSwipes += 1;
+      // this.$store.state.totalSwipes += 1;
       const id = this.getId(choice.item.id);
       if (id == "-1") {
         if (choice.type === "nope") {
@@ -421,7 +430,7 @@ export default {
       }
       if (choice.type === "like" || choice.type === "super") {
         swipe({ requestType: "like", id: id });
-        this.$store.state.likedSet.add(id);
+        // this.$store.state.likedSet.add(id);
       }
       if (choice.type === "nope") {
         swipe({ requestType: "dislike", id: id });
