@@ -12,10 +12,11 @@ const sessionDb = admin.database();
 exports.registerTenant = functions.https.onCall(async (data, context) => {
   if (data.requestType === "join") {
     const token = await generateJWTToken(data.username, data.sessionId);
-    sessionDb.ref(data.sessionId).child("sessionActivity/users").update({
-      [data.username]: {
-        "swipes": 0,
-      },
+    sessionDb.ref(data.sessionId).child("users").child(data.username).update({
+      isActive: true,
+    });
+    sessionDb.ref(data.sessionId).child("sessionActivity").child("users").child(data.username).update({
+      joinedAt: new Date().getTime(),
     });
     return (token);
   } else if (data.requestType === "create") {
@@ -45,7 +46,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
       {
         [username]: {
           swipes: 0,
-          joinedAt: new Date(),
+          joinedAt: new Date().getTime(),
         },
       },
       },
@@ -67,12 +68,14 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
 exports.swipeHandler = functions.https.onCall(async (data, context) => {
   const sessionId = context.auth.token.sessionId;
   const userId = context.auth.token.userId;
-  const snap = await sessionDb.ref(sessionId).child("users").child(userId).get();
+  const snap = await sessionDb.ref(sessionId).child("users").get();
   let updateVariable = "";
   let likeLength = 0;
   let dislikeLength = 0;
   const movieId = data.id;
   if (snap.val()) {
+    const userData = snap.val()[userId];
+    // const numUsers = Object.keys(snap.val()).length;
     if (data.requestType === "like") {
       updateVariable = "likes";
     } else if ( data.requestType === "dislike") {
@@ -80,29 +83,63 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
     } else {
       return;
     }
-    if ((!snap.val().likes || !(snap.val().likes.includes(movieId))) && ( !snap.val().dislikes || !(snap.val().dislikes.includes(movieId)))) {
+    if ((!userData.likes || !(userData.likes.includes(movieId))) && ( !userData.dislikes || !(userData.dislikes.includes(movieId)))) {
       sessionDb.ref(sessionId).child("users").child(userId).update({
-        [updateVariable]: (snap.val()[updateVariable] || []).concat(movieId),
+        [updateVariable]: (userData[updateVariable] || []).concat(movieId),
       });
-      if (snap.val().likes) {
-        likeLength = parseInt(snap.val().likes.length);
+      if (userData.likes) {
+        likeLength = parseInt(userData.likes.length);
       }
-      if (snap.val().dislikes) {
-        dislikeLength = parseInt(snap.val().dislikes.length);
+      if (userData.dislikes) {
+        dislikeLength = parseInt(userData.dislikes.length);
       }
-      const matches=["123", "435"];
+      const matches = getMatches(snap.val(), userId, movieId, updateVariable);
+      sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).update({
+        swipes: likeLength + dislikeLength + 1,
+      });
       sessionDb.ref(sessionId).child("sessionActivity").update({
-        users: {
-          [userId]: {
-            swipes: likeLength + dislikeLength + 1,
-          },
-        },
         matches: matches,
       });
     }
     return;
   }
 });
+
+/**
+ * @param {any} data
+ * @param {any} userId
+ * @param {any} movieId
+ * @param {any} updateVariable
+ * @return {any}
+ */
+function getMatches(data, userId, movieId, updateVariable) {
+  const matches = [];
+  let allLikes = [];
+  const matchMap = {};
+  if (!data[userId][updateVariable]) {
+    data[userId][updateVariable]=[];
+  }
+  data[userId][updateVariable].push(movieId);
+
+  for (const eachUser of Object.keys(data)) {
+    const likes = data[eachUser]["likes"];
+    if (likes) {
+      allLikes = allLikes.concat(...likes);
+    }
+  }
+
+  for (const mediaId of allLikes) {
+    if (!matchMap[mediaId]) {
+      matchMap[mediaId] = 1;
+    } else {
+      matchMap[mediaId] += 1;
+    }
+    if (matchMap[mediaId] == Object.keys(data).length && Object.keys(data).length > 1) {
+      matches.push(mediaId);
+    }
+  }
+  return matches;
+}
 
 exports.generateInitialData = functions.database.ref("{sessionId}")
     .onCreate(async (snapshot, context) => {
