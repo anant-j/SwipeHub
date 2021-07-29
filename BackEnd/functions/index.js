@@ -112,10 +112,17 @@ exports.generateInitialData = functions.database.ref("{sessionId}")
       const languages = sessionInfo.languages;
       const platform = sessionInfo.platform;
       const region = sessionInfo.region;
-      const sortby = sessionInfo.order;
+      let sortby = sessionInfo.order;
       let dataSet = [];
       const movie = sessionInfo.isMovie;
       if (movie === true) {
+        if (sortby == "Popularity") {
+          sortby = "popularity.desc";
+        } else if (sortby == "Release") {
+          sortby = "primary_release_date.desc";
+        } else if (sortby == "Revenue") {
+          sortby = "revenue.desc";
+        }
         dataSet = await generateMovieList(
             languages,
             categories,
@@ -125,6 +132,13 @@ exports.generateInitialData = functions.database.ref("{sessionId}")
             1,
         );
       } else {
+        if (sortby == "Popularity") {
+          sortby = "popularity.desc";
+        } else if (sortby == "Release") {
+          sortby = "first_air_date.desc";
+        } else if (sortby == "Revenue") {
+          sortby = "popularity.desc";
+        }
         dataSet = await generateTVList(
             languages,
             categories,
