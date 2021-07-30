@@ -35,10 +35,7 @@
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="this.sessionDataPresent()">
-              <router-link
-                class="nav-link"
-                to="/matches"
-                @click.native="checkPollPending()"
+              <router-link class="nav-link" to="/matches"
                 >Matches
                 <span v-if="this.$store.state.totalMatches > 0"
                   >({{ this.$store.state.totalMatches }})
@@ -162,11 +159,11 @@ export default {
         .getElementById("navbarSupportedContent")
         .classList.toggle("show");
     },
-    checkPollPending() {
-      if (this.$store.state.likedSet.size > 0) {
-        this.globalSessionPoll();
-      }
-    },
+    // checkPollPending() {
+    //   if (this.$store.state.likedSet.size > 0) {
+    //     this.globalSessionPoll();
+    //   }
+    // },
     toggleDevMode() {
       if (this.$store.state.devmode == 1) {
         this.$store.state.devmode = 2;
