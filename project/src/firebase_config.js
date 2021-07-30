@@ -1,13 +1,13 @@
+// self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 import { initializeApp } from "firebase/app";
 import { getFirestore, useFirestoreEmulator } from "firebase/firestore";
 import { getDatabase, useDatabaseEmulator } from "firebase/database";
 import { getAuth, useAuthEmulator } from "firebase/auth";
 import { getFunctions, useFunctionsEmulator } from "firebase/functions";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { httpsCallable } from "firebase/functions";
-let localMode = false;
 
+const localMode = location.hostname === "localhost";
 const firebaseApp = initializeApp({
   apiKey: process.env.VUE_APP_API_KEY,
   authDomain: process.env.VUE_APP_AUTH_DOMAIN,
@@ -26,22 +26,26 @@ export const functions = getFunctions(firebaseApp);
 export const JWTService = httpsCallable(functions, "registerTenant");
 export const swipe = httpsCallable(functions, "swipeHandler");
 export const leave = httpsCallable(functions, "leaveSession");
-
 let analytics;
 
-if (location.hostname === "localhost") {
+if (localMode) {
   useFirestoreEmulator(movieDb, "localhost", 8080);
   useDatabaseEmulator(sessionDb, "localhost", 9000);
   useAuthEmulator(auth, "http://localhost:9099");
   useFunctionsEmulator(functions, "localhost", 5001);
-  localMode = true;
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 } else {
-  const options = {};
-  options.isTokenAutoRefreshEnabled = true;
-  options.provider = new ReCaptchaV3Provider(process.env.VUE_APP_APP_CHECK_KEY);
-  initializeAppCheck(firebaseApp, options);
   analytics = getAnalytics(firebaseApp);
 }
+
+const {
+  initializeAppCheck,
+  ReCaptchaV3Provider,
+} = require("firebase/app-check");
+initializeAppCheck(firebaseApp, {
+  provider: new ReCaptchaV3Provider(process.env.VUE_APP_APP_CHECK_KEY),
+  isTokenAutoRefreshEnabled: true,
+});
 
 export function eventLogger(event) {
   if (!localMode) {
