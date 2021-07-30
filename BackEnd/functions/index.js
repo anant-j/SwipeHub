@@ -17,14 +17,14 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
     if (!snap.val()) {
       return ({status: "error", message: "SessionId is not valid!"});
     }
-    const token = await generateJWTToken(username, sessionId);
+    const isCreator = snap.val()["sessionInfo"]["creator"] == username;
+    const token = await generateJWTToken(username, sessionId, isCreator);
     sessionDb.ref(sessionId).child("users").child(username).update({
       isActive: true,
     });
     sessionDb.ref(sessionId).child("sessionActivity").child("users").child(username).update({
       joinedAt: new Date().getTime(),
     });
-    const isCreator = snap.val()["sessionInfo"]["creator"] == username;
     return ({status: "success", token: token, isCreator: isCreator});
   } else if (data.requestType === "create") {
     const sessionId = await generateSessionId();
