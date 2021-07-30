@@ -22,8 +22,10 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
     sessionDb.ref(sessionId).child("users").child(username).update({
       isActive: true,
     });
-    sessionDb.ref(sessionId).child("sessionActivity").child("users").child(username).update({
-      joinedAt: new Date().getTime(),
+    sessionDb.ref(sessionId).update({
+      [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
+      [`users/${username}/isActive`]: true,
+      "sessionActivity/matches": [],
     });
     return ({status: "success", token: token, isCreator: isCreator});
   } else if (data.requestType === "create") {
@@ -82,7 +84,7 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
   const movieId = data.id;
   if (snap.val()) {
     const userData = snap.val()[userId];
-    // const numUsers = Object.keys(snap.val()).length;
+    const oldData = snap.val();
     if (data.requestType === "like") {
       updateVariable = "likes";
     } else if ( data.requestType === "dislike") {
@@ -91,30 +93,24 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
       return;
     }
     if ((!userData.likes || !(userData.likes.includes(movieId))) && ( !userData.dislikes || !(userData.dislikes.includes(movieId)))) {
-      sessionDb.ref(sessionId).child("users").child(userId).update({
-        [updateVariable]: (userData[updateVariable] || []).concat(movieId),
-      });
+      if (!oldData[userId][updateVariable]) {
+        oldData[userId][updateVariable]=[];
+      }
+      oldData[userId][updateVariable].push(movieId);
+      const matches = getMatches(oldData);
       if (userData.likes) {
         likeLength = parseInt(userData.likes.length);
       }
       if (userData.dislikes) {
         dislikeLength = parseInt(userData.dislikes.length);
       }
-      const oldData = snap.val();
-      if (!oldData[userId][updateVariable]) {
-        oldData[userId][updateVariable]=[];
-      }
-      oldData[userId][updateVariable].push(movieId);
-
-      const matches = getMatches(oldData);
-      sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).update({
-        swipes: likeLength + dislikeLength + 1,
-      });
-      sessionDb.ref(sessionId).child("sessionActivity").update({
-        matches: matches,
+      sessionDb.ref(sessionId).update({
+        [`sessionActivity/users/${userId}/swipes`]: likeLength + dislikeLength + 1,
+        "sessionActivity/matches": matches,
+        [`users/${userId}/${updateVariable}`]: (userData[updateVariable] || []).concat(movieId),
       });
     }
-    return;
+    return {status: "success", updated: movieId};
   }
 });
 
