@@ -280,12 +280,19 @@ export default {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        console.log(data);
+        if (data.isValid != undefined && data.isValid != null) {
+          if (!data.isValid) {
+            this.leaveSession(true);
+          }
+        }
         const userData = data.users;
-        const mySwipes = userData[this.getUserId()].swipes;
+        const mySwipes = userData[this.getUserId()].swipes || 0;
         if (userData) {
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
+            if (!userData[iterator].swipes) {
+              userData[iterator]["swipes"] = 0;
+            }
             if (iterator !== this.getUserId()) {
               userDataArray.push({
                 userId: iterator,

@@ -11,14 +11,21 @@ const sessionDb = admin.database();
 
 exports.registerTenant = functions.https.onCall(async (data, context) => {
   if (data.requestType === "join") {
-    const token = await generateJWTToken(data.username, data.sessionId);
-    sessionDb.ref(data.sessionId).child("users").child(data.username).update({
+    const username = data.username;
+    const sessionId = data.sessionId;
+    const snap = await sessionDb.ref(sessionId).get();
+    if (!snap.val()) {
+      return ({status: "error", message: "SessionId is not valid!"});
+    }
+    const token = await generateJWTToken(username, sessionId);
+    sessionDb.ref(sessionId).child("users").child(username).update({
       isActive: true,
     });
-    sessionDb.ref(data.sessionId).child("sessionActivity").child("users").child(data.username).update({
+    sessionDb.ref(sessionId).child("sessionActivity").child("users").child(username).update({
       joinedAt: new Date().getTime(),
     });
-    return (token);
+    const isCreator = snap.val()["sessionInfo"]["creator"] == username;
+    return ({status: "success", token: token, isCreator: isCreator});
   } else if (data.requestType === "create") {
     const sessionId = await generateSessionId();
     const username=data.username;
@@ -93,7 +100,13 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
       if (userData.dislikes) {
         dislikeLength = parseInt(userData.dislikes.length);
       }
-      const matches = getMatches(snap.val(), userId, movieId, updateVariable);
+      const oldData = snap.val();
+      if (!oldData[userId][updateVariable]) {
+        oldData[userId][updateVariable]=[];
+      }
+      oldData[userId][updateVariable].push(movieId);
+
+      const matches = getMatches(oldData);
       sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).update({
         swipes: likeLength + dislikeLength + 1,
       });
@@ -112,22 +125,16 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
  * @param {any} updateVariable
  * @return {any}
  */
-function getMatches(data, userId, movieId, updateVariable) {
+function getMatches(data) {
   const matches = [];
   let allLikes = [];
   const matchMap = {};
-  if (!data[userId][updateVariable]) {
-    data[userId][updateVariable]=[];
-  }
-  data[userId][updateVariable].push(movieId);
-
   for (const eachUser of Object.keys(data)) {
     const likes = data[eachUser]["likes"];
     if (likes) {
       allLikes = allLikes.concat(...likes);
     }
   }
-
   for (const mediaId of allLikes) {
     if (!matchMap[mediaId]) {
       matchMap[mediaId] = 1;
@@ -190,7 +197,27 @@ exports.generateInitialData = functions.database.ref("{sessionId}")
       });
     });
 
-
+exports.leaveSession = functions.https.onCall(async (data, context) => {
+  const userId = context.auth.token.userId;
+  const sessionId = context.auth.token.sessionId;
+  const isCreator = context.auth.token.isCreator;
+  await admin.auth().deleteUser(`${sessionId}|${userId}`);
+  if (isCreator) {
+    sessionDb.ref(sessionId).child("sessionActivity").update({
+      isValid: false,
+    });
+  } else {
+    sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
+    });
+    sessionDb.ref(sessionId).child("users").child(userId).set({
+    });
+  }
+  const snap = await sessionDb.ref(sessionId).child("users").get();
+  const matches = getMatches(snap.val());
+  sessionDb.ref(sessionId).child("sessionActivity").update({
+    matches: matches,
+  });
+});
 // exports.leaveSession = functions.https.onRequest(async (req, res) => {
 //   try {
 //     res.set("Access-Control-Allow-Origin", "*");

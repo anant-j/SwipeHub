@@ -348,6 +348,7 @@ export default {
           this.setSessionId(result.data.sessionId);
           this.setUserId(result.data.userId);
           this.setJWT(result.data.token);
+          this.$store.state.isCreator = true;
           this.$router.push({ name: "Session" });
         })
         .catch((error) => {

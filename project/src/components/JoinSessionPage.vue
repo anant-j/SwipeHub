@@ -219,11 +219,15 @@ export default {
         sessionId: sessionId,
       })
         .then((result) => {
-          console.log(result);
-          this.setSessionId(sessionId);
-          this.setUserId(username);
-          this.setJWT(result.data);
-          this.$router.push({ name: "Session" });
+          if (result.data.status == "error") {
+            this.showAlert(result.data.message, "e", 5000, "JWTError");
+          } else {
+            this.setSessionId(sessionId);
+            this.setUserId(username);
+            this.setJWT(result.data.token);
+            this.$store.state.isCreator = result.data.isCreator;
+            this.$router.push({ name: "Session" });
+          }
         })
         .catch((error) => {
           console.log(error);

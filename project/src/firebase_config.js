@@ -25,6 +25,7 @@ export const auth = getAuth(firebaseApp);
 export const functions = getFunctions(firebaseApp);
 export const JWTService = httpsCallable(functions, "registerTenant");
 export const swipe = httpsCallable(functions, "swipeHandler");
+export const leave = httpsCallable(functions, "leaveSession");
 
 let analytics;
 

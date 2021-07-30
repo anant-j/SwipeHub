@@ -13,6 +13,7 @@ import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 import MatchNotification from "@/components/MatchNotification";
 import VueLazyload from "vue-lazyload";
+import { leave } from "@/firebase_config.js";
 
 let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -154,20 +155,19 @@ Vue.mixin({
         usersData: [],
       });
     },
-    leaveSession() {
-      const url = `${
-        this.backend
-      }/leaveSession?id=${this.getSessionId()}&user=${this.getUserId()}`;
-      this.$store.state.loader = true;
-      axios
-        .get(url, {
-          validateStatus: false,
-        })
-        .then(() => {
-          this.clearSession();
-          this.$router.push({ name: "Home" });
-          this.$store.state.loader = false;
-        });
+    leaveSession(kick = false) {
+      if (!kick) {
+        leave();
+      } else {
+        this.showAlert(
+          "This session has been ended by the creator. Please join or create a new session.",
+          "e",
+          5000,
+          "sessionEnded"
+        );
+      }
+      this.clearSession();
+      this.$router.push({ name: "Home" });
     },
     copyToClipboard(item) {
       let data = "";
