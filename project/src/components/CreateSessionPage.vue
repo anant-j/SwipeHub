@@ -349,6 +349,7 @@ export default {
           this.setUserId(result.data.userId);
           this.setJWT(result.data.token);
           this.$store.state.isCreator = true;
+          this.$store.state.activeShareModal = true;
           this.$router.push({ name: "Session" });
         })
         .catch((error) => {
