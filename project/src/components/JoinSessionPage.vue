@@ -221,6 +221,8 @@ export default {
         .then((result) => {
           if (result.data.status == "error") {
             this.showAlert(result.data.message, "e", 5000, "JWTError");
+            this.$store.state.loader = false;
+            this.$router.push({ name: "Home" });
           } else {
             this.setSessionId(sessionId);
             this.setUserId(username);
