@@ -33,7 +33,7 @@ if (localMode) {
   useDatabaseEmulator(sessionDb, "localhost", 9000);
   useAuthEmulator(auth, "http://localhost:9099");
   useFunctionsEmulator(functions, "localhost", 5001);
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.VUE_APP_APPCHECK_DEBUG;
 } else {
   analytics = getAnalytics(firebaseApp);
 }
