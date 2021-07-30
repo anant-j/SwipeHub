@@ -280,6 +280,9 @@ export default {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
+        if (!data) {
+          this.leaveSession(true);
+        }
         if (data.isValid != undefined && data.isValid != null) {
           if (!data.isValid) {
             this.leaveSession(true);
@@ -418,7 +421,7 @@ export default {
       if (this.pollAllowed()) {
         if (document.hasFocus()) {
           this.sessionPausedNotifications = false;
-          this.globalSessionPoll();
+          // this.globalSessionPoll();
         }
       } else {
         if (!this.sessionPausedNotifications) {
@@ -449,18 +452,17 @@ export default {
         }
         return;
       }
-      if (this.queue.length === 9 && this.subsequentPollAllowed) {
-        this.getCards(
-          `${
-            this.backend
-          }/subsequentCards?id=${this.getSessionId()}&userId=${this.getUserId()}&totalCards=${
-            this.$store.state.totalSwipes
-          }`
-        );
-      }
+      this.$store.state.pendingSwipeData[id] = choice.type;
       if (choice.type === "like" || choice.type === "super") {
-        swipe({ requestType: "like", id: id });
-        // this.$store.state.likedSet.add(id);
+        swipe({ requestType: "like", id: id })
+          .then((result) => {
+            if (result.data.status == "success" && result.data.updated == id) {
+              delete this.$store.state.pendingSwipeData[id];
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
       if (choice.type === "nope") {
         swipe({ requestType: "dislike", id: id });
