@@ -13,7 +13,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
   if (data.requestType === "join") {
     const username = data.username;
     const sessionId = data.sessionId;
-    const snap = await sessionDb.ref(sessionId).get();
+    const snap = await sessionDb.ref(sessionId).once("value");
     if (!snap.val()) {
       return ({status: "error", message: "SessionId is not valid!"});
     }
@@ -67,8 +67,8 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
         },
       },
     });
-    const token = await generateJWTToken(data.username, sessionId, true);
-    return ({token: token, sessionId: sessionId, userId: data.username});
+    const token = await generateJWTToken(username, sessionId, true);
+    return ({token: token, sessionId: sessionId, userId: username});
   } else {
     throw new functions.https.HttpsError("invalid-argument", "The function must be called with correct request type");
   }
@@ -77,7 +77,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
 exports.swipeHandler = functions.https.onCall(async (data, context) => {
   const sessionId = context.auth.token.sessionId;
   const userId = context.auth.token.userId;
-  const snap = await sessionDb.ref(sessionId).child("users").get();
+  const snap = await sessionDb.ref(sessionId).child("users").once("value");
   let updateVariable = "";
   let likeLength = 0;
   let dislikeLength = 0;
@@ -208,44 +208,12 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
     sessionDb.ref(sessionId).child("users").child(userId).set({
     });
   }
-  const snap = await sessionDb.ref(sessionId).child("users").get();
+  const snap = await sessionDb.ref(sessionId).child("users").once("value");
   const matches = getMatches(snap.val());
   sessionDb.ref(sessionId).child("sessionActivity").update({
     matches: matches,
   });
 });
-// exports.leaveSession = functions.https.onRequest(async (req, res) => {
-//   try {
-//     res.set("Access-Control-Allow-Origin", "*");
-//     const id = req.query.id.toUpperCase();
-//     const userId = req.query.user;
-//     const sessionDb = admin.firestore().collection("sessions").doc(id);
-//     const doc = await sessionDb.get();
-//     if (!isValidSession(doc)) {
-//       res.status(404).send("Session doesn't exist");
-//       return;
-//     } else {
-//       const users = doc.data().participants;
-//       if (users[userId] != undefined) {
-//         if (userId == doc.data().creator) {
-//           await endSession(id);
-//         } else {
-//           await leaveSession(id, userId, doc.data());
-//         }
-//       } else {
-//         res.status(404).send("Session does not exist");
-//       }
-//       res.status(200).send({
-//         movies: doc.data().mediaInfo,
-//         isCreator: doc.data().creator == userId,
-//       });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     sendErrorNotification("leaveSession", error);
-//     res.status(500).send("error");
-//   }
-// });
 
 // exports.subsequentCards = functions.https.onRequest(async (req, res) => {
 //   try {
@@ -320,105 +288,6 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
 //   } catch (error) {
 //     console.error(error);
 //     sendErrorNotification("subsequentCards", error);
-//     res.status(500).send("error");
-//   }
-// });
-
-
-// exports.polling = functions.https.onRequest(async (req, res) => {
-//   try {
-//     res.set("Access-Control-Allow-Origin", "*");
-//     const username = req.body.userId;
-//     const sessionId = req.body.sessionId.toUpperCase();
-//     let totalSwipes = req.body.totalSwipes;
-//     let likedList = req.body.likedList;
-//     const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
-//     const doc = await sessionDb.get();
-//     if (!isValidSession(doc)) {
-//       res.status(404).send("Session doesn't exist");
-//       return;
-//     } else {
-//       const data = doc.data();
-//       const matches = new Set();
-//       const active = Object.keys(doc.data().participants).length;
-//       if (likedList != "") {
-//         likedList = likedList.split(",");
-//         likedList.forEach((element) => {
-//           element = element.toString();
-//           const newdata = toSet(data["likes"][element]);
-//           newdata.add(username);
-//           const sendBuffer = [];
-//           newdata.forEach((v) => sendBuffer.push(v));
-//           data["likes"][element] = sendBuffer;
-//         });
-//       }
-//       for (const [key, value] of Object.entries(data["likes"])) {
-//         if (value.length == active && active > 1) {
-//           matches.add(key);
-//         }
-//       }
-//       const results = [];
-//       matches.forEach((v) => results.push(v));
-//       data["matches"] = results;
-//       let currentSwipes = doc.data().participants[username]["totalSwipes"];
-//       if (totalSwipes != "") {
-//         totalSwipes = totalSwipes.split(",");
-//         currentSwipes = toSet(currentSwipes);
-//         totalSwipes.forEach((element) => {
-//           currentSwipes = currentSwipes.add(element);
-//         });
-//         currentSwipes = toArray(currentSwipes);
-//       }
-//       data["participants"][username]["totalSwipes"] = currentSwipes;
-//       const participantData = {};
-//       for (const [key, value] of Object.entries(data["participants"])) {
-//         participantData[key] = value["totalSwipes"].length;
-//       }
-//       await admin
-//           .firestore()
-//           .collection("sessions")
-//           .doc(sessionId)
-//           .set(data, {merge: true});
-//       res.status(200).send({match: results.length, userData: participantData});
-//       return;
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     sendErrorNotification("polling", error);
-//     res.status(500).send("error");
-//   }
-// });
-
-// exports.matchPolling = functions.https.onRequest(async (req, res) => {
-//   try {
-//     res.set("Access-Control-Allow-Origin", "*");
-//     const username = req.body.userId;
-//     const sessionId = req.body.sessionId.toUpperCase();
-//     const sessionDb = admin.firestore().collection("sessions").doc(sessionId);
-//     const doc = await sessionDb.get();
-//     if (!isValidSession(doc)) {
-//       res.status(404).send("Session doesn't exist");
-//       return;
-//     } else {
-//       const data = doc.data();
-//       const matches = data.matches;
-//       const movieData = {};
-//       for (let index = 0; index < matches.length; index++) {
-//         const element = matches[index];
-//         movieData[element] = data.mediaInfo[element];
-//       }
-//       const participantData = {};
-//       for (const [key, value] of Object.entries(data["participants"])) {
-//         participantData[key] = value["totalSwipes"].length;
-//       }
-//       res
-//           .status(200)
-//           .send({movies: movieData, isCreator: doc.data().creator == username, userData: participantData} );
-//     }
-//     return;
-//   } catch (error) {
-//     console.error(error);
-//     sendErrorNotification("matchPolling", error);
 //     res.status(500).send("error");
 //   }
 // });
@@ -545,7 +414,7 @@ async function generateSessionId() {
   let id = randomSessionCode();
   const validId = true;
   while (validId) {
-    const snap = await sessionDb.ref(id).get();
+    const snap = await sessionDb.ref(id).once("value");
     if (!snap.val()) {
       return id;
     } else {
