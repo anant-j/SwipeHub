@@ -13,7 +13,8 @@ import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 import MatchNotification from "@/components/MatchNotification";
 import VueLazyload from "vue-lazyload";
-import { leave } from "@/firebase_config.js";
+import { leave, movieDb } from "@/firebase_config.js";
+import { doc, getDoc } from "firebase/firestore";
 
 let productionMode = true;
 let backendUrl = "http://localhost:5001/theswipehub/us-central1";
@@ -222,6 +223,15 @@ Vue.mixin({
     getId(inputUrl) {
       const movieId = inputUrl.split("?id=")[1];
       return movieId;
+    },
+    async getMovieData(id) {
+      const docRef = doc(movieDb, "media", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        return null;
+      }
     },
     updateUsersJoinLeaveNotification(newData) {
       const NotificationStore = {
