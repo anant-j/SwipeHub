@@ -139,14 +139,8 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import {
-  sessionDb,
-  movieDb,
-  auth,
-  eventLogger,
-  swipe,
-} from "../firebase_config";
-import { doc, getDoc } from "firebase/firestore";
+import { sessionDb, auth, eventLogger, swipe } from "@/firebase_config.js";
+
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 
@@ -170,7 +164,6 @@ export default {
   }),
   mounted() {
     if (!this.sessionDataPresent()) {
-      console.log("Session Data Not Present");
       this.showAlert(
         "Please join or create a session",
         "w",
@@ -253,10 +246,7 @@ export default {
           this.getSessionData();
           this.$store.state.loader = false;
         })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorCode, errorMessage);
+        .catch(() => {
           this.$store.state.loader = false;
           this.showAlert(
             "Please join a session first",
@@ -266,15 +256,6 @@ export default {
           );
           this.$router.push({ name: "Home" });
         });
-    },
-    async getMovieData(id) {
-      const docRef = doc(movieDb, "media", id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        return docSnap.data();
-      } else {
-        return null;
-      }
     },
     async getSessionData() {
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
@@ -452,17 +433,17 @@ export default {
         }
         return;
       }
-      this.$store.state.pendingSwipeData[id] = choice.type;
+      // this.$store.state.pendingSwipeData[id] = choice.type;
       if (choice.type === "like" || choice.type === "super") {
-        swipe({ requestType: "like", id: id })
-          .then((result) => {
-            if (result.data.status == "success" && result.data.updated == id) {
-              delete this.$store.state.pendingSwipeData[id];
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        swipe({ requestType: "like", id: id });
+        // .then((result) => {
+        //   if (result.data.status == "success" && result.data.updated == id) {
+        //     delete this.$store.state.pendingSwipeData[id];
+        //   }
+        // })
+        // .catch((err) => {
+        //   console.log(err);
+        // });
       }
       if (choice.type === "nope") {
         swipe({ requestType: "dislike", id: id });

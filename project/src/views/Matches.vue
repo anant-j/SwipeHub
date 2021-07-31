@@ -74,6 +74,9 @@
 <script>
 import store from "@/store/index.js";
 import axios from "axios";
+import { sessionDb, auth } from "@/firebase_config.js";
+import { ref, onValue } from "firebase/database";
+import { signInWithCustomToken } from "firebase/auth";
 
 export default {
   name: "Matches",
@@ -98,7 +101,8 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
-    this.matchPoll();
+    // this.matchPoll();
+    this.signIn();
   },
   destroyed() {
     window.removeEventListener("scroll", this.pageActivity);
@@ -126,6 +130,79 @@ export default {
     },
   },
   methods: {
+    signIn() {
+      signInWithCustomToken(auth, this.getJWT())
+        .then(() => {
+          this.getMatchData();
+          this.$store.state.loader = false;
+        })
+        .catch(() => {
+          this.$store.state.loader = false;
+          this.showAlert(
+            "Please join a session first",
+            "e",
+            5000,
+            "loginFailed"
+          );
+          this.$router.push({ name: "Home" });
+        });
+    },
+    async getMatchData() {
+      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log(data);
+        const matchData = data.matches;
+        if (!data) {
+          this.leaveSession(true);
+        }
+        if (data.isValid != undefined && data.isValid != null) {
+          if (!data.isValid) {
+            this.leaveSession(true);
+          }
+        }
+        if (matchData) {
+          const numMatch = matchData.length;
+          this.$store.state.totalMatches = numMatch;
+          this.$store.state.matchData = [];
+          // const movieList = [];
+          for (const movieId of matchData) {
+            if (this.$store.state.movieData[movieId]) {
+              const tempMovieData = {
+                movieId: movieId,
+                title: this.$store.state.movieData[movieId].title,
+                posterURL:
+                  "https://image.tmdb.org/t/p/original/" +
+                  this.$store.state.movieData[movieId].poster_path,
+                description: this.$store.state.movieData[movieId].overview,
+                release: this.$store.state.movieData[movieId].release_date,
+              };
+              // movieList.push(tempMovieData);
+              this.$store.state.matchData.push(tempMovieData);
+            } else {
+              this.getMovieData(movieId).then((movieData) => {
+                this.$store.state.movieData[movieId] = movieData;
+                const tempMovieData = {
+                  movieId: movieId,
+                  title: movieData.title,
+                  posterURL:
+                    "https://image.tmdb.org/t/p/original/" +
+                    movieData.poster_path,
+                  description: movieData.overview,
+                  release: movieData.release_date,
+                };
+                // movieList.push(tempMovieData);
+                this.$store.state.matchData.push(tempMovieData);
+              });
+            }
+            // this.$store.state.matchData = movieList;
+            if (this.searchField == "") {
+              this.localMatchStore = this.$store.state.matchData;
+            }
+          }
+        }
+      });
+    },
     pageActivity() {
       this.lastInteraction = new Date();
     },
