@@ -1,7 +1,5 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
-    <!-- <br />
-    <h4>{{ tempInfo }}</h4> -->
     <Tinder
       ref="tinder"
       key-name="id"
@@ -140,15 +138,13 @@
 import Tinder from "vue-tinder";
 import axios from "axios";
 import { sessionDb, auth, eventLogger, swipe } from "@/firebase_config.js";
-
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, off } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 
 export default {
   name: "Session",
   components: { Tinder },
   data: () => ({
-    tempInfo: "",
     showInfo: false,
     rewindAllow: false,
     queue: [],
@@ -156,8 +152,7 @@ export default {
     lastInteraction: 0,
     sessionPausedNotifications: true,
     activeDescriptionModal: false,
-    timer: null,
-    subsequentPollAllowed: true,
+    signedIn: false,
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
     noImageUrl: "https://i.imgur.com/Sql8s2M.png",
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
@@ -177,16 +172,15 @@ export default {
     this.$store.state.activePage = 1;
     this.lastInteraction = 0;
     this.signIn();
-    // this.getCards(
-    //   `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
-    // );
-    // this.poll();
-    // document.addEventListener("keyup", this.keyListener);
+    document.addEventListener("keyup", this.keyListener);
     eventLogger("Session Page Loaded");
   },
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
-    clearTimeout(this.timer);
+    if (this.signedIn) {
+      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      off(dbRef);
+    }
   },
   computed: {
     photoAvailable() {
@@ -244,6 +238,7 @@ export default {
       signInWithCustomToken(auth, this.getJWT())
         .then(() => {
           this.getSessionData();
+          this.signedIn = true;
           this.$store.state.loader = false;
         })
         .catch(() => {
@@ -283,11 +278,24 @@ export default {
                 value: userData[iterator].swipes,
               });
             } else {
-              this.$store.state.totalSwipes = mySwipes;
+              let currentSwipes = this.$store.state.totalSwipes;
+              if (currentSwipes != 0) {
+                while (mySwipes > currentSwipes) {
+                  try {
+                    this.decide("super");
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  currentSwipes += 1;
+                }
+              } else {
+                this.$store.state.totalSwipes = mySwipes;
+              }
             }
           }
           this.$store.state.usersData = userDataArray;
         }
+
         const matches = data.matches;
         if (matches) {
           const numMatch = matches.length;
@@ -331,7 +339,6 @@ export default {
         id: posterLink + `?id=-1`,
       });
       this.queue = this.queue.concat(list);
-      this.subsequentPollAllowed = false;
       return;
     },
     addCard(id) {
@@ -398,25 +405,6 @@ export default {
           this.addLastCard();
         });
     },
-    poll() {
-      if (this.pollAllowed()) {
-        if (document.hasFocus()) {
-          this.sessionPausedNotifications = false;
-          // this.globalSessionPoll();
-        }
-      } else {
-        if (!this.sessionPausedNotifications) {
-          this.showAlert(
-            "Session is paused. Swipe again to receive session updates",
-            "w",
-            4900,
-            "sessionPausedAlert"
-          );
-          this.sessionPausedNotifications = true;
-        }
-      }
-      this.timer = setTimeout(() => this.poll(), 5000);
-    },
     onSubmit(choice) {
       this.lastInteraction = new Date();
       this.rewindAllow = true;
@@ -428,13 +416,13 @@ export default {
         if (choice.type === "nope") {
           this.leaveSession();
         }
-        if (choice.type === "like" || choice.type === "super") {
+        if (choice.type === "like") {
           this.$router.push({ name: "Matches" });
         }
         return;
       }
       // this.$store.state.pendingSwipeData[id] = choice.type;
-      if (choice.type === "like" || choice.type === "super") {
+      if (choice.type === "like") {
         swipe({ requestType: "like", id: id });
         // .then((result) => {
         //   if (result.data.status == "success" && result.data.updated == id) {
@@ -459,6 +447,7 @@ export default {
       } else {
         this.$refs.tinder.decide(choice);
       }
+      return;
     },
     cardClicked() {
       this.lastInteraction = new Date();
