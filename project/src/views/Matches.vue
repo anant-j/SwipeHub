@@ -160,10 +160,12 @@ export default {
         const matchData = data.matches;
         if (!data) {
           this.leaveSession(true);
+          return;
         }
         if (data.isValid != undefined && data.isValid != null) {
           if (!data.isValid) {
             this.leaveSession(true);
+            return;
           }
         }
         if (matchData) {

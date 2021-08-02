@@ -141,12 +141,12 @@ import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
-import { cleanup } from "@/mixins/utilities.js";
+import { cleanup, mediaTools } from "@/mixins/utilities.js";
 
 export default {
   name: "Session",
   components: { Tinder },
-  mixins: [notification, cleanup],
+  mixins: [notification, cleanup, mediaTools],
   data: () => ({
     showInfo: false,
     rewindAllow: false,
@@ -261,10 +261,14 @@ export default {
         const data = snapshot.val();
         if (!data) {
           this.leaveSession(true);
+          off(dbRef);
+          return;
         }
         if (data.isValid != undefined && data.isValid != null) {
           if (!data.isValid) {
             this.leaveSession(true);
+            off(dbRef);
+            return;
           }
         }
         const userData = data.users;
@@ -366,7 +370,7 @@ export default {
       this.showInfo = false;
       this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
-      const id = this.getId(choice.item.id);
+      const id = this.getIdfromURL(choice.item.id);
       if (id == "-1") {
         if (choice.type === "nope") {
           this.leaveSession();

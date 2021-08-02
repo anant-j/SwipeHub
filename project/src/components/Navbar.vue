@@ -145,11 +145,12 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import store from "@/plugins/store/index.js";
 import { cleanup } from "@/mixins/utilities.js";
 import { navigation } from "@/mixins/navigation.js";
+import { clipboard, share } from "@/mixins/share.js";
 
 export default {
   name: "Navbar",
   store,
-  mixins: [cleanup, navigation],
+  mixins: [cleanup, navigation, clipboard, share],
   watch: {
     $route() {
       document

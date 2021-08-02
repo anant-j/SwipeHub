@@ -28,8 +28,10 @@
 </template>
 
 <script>
+import { share } from "@/mixins/share.js";
 export default {
   name: "ShareScreen",
+  mixins: [share],
   computed: {
     shareModalVisible() {
       return this.$store.state.activeShareModal;

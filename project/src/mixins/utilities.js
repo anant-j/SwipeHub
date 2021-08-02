@@ -16,6 +16,7 @@ export const defaultStore = {
   matchData: [],
   totalMatches: 0,
   usersData: [],
+  hostURL: "https://www.theswipehub.com",
 };
 
 export const cleanup = {
@@ -52,6 +53,15 @@ export const cleanup = {
       }
       this.clearSessionHard();
       this.$router.push({ name: "Home" });
+    },
+  },
+};
+
+export const mediaTools = {
+  methods: {
+    getIdfromURL(inputUrl) {
+      const movieId = inputUrl.split("?id=")[1];
+      return movieId;
     },
   },
 };

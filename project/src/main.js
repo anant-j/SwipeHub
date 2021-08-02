@@ -14,18 +14,16 @@ import VueLazyload from "vue-lazyload";
 import { movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
 
-let productionMode = true;
-let hostURL = "http://localhost:" + window.location.port;
-document.title = "SwipeHub Dev Mode";
 if (window.location.hostname === "localhost") {
-  productionMode = false;
+  store.state.hostURL = "http://localhost:" + window.location.port;
+  document.title = "SwipeHub Dev Mode";
   store.state.devmode = 1;
-}
-
-Vue.config.productionTip = !productionMode;
-if (productionMode) {
+  Vue.config.productionTip = true;
+} else {
   document.title = "SwipeHub";
-  hostURL = "https://" + window.location.hostname;
+  store.state.hostURL = "https://" + window.location.hostname;
+  store.state.devmode = 0;
+  Vue.config.productionTip = false;
 }
 Vue.mixin({
   methods: {
@@ -89,54 +87,6 @@ Vue.mixin({
     setUserId(userId) {
       this.$store.state.userId = userId;
       storage.setItem("userId", userId);
-    },
-    copyToClipboard(item) {
-      let data = "";
-      // let text = "";
-      switch (item) {
-        case "userId":
-          data = this.getUserId();
-          // text = "User Id";
-          break;
-        case "sessionId":
-          data = this.getSessionId();
-          // text = "Session Id";
-          break;
-        default:
-          console.log("error while copying to clipboard");
-      }
-      navigator.clipboard.writeText(data);
-      // this.showAlert(
-      //   `${text} copied to clipboard`,
-      //   "s",
-      //   5000,
-      //   "sessionIdCopidToClipboard"
-      // );
-    },
-    createShareLink() {
-      const joinLink = this.getShareLink();
-      navigator.clipboard.writeText(joinLink);
-      this.$store.state.activeShareModal = true;
-      this.showAlert(
-        "Shareable link copied to clipboard.",
-        "s",
-        5000,
-        "shareableLinkCopidToClipboard"
-      );
-    },
-    getShareLink() {
-      return `${hostURL}/?join=${this.getSessionId()}`;
-    },
-    shareLinkNatively() {
-      const joinLink = this.getShareLink();
-      navigator
-        .share({
-          title: "SwipeHub Session Share",
-          text: `Come join my Swipehub session with Session Id: ${this.getSessionId()}.`,
-          url: joinLink,
-        })
-        .then(() => console.log("Successful share! 🎉"))
-        .catch((err) => console.error(err));
     },
     getId(inputUrl) {
       const movieId = inputUrl.split("?id=")[1];
