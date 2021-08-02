@@ -26,55 +26,48 @@ if (window.location.hostname === "localhost") {
   Vue.config.productionTip = false;
 }
 Vue.mixin({
-  methods: {
+  computed: {
     getSessionId() {
-      if (this.$store.state.sessionId === null) {
-        if (
-          storage.getItem("sessionId") === undefined ||
-          storage.getItem("sessionId") === null
-        ) {
-          return null;
-        } else {
-          return storage.getItem("sessionId");
-        }
-      } else {
-        return this.$store.state.sessionId;
+      const vuex = this.$store.state.sessionId;
+      const local = storage.getItem("sessionId");
+      if (vuex) {
+        return vuex;
       }
+      if (local) {
+        return local;
+      }
+      return null;
     },
     getUserId() {
-      if (this.$store.state.userId === null) {
-        if (
-          storage.getItem("userId") === undefined ||
-          storage.getItem("userId") === null
-        ) {
-          return null;
-        } else {
-          return storage.getItem("userId");
-        }
-      } else {
-        return this.$store.state.userId;
+      const vuex = this.$store.state.userId;
+      const local = storage.getItem("userId");
+      if (vuex) {
+        return vuex;
       }
+      if (local) {
+        return local;
+      }
+      return null;
     },
     getJWT() {
-      if (this.$store.state.JWT === null) {
-        if (
-          storage.getItem("SwipeHub_JWT") === undefined ||
-          storage.getItem("SwipeHub_JWT") === null
-        ) {
-          return null;
-        } else {
-          return storage.getItem("SwipeHub_JWT");
-        }
-      } else {
-        return this.$store.state.JWT;
+      const vuex = this.$store.state.JWT;
+      const local = storage.getItem("SwipeHub_JWT");
+      if (vuex) {
+        return vuex;
       }
+      if (local) {
+        return local;
+      }
+      return null;
     },
     sessionDataPresent() {
-      if (this.getSessionId() && this.getUserId() && this.getJWT()) {
+      if (this.getSessionId && this.getUserId && this.getJWT) {
         return true;
       }
       return false;
     },
+  },
+  methods: {
     setSessionId(sessionId) {
       const validatedSessionId = sessionId.toString().toUpperCase();
       this.$store.state.sessionId = validatedSessionId;
@@ -108,12 +101,12 @@ Vue.mixin({
         oldData.push(userData["userId"]);
       }
       for (const user of oldData) {
-        if (!newData.includes(user) && user != this.getUserId()) {
+        if (!newData.includes(user) && user != this.getUserId) {
           NotificationStore["left"].push(user);
         }
       }
       for (const user of newData) {
-        if (!oldData.includes(user) && user != this.getUserId()) {
+        if (!oldData.includes(user) && user != this.getUserId) {
           NotificationStore["joined"].push(user);
         }
       }

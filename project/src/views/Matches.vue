@@ -91,7 +91,7 @@ export default {
   }),
   created() {
     window.addEventListener("scroll", this.pageActivity);
-    if (!this.sessionDataPresent()) {
+    if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
         "w",
@@ -109,7 +109,7 @@ export default {
     window.removeEventListener("scroll", this.pageActivity);
     if (this.signedIn) {
       signOut(auth);
-      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       off(dbRef);
     }
   },
@@ -135,7 +135,7 @@ export default {
   },
   methods: {
     signIn() {
-      signInWithCustomToken(auth, this.getJWT())
+      signInWithCustomToken(auth, this.getJWT)
         .then(() => {
           this.signedIn = true;
           this.getMatchData();
@@ -153,7 +153,7 @@ export default {
         });
     },
     async getMatchData() {
-      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         console.log(data);

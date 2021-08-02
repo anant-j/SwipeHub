@@ -31,10 +31,10 @@
                 >Home</router-link
               >
             </li>
-            <li class="nav-item" v-if="this.sessionDataPresent()">
+            <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
-            <li class="nav-item" v-if="this.sessionDataPresent()">
+            <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/matches"
                 >Matches
                 <span v-if="this.$store.state.totalMatches > 0"
@@ -76,7 +76,7 @@
               >
                 <li>
                   <a class="dropdown-item" id="userIdPlaceholder"
-                    >User Id: {{ getUserId() }}</a
+                    >User Id: {{ getUserId }}</a
                   >
                 </li>
                 <li>
@@ -87,7 +87,7 @@
                     class="dropdown-item"
                     id="sessionIdPlaceholder"
                     @click="copyToClipboard('sessionId')"
-                    >Session Id: {{ getSessionId() }}</a
+                    >Session Id: {{ getSessionId }}</a
                   >
                 </li>
                 <li>

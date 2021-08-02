@@ -129,7 +129,7 @@ export default {
     };
   },
   mounted() {
-    if (this.getSessionId()) {
+    if (this.getSessionId) {
       this.sessionId = this.getSessionId();
     }
   },

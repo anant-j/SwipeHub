@@ -161,7 +161,7 @@ export default {
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
-    if (!this.sessionDataPresent()) {
+    if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
         "w",
@@ -181,7 +181,7 @@ export default {
     document.removeEventListener("keyup", this.keyListener);
     if (this.signedIn) {
       signOut(auth);
-      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       off(dbRef);
     }
   },
@@ -238,7 +238,7 @@ export default {
   },
   methods: {
     signIn() {
-      signInWithCustomToken(auth, this.getJWT())
+      signInWithCustomToken(auth, this.getJWT)
         .then(() => {
           this.getSessionData();
           this.signedIn = true;
@@ -256,7 +256,7 @@ export default {
         });
     },
     async getSessionData() {
-      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
         if (!data) {
@@ -272,14 +272,14 @@ export default {
           }
         }
         const userData = data.users;
-        const mySwipes = userData[this.getUserId()].swipes || 0;
+        const mySwipes = userData[this.getUserId].swipes || 0;
         if (userData) {
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
             if (!userData[iterator].swipes) {
               userData[iterator]["swipes"] = 0;
             }
-            if (iterator !== this.getUserId()) {
+            if (iterator !== this.getUserId) {
               userDataArray.push({
                 userId: iterator,
                 value: userData[iterator].swipes,
@@ -385,7 +385,7 @@ export default {
     swipe(id, type) {
       const dbRef = ref(
         sessionDb,
-        `${this.getSessionId()}/users/${this.getUserId()}/swipes/${id}`
+        `${this.getSessionId}/users/${this.getUserId}/swipes/${id}`
       );
       if (type === "like") {
         set(dbRef, true);

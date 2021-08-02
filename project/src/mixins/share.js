@@ -8,11 +8,11 @@ export const clipboard = {
       let text = "";
       switch (item) {
         case "userId":
-          data = this.getUserId();
+          data = this.getUserId;
           text = "User Id";
           break;
         case "sessionId":
-          data = this.getSessionId();
+          data = this.getSessionId;
           text = "Session Id";
           break;
         default:
@@ -43,14 +43,14 @@ export const share = {
       );
     },
     getShareLink() {
-      return `${this.$store.state.hostURL}/?join=${this.getSessionId()}`;
+      return `${this.$store.state.hostURL}/?join=${this.getSessionId}`;
     },
     shareLinkNatively() {
       const joinLink = this.getShareLink();
       navigator
         .share({
           title: "SwipeHub Session Share",
-          text: `Come join my Swipehub session with Session Id: ${this.getSessionId()}.`,
+          text: `Come join my Swipehub session with Session Id: ${this.getSessionId}.`,
           url: joinLink,
         })
         .then(() => console.log("Successful share! 🎉"))
