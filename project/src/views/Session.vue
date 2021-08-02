@@ -285,15 +285,11 @@ export default {
                 value: userData[iterator].swipes,
               });
             } else {
-              let currentSwipes = this.$store.state.totalSwipes;
-              if (currentSwipes != 0) {
-                while (mySwipes > currentSwipes) {
-                  try {
-                    this.decide("super");
-                  } catch (e) {
-                    console.log(e);
-                  }
-                  currentSwipes += 1;
+              let current = this.$store.state.totalSwipes;
+              if (current != 0) {
+                while (mySwipes > current) {
+                  this.decide("super");
+                  current += 1;
                 }
               }
               this.$store.state.totalSwipes = mySwipes;
@@ -315,6 +311,7 @@ export default {
         } else {
           this.$store.state.totalMatches = 0;
         }
+
         const allMovies = data.mediaOrder;
         if (allMovies) {
           const movieOrder = allMovies.slice(mySwipes, allMovies.length);
@@ -393,9 +390,10 @@ export default {
       );
       if (type === "like") {
         set(dbRef, true);
-      } else {
+      } else if (type === "nope") {
         set(dbRef, false);
       }
+      return;
     },
     async decide(choice) {
       // if (choice === "rewind") {
