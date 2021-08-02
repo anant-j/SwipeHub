@@ -5,6 +5,7 @@
       key-name="id"
       :queue.sync="queue"
       :offset-y="-15"
+      :allowSuper="superAllowed"
       @submit="onSubmit"
     >
       <template slot-scope="scope">
@@ -110,11 +111,11 @@
         slot="nope"
         src="../assets/nope.png"
       />
-      <img
+      <!-- <img
         class="card-overlay super-pointer"
         slot="super"
         src="../assets/like.png"
-      />
+      /> -->
       <img
         class="card-overlay rewind-pointer"
         slot="rewind"
@@ -136,7 +137,6 @@
 
 <script>
 import Tinder from "vue-tinder";
-import axios from "axios";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
@@ -147,10 +147,10 @@ export default {
   data: () => ({
     showInfo: false,
     rewindAllow: false,
+    superAllowed: false,
+    superThreshold: 5,
     queue: [],
     shown: new Set(),
-    lastInteraction: 0,
-    sessionPausedNotifications: true,
     activeDescriptionModal: false,
     signedIn: false,
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
@@ -170,7 +170,6 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
-    this.lastInteraction = 0;
     this.signIn();
     document.addEventListener("keyup", this.keyListener);
     eventLogger("Session Page Loaded");
@@ -360,53 +359,7 @@ export default {
       this.queue = this.queue.concat(list);
       this.shown.add(id);
     },
-    getCards(url) {
-      axios
-        .get(url, {
-          validateStatus: false,
-        })
-        .then((result) => {
-          this.$store.state.loader = false;
-          if (result.data.totalSwipes !== undefined) {
-            this.$store.state.totalSwipes = result.data.totalSwipes;
-          }
-          if (result.data.isCreator !== undefined) {
-            this.$store.state.isCreator = result.data.isCreator;
-          }
-          const order = result.data.movies.order;
-          if (order.length == 0) {
-            this.addLastCard();
-            return;
-          }
-          const list = [];
-          for (let i = 0; i < order.length; i++) {
-            if (order[i] == null) {
-              this.addLastCard();
-              return;
-            }
-            // if (!(order[i] in this.$store.state.movieData)) {
-            this.$store.state.movieData[order[i]] =
-              result.data.movies[order[i]];
-            let posterlink = result.data.movies[order[i]].poster;
-            if (posterlink === this.TMDBNull) {
-              posterlink = this.noImageUrl;
-            }
-            posterlink = posterlink.replace("http://", "https://");
-            const finalPosterLink = posterlink + `?id=${order[i]}`;
-            if (!this.queue.includes(finalPosterLink)) {
-              list.push({
-                id: finalPosterLink,
-              });
-            }
-          }
-          this.queue = this.queue.concat(list);
-        })
-        .catch(() => {
-          this.addLastCard();
-        });
-    },
     onSubmit(choice) {
-      this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
@@ -447,18 +400,7 @@ export default {
       return;
     },
     cardClicked() {
-      this.lastInteraction = new Date();
       this.showInfo = !this.showInfo;
-    },
-    pollAllowed() {
-      const currentTime = new Date();
-      if (
-        (currentTime - this.lastInteraction) / 1000 > 60 ||
-        this.lastInteraction === 0
-      ) {
-        return false;
-      }
-      return true;
     },
     keyListener: function (evt) {
       if (evt.keyCode === 37) {
