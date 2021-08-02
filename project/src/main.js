@@ -72,10 +72,10 @@ Vue.mixin({
       }
     },
     sessionDataPresent() {
-      if (!this.getSessionId() || !this.getUserId() || !this.getJWT()) {
-        return false;
+      if (this.getSessionId() && this.getUserId() && this.getJWT()) {
+        return true;
       }
-      return true;
+      return false;
     },
     setSessionId(sessionId) {
       const validatedSessionId = sessionId.toString().toUpperCase();
