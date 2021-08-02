@@ -75,7 +75,7 @@
                     margin-right: 10px;
                     margin-bottom: 0px;
                   "
-                  src="../assets/nope.png"
+                  src="@/assets/nope.png"
                   @click="decide('nope')"
                 />
                 <img
@@ -87,7 +87,7 @@
                     margin-left: 10px;
                     margin-bottom: 0px;
                   "
-                  src="../assets/like.png"
+                  src="@/assets/like.png"
                   @click="decide('like')"
                 />
               </div>
@@ -104,33 +104,33 @@
       <img
         class="card-overlay like-pointer"
         slot="like"
-        src="../assets/like.png"
+        src="@/assets/like.png"
       />
       <img
         class="card-overlay nope-pointer"
         slot="nope"
-        src="../assets/nope.png"
+        src="@/assets/nope.png"
       />
       <!-- <img
         class="card-overlay super-pointer"
         slot="super"
-        src="../assets/like.png"
+        src="@/assets/like.png"
       /> -->
       <img
         class="card-overlay rewind-pointer"
         slot="rewind"
-        src="../assets/rewind.png"
+        src="@/assets/rewind.png"
       />
     </Tinder>
     <div class="btns">
-      <img src="../assets/nope.png" @click="decide('nope')" />
+      <img src="@/assets/nope.png" @click="decide('nope')" />
       <!-- <img
-        src="../assets/rewind.png"
+        src="@/assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
       /> -->
-      <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
-      <img src="../assets/like.png" @click="decide('like')" />
+      <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
+      <img src="@/assets/like.png" @click="decide('like')" />
     </div>
   </div>
 </template>
