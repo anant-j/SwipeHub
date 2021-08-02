@@ -19,7 +19,7 @@
 import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
 import ShareScreen from "@/components/ShareScreen.vue";
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 
 export default {
   name: "App",

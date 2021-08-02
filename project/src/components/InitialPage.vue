@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 
 export default {
   name: "InitialPage",

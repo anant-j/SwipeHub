@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 import router from "@/router";
 export default {
   name: "MatchNotification",

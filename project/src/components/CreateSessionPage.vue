@@ -191,7 +191,7 @@
 import "vue-multiselect/dist/vue-multiselect.min.css";
 // import axios from "axios";
 
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";

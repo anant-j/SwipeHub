@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 import axios from "axios";
 import { sessionDb, auth } from "@/firebase_config.js";
 import { ref, onValue } from "firebase/database";

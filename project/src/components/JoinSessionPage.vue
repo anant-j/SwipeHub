@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 // import axios from "axios";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
