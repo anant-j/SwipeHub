@@ -101,6 +101,9 @@ function getMatches(data) {
   const matches = [];
   const allLikes = [];
   const matchMap = {};
+  if (Object.keys(data).length <=1) {
+    return matches;
+  }
   for (const eachUser of Object.keys(data)) {
     const likes = data[eachUser]["swipes"];
     for (const movieId in likes) {

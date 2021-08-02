@@ -300,6 +300,8 @@ export default {
             }
           }
           this.$store.state.usersData = userDataArray;
+        } else {
+          this.$store.state.usersData = [];
         }
 
         const matches = data.matches;
@@ -310,6 +312,8 @@ export default {
             this.showAlert(`temp`, "s", 4800, "matchesAlert");
           }
           this.$store.state.totalMatches = numMatch;
+        } else {
+          this.$store.state.totalMatches = 0;
         }
         const allMovies = data.mediaOrder;
         if (allMovies) {
