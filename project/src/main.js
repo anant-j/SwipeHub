@@ -101,15 +101,15 @@ Vue.mixin({
     },
     copyToClipboard(item) {
       let data = "";
-      let text = "";
+      // let text = "";
       switch (item) {
         case "userId":
           data = this.getUserId();
-          text = "User Id";
+          // text = "User Id";
           break;
         case "sessionId":
           data = this.getSessionId();
-          text = "Session Id";
+          // text = "Session Id";
           break;
         default:
           console.log("error while copying to clipboard");
