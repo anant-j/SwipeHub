@@ -130,7 +130,7 @@ export default {
   },
   mounted() {
     if (this.getSessionId) {
-      this.sessionId = this.getSessionId();
+      this.sessionId = this.getSessionId;
     }
   },
   watch: {
