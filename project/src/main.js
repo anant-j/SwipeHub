@@ -88,10 +88,6 @@ Vue.mixin({
       this.$store.state.userId = userId;
       storage.setItem("userId", userId);
     },
-    getId(inputUrl) {
-      const movieId = inputUrl.split("?id=")[1];
-      return movieId;
-    },
     async getMovieData(id) {
       const docRef = doc(movieDb, "media", id);
       const docSnap = await getDoc(docRef);
