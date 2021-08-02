@@ -106,13 +106,14 @@
 
 <script>
 import store from "@/plugins/store/index.js";
-// import axios from "axios";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
+import { notification } from "@/mixins/notification.js";
 
 export default {
   name: "JoinSessionPage",
   store,
+  mixins: [notification],
   data() {
     return {
       username: null,
@@ -234,35 +235,6 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-
-      // axios
-      //   .get(`${this.backend}/sessionValid?id=${sessionId}`, {
-      //     validateStatus: false,
-      //   })
-      //   .then((result) => {
-      //     if (result.status === 200) {
-      //       this.setSessionId(sessionId);
-      //       this.setUserId(username);
-      //       this.$router.push({ name: "Session" });
-      //     } else {
-      //       this.showAlert(
-      //         "This session could not be found!",
-      //         "e",
-      //         4800,
-      //         "sessionNotFound"
-      //       );
-      //       this.$store.state.loader = false;
-      //     }
-      //   })
-      //   .catch(() => {
-      //     this.showAlert(
-      //       "This session could not be found!",
-      //       "e",
-      //       4800,
-      //       "sessionNotFound"
-      //     );
-      //     this.$store.state.loader = false;
-      //   });
     },
   },
 };

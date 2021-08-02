@@ -159,11 +159,6 @@ export default {
         .getElementById("navbarSupportedContent")
         .classList.toggle("show");
     },
-    // checkPollPending() {
-    //   if (this.$store.state.likedSet.size > 0) {
-    //     this.globalSessionPoll();
-    //   }
-    // },
     toggleDevMode() {
       if (this.$store.state.devmode == 1) {
         this.$store.state.devmode = 2;

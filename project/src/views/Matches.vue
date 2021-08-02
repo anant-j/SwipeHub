@@ -77,10 +77,12 @@ import axios from "axios";
 import { sessionDb, auth } from "@/firebase_config.js";
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
+import { notification } from "@/mixins/notification.js";
 
 export default {
   name: "Matches",
   store,
+  mixins: [notification],
   data: () => ({
     timer: null,
     lastInteraction: new Date(),
@@ -101,7 +103,6 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
-    // this.matchPoll();
     this.signIn();
   },
   destroyed() {
@@ -114,7 +115,6 @@ export default {
       if (value == "") {
         this.localMatchStore = this.$store.state.matchData;
       } else {
-        // searchAlgorithm(value)
         this.localMatchStore = [];
         const searchValue = value.toLowerCase().trim();
         const localMovieData = this.$store.state.matchData;
@@ -165,7 +165,6 @@ export default {
           const numMatch = matchData.length;
           this.$store.state.totalMatches = numMatch;
           this.$store.state.matchData = [];
-          // const movieList = [];
           for (const movieId of matchData) {
             if (this.$store.state.movieData[movieId]) {
               const tempMovieData = {
@@ -177,7 +176,6 @@ export default {
                 description: this.$store.state.movieData[movieId].overview,
                 release: this.$store.state.movieData[movieId].release_date,
               };
-              // movieList.push(tempMovieData);
               this.$store.state.matchData.push(tempMovieData);
             } else {
               this.getMovieData(movieId).then((movieData) => {
@@ -191,11 +189,9 @@ export default {
                   description: movieData.overview,
                   release: movieData.release_date,
                 };
-                // movieList.push(tempMovieData);
                 this.$store.state.matchData.push(tempMovieData);
               });
             }
-            // this.$store.state.matchData = movieList;
             if (this.searchField == "") {
               this.localMatchStore = this.$store.state.matchData;
             }

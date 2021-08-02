@@ -11,13 +11,11 @@ import Multiselect from "vue-multiselect";
 import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
-import MatchNotification from "@/components/MatchNotification";
 import VueLazyload from "vue-lazyload";
 import { leave, movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
 
 let productionMode = true;
-let backendUrl = "http://localhost:5001/theswipehub/us-central1";
 let hostURL = "http://localhost:" + window.location.port;
 document.title = "SwipeHub Dev Mode";
 if (window.location.hostname === "localhost") {
@@ -28,15 +26,9 @@ if (window.location.hostname === "localhost") {
 Vue.config.productionTip = !productionMode;
 if (productionMode) {
   document.title = "SwipeHub";
-  backendUrl = "https://us-central1-theswipehub.cloudfunctions.net";
   hostURL = "https://" + window.location.hostname;
 }
 Vue.mixin({
-  data() {
-    return {
-      backend: backendUrl,
-    };
-  },
   methods: {
     getSessionId() {
       if (this.$store.state.sessionId === null) {
@@ -85,34 +77,6 @@ Vue.mixin({
         return false;
       }
       return true;
-    },
-    /**
-     * @param  {string} message : Content of the alert
-     * @param  {string} type="s" Type: success, warning, error, info, default
-     * @param  {number} timeout=false : Add int in miliseconds, false for persistent
-     */
-    showAlert(message, type = "s", timeout = false, id) {
-      let final_message = MatchNotification;
-      if (id !== "matchesAlert") {
-        final_message = message.toString();
-      }
-      this.$toast.update(
-        id,
-        {
-          content: final_message,
-          options: {
-            type: getType(type),
-            timeout: parseInt(timeout),
-          },
-        },
-        true
-      );
-    },
-    hideAlert(id) {
-      this.$toast.dismiss(id);
-    },
-    hideAllAlerts() {
-      this.$toast.clear();
     },
     toHomePage() {
       this.$store.state.sessionState = 0;
@@ -184,8 +148,6 @@ Vue.mixin({
           break;
         default:
           console.log("error while copying to clipboard");
-        // this.showAlert("Alert occurred while copying to clipboard", "e", 7000);
-        // code block
       }
       navigator.clipboard.writeText(data);
       this.showAlert(
@@ -253,7 +215,6 @@ Vue.mixin({
           NotificationStore["joined"].push(user);
         }
       }
-      // console.log(NotificationStore);
       let NotificationMessage = "";
       if (NotificationStore["joined"].length > 0) {
         let joinMessage = "";
@@ -340,28 +301,6 @@ Vue.mixin({
   },
 });
 
-function getType(types) {
-  types = types.toLowerCase().trim();
-  switch (types) {
-    case "success":
-    case "s":
-      return "success";
-    case "error":
-    case "e":
-      return "error";
-    case "default":
-    case "d":
-      return "default";
-    case "info":
-    case "i":
-      return "info";
-    case "warning":
-    case "w":
-      return "warning";
-    default:
-      return "success";
-  }
-}
 const options = {
   position: "top-center",
   maxToasts: 3,

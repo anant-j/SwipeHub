@@ -1,4 +1,3 @@
-// self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 import { initializeApp } from "firebase/app";
 import { getFirestore, useFirestoreEmulator } from "firebase/firestore";
 import { getDatabase, useDatabaseEmulator } from "firebase/database";

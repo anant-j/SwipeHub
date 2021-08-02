@@ -37,7 +37,6 @@ export default {
           temp[key] = value;
         }
         if (key == "likedList") {
-          // console.log(this.$store.state.likedList);
           temp[key] = Array.from(this.$store.state.likedList);
         }
       }

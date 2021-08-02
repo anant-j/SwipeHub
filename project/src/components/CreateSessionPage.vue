@@ -189,8 +189,6 @@
 
 <script>
 import "vue-multiselect/dist/vue-multiselect.min.css";
-// import axios from "axios";
-
 import store from "@/plugins/store/index.js";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
@@ -325,15 +323,6 @@ export default {
         }
         categoryList = categoryList.substring(0, categoryList.length - 1);
       }
-      // const params = {
-      //   username: username,
-      //   categories: categoryList,
-      //   languages: language,
-      //   platform: platform,
-      //   region: country,
-      //   type: type,
-      //   order: order,
-      // };
       JWTService({
         requestType: "create",
         username: username,
@@ -355,39 +344,6 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-      // const data = Object.keys(params)
-      //   .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      //   .join("&");
-      // axios({
-      //   url: `${this.backend}/createSession`,
-      //   method: "POST",
-      //   headers: { "content-type": "application/x-www-form-urlencoded" },
-      //   data,
-      // })
-      //   .then((response) => {
-      //     if (response.status === 200) {
-      //       const sessionId = response.data.sessionId;
-      //       this.setSessionId(sessionId);
-      //       this.setUserId(username);
-      //       this.$router.push({ name: "Session" });
-      //     } else {
-      //       this.showAlert(
-      //         "This session could not be created!",
-      //         "e",
-      //         4800,
-      //         "sessionCreateAlert"
-      //       );
-      //     }
-      //   })
-      //   .catch(() => {
-      //     this.showAlert(
-      //       "The session could not be created! Please try again later",
-      //       "e",
-      //       5000,
-      //       "sessionCreateAlert"
-      //     );
-      //     this.$store.state.loader = false;
-      //   });
     },
   },
 };

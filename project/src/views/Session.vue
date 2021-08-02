@@ -140,10 +140,12 @@ import Tinder from "vue-tinder";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
+import { notification } from "@/mixins/notification.js";
 
 export default {
   name: "Session",
   components: { Tinder },
+  mixins: [notification],
   data: () => ({
     showInfo: false,
     rewindAllow: false,
@@ -317,7 +319,6 @@ export default {
               this.addCard(id);
             }
           }
-          // console.log(allMovies.length);
           if (allMovies.length === mySwipes) {
             this.addLastCard();
           }
