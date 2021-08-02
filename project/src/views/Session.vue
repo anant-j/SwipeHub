@@ -180,7 +180,7 @@ export default {
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
     if (this.signedIn) {
-      signOut();
+      signOut(auth);
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       off(dbRef);
     }
