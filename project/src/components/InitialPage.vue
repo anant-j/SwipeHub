@@ -24,9 +24,11 @@
 
 <script>
 import store from "@/plugins/store/index.js";
+import { navigation } from "@/mixins/utilities.js";
 
 export default {
   name: "InitialPage",
+  mixins: [navigation],
   store,
 };
 </script>
