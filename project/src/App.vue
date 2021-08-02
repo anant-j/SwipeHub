@@ -33,7 +33,7 @@ export default {
     omitted() {
       const temp = {};
       for (const [key, value] of Object.entries(this.$store.state)) {
-        if (key != "movieData" && key != "swipeHistory" && key != "likedList") {
+        if (key != "movieData" && key != "likedList") {
           temp[key] = value;
         }
         if (key == "likedList") {

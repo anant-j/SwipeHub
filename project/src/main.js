@@ -8,11 +8,10 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Multiselect from "vue-multiselect";
-import axios from "axios";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 const storage = window.localStorage;
 import VueLazyload from "vue-lazyload";
-import { leave, movieDb } from "@/firebase_config.js";
+import { movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
 
 let productionMode = true;
@@ -100,40 +99,6 @@ Vue.mixin({
       this.$store.state.userId = userId;
       storage.setItem("userId", userId);
     },
-    clearSession() {
-      storage.removeItem("sessionId");
-      storage.removeItem("userId");
-      this.$store.replaceState({
-        loader: false,
-        userId: null,
-        sessionId: null,
-        activePage: 0,
-        activeShareModal: false,
-        isCreator: false,
-        sessionState: 0,
-        movieData: {},
-        totalSwipes: 0,
-        likedSet: new Set(),
-        swipeHistory: [],
-        matchData: [],
-        totalMatches: 0,
-        usersData: [],
-      });
-    },
-    leaveSession(kick = false) {
-      if (!kick) {
-        leave();
-      } else {
-        this.showAlert(
-          "This session has been ended by the creator. Please join or create a new session.",
-          "e",
-          5000,
-          "sessionEnded"
-        );
-      }
-      this.clearSession();
-      this.$router.push({ name: "Home" });
-    },
     copyToClipboard(item) {
       let data = "";
       let text = "";
@@ -150,12 +115,12 @@ Vue.mixin({
           console.log("error while copying to clipboard");
       }
       navigator.clipboard.writeText(data);
-      this.showAlert(
-        `${text} copied to clipboard`,
-        "s",
-        5000,
-        "sessionIdCopidToClipboard"
-      );
+      // this.showAlert(
+      //   `${text} copied to clipboard`,
+      //   "s",
+      //   5000,
+      //   "sessionIdCopidToClipboard"
+      // );
     },
     createShareLink() {
       const joinLink = this.getShareLink();
@@ -236,67 +201,6 @@ Vue.mixin({
         this.showAlert(NotificationMessage, "i", 4000, "userNotification");
       }
       return;
-    },
-    globalSessionPoll() {
-      const localTotalSwipes = [];
-      for (const val of this.$store.state.swipeHistory) {
-        localTotalSwipes.push(this.getId(val.id));
-      }
-      const localLikedList = Array.from(this.$store.state.likedSet);
-      const params = {
-        totalSwipes: localTotalSwipes,
-        likedList: localLikedList,
-        sessionId: this.getSessionId(),
-        userId: this.getUserId(),
-      };
-      const data = Object.keys(params)
-        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join("&");
-      axios({
-        url: `${this.backend}/polling`,
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data,
-      })
-        .then((response) => {
-          const numMatch = response.data.match;
-          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.$store.state.totalMatches = numMatch;
-            this.showAlert(`temp`, "s", 4800, "matchesAlert");
-          }
-          this.$store.state.totalMatches = numMatch;
-          const userData = response.data.userData;
-          const userDataArray = [];
-          for (const iterator of Object.keys(userData)) {
-            if (iterator !== this.getUserId()) {
-              userDataArray.push({
-                userId: iterator,
-                value: userData[iterator],
-              });
-            } else {
-              this.$store.state.totalSwipes = userData[iterator];
-            }
-          }
-          this.updateUsersJoinLeaveNotification(Object.keys(userData));
-          this.$store.state.usersData = userDataArray;
-          for (let index = 0; index < localTotalSwipes.length; index++) {
-            const element = localTotalSwipes[index];
-            this.$store.state.likedSet.delete(element);
-          }
-        })
-        .catch(() => {
-          this.showAlert(
-            "This session could not be loaded. It might have been ended by the creator. You will now be redirected to homepage.",
-            "e",
-            4800,
-            "sessionLoadAlert"
-          );
-          let root = this;
-          setTimeout(function () {
-            root.clearSession();
-            root.$router.push({ name: "Home" });
-          }, 4800);
-        });
     },
   },
 });

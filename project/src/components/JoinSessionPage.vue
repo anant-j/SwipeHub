@@ -109,11 +109,12 @@ import store from "@/plugins/store/index.js";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
 import { notification } from "@/mixins/notification.js";
+import { cleanup } from "@/mixins/utilities.js";
 
 export default {
   name: "JoinSessionPage",
   store,
-  mixins: [notification],
+  mixins: [notification, cleanup],
   data() {
     return {
       username: null,
@@ -208,9 +209,10 @@ export default {
       if (!this.validateState()) {
         return;
       }
-      this.isSessionValid();
+      this.join();
     },
-    isSessionValid() {
+    join() {
+      this.clearSessionSoft();
       const username = this.username;
       const sessionId = this.sessionId;
       this.$store.state.loader = true;
@@ -223,7 +225,6 @@ export default {
           if (result.data.status == "error") {
             this.showAlert(result.data.message, "e", 5000, "JWTError");
             this.$store.state.loader = false;
-            this.$router.push({ name: "Home" });
           } else {
             this.setSessionId(sessionId);
             this.setUserId(username);

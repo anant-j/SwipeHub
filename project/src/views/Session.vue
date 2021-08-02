@@ -141,11 +141,12 @@ import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
+import { cleanup } from "@/mixins/utilities.js";
 
 export default {
   name: "Session",
   components: { Tinder },
-  mixins: [notification],
+  mixins: [notification, cleanup],
   data: () => ({
     showInfo: false,
     rewindAllow: false,
@@ -289,9 +290,8 @@ export default {
                   }
                   currentSwipes += 1;
                 }
-              } else {
-                this.$store.state.totalSwipes = mySwipes;
               }
+              this.$store.state.totalSwipes = mySwipes;
             }
           }
           this.$store.state.usersData = userDataArray;
@@ -376,7 +376,6 @@ export default {
         return;
       }
       this.swipe(id, choice.type);
-      this.$store.state.swipeHistory.push(choice.item);
     },
     swipe(id, type) {
       const dbRef = ref(
@@ -390,14 +389,14 @@ export default {
       }
     },
     async decide(choice) {
-      if (choice === "rewind") {
-        if (this.$store.state.swipeHistory.length && this.rewindAllow) {
-          this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
-          this.rewindAllow = false;
-        }
-      } else {
-        this.$refs.tinder.decide(choice);
-      }
+      // if (choice === "rewind") {
+      //   if (this.$store.state.swipeHistory.length && this.rewindAllow) {
+      //     this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
+      //     this.rewindAllow = false;
+      //   }
+      // } else {
+      this.$refs.tinder.decide(choice);
+      // }
       return;
     },
     cardClicked() {

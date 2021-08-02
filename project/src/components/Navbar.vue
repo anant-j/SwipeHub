@@ -143,9 +143,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "jquery/src/jquery.js";
 import "bootstrap/dist/js/bootstrap.min.js";
 import store from "@/plugins/store/index.js";
+import { cleanup } from "@/mixins/utilities.js";
+
 export default {
   name: "Navbar",
   store,
+  mixins: [cleanup],
   watch: {
     $route() {
       document

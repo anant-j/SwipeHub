@@ -78,11 +78,12 @@ import { sessionDb, auth } from "@/firebase_config.js";
 import { ref, onValue } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
+import { cleanup } from "@/mixins/utilities.js";
 
 export default {
   name: "Matches",
   store,
-  mixins: [notification],
+  mixins: [notification, cleanup],
   data: () => ({
     timer: null,
     lastInteraction: new Date(),
