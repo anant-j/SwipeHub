@@ -137,8 +137,8 @@
 <script>
 import Tinder from "vue-tinder";
 import axios from "axios";
-import { sessionDb, auth, eventLogger, swipe } from "@/firebase_config.js";
-import { ref, onValue, off } from "firebase/database";
+import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
+import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken } from "firebase/auth";
 
 export default {
@@ -421,22 +421,19 @@ export default {
         }
         return;
       }
-      // this.$store.state.pendingSwipeData[id] = choice.type;
-      if (choice.type === "like") {
-        swipe({ requestType: "like", id: id });
-        // .then((result) => {
-        //   if (result.data.status == "success" && result.data.updated == id) {
-        //     delete this.$store.state.pendingSwipeData[id];
-        //   }
-        // })
-        // .catch((err) => {
-        //   console.log(err);
-        // });
-      }
-      if (choice.type === "nope") {
-        swipe({ requestType: "dislike", id: id });
-      }
+      this.swipe(id, choice.type);
       this.$store.state.swipeHistory.push(choice.item);
+    },
+    swipe(id, type) {
+      const dbRef = ref(
+        sessionDb,
+        `${this.getSessionId()}/users/${this.getUserId()}/swipes/${id}`
+      );
+      if (type === "like") {
+        set(dbRef, true);
+      } else {
+        set(dbRef, false);
+      }
     },
     async decide(choice) {
       if (choice === "rewind") {

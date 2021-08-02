@@ -2,8 +2,18 @@
   "rules": {
     "$sessionId":{
       "sessionActivity":{
-    ".read": "auth != null && auth.token.sessionId == $sessionId",
-    ".write": false
-    }}
+        ".read": "auth != null && auth.token.sessionId == $sessionId",
+        ".write": false
+      },
+      "users":{
+        "$userId":
+        {
+          "swipes":{
+        ".read": "auth != null && auth.token.sessionId == $sessionId && auth.token.userId == $userId",
+        ".write": "auth != null && auth.token.sessionId == $sessionId && auth.token.userId == $userId"
+        }
+        }
+      }
   }
+}
 }

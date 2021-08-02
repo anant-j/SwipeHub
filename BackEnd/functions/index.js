@@ -74,45 +74,21 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
   }
 });
 
-exports.swipeHandler = functions.https.onCall(async (data, context) => {
-  const sessionId = context.auth.token.sessionId;
-  const userId = context.auth.token.userId;
-  const snap = await sessionDb.ref(sessionId).child("users").once("value");
-  let updateVariable = "";
-  let likeLength = 0;
-  let dislikeLength = 0;
-  const movieId = data.id;
-  if (snap.val()) {
-    const userData = snap.val()[userId];
-    const oldData = snap.val();
-    if (data.requestType === "like") {
-      updateVariable = "likes";
-    } else if ( data.requestType === "dislike") {
-      updateVariable = "dislikes";
-    } else {
-      return;
-    }
-    if ((!userData.likes || !(userData.likes.includes(movieId))) && ( !userData.dislikes || !(userData.dislikes.includes(movieId)))) {
-      if (!oldData[userId][updateVariable]) {
-        oldData[userId][updateVariable]=[];
+exports.swipe = functions.database.ref("{sessionId}/users/{userId}/swipes")
+    .onWrite(async (change, context) => {
+      if (!change.after.exists()) {
+        return null;
       }
-      oldData[userId][updateVariable].push(movieId);
-      const matches = getMatches(oldData);
-      if (userData.likes) {
-        likeLength = parseInt(userData.likes.length);
-      }
-      if (userData.dislikes) {
-        dislikeLength = parseInt(userData.dislikes.length);
-      }
+      const sessionId = context.params.sessionId;
+      const userId = context.params.userId;
+      const mySwipes = change.after.val();
+      const snap = await sessionDb.ref(sessionId).child("users").once("value");
+      const matches = getMatches(snap.val());
       sessionDb.ref(sessionId).update({
-        [`sessionActivity/users/${userId}/swipes`]: likeLength + dislikeLength + 1,
+        [`sessionActivity/users/${userId}/swipes`]: Object.keys(mySwipes).length,
         "sessionActivity/matches": matches,
-        [`users/${userId}/${updateVariable}`]: (userData[updateVariable] || []).concat(movieId),
       });
-    }
-    return {status: "success", updated: movieId};
-  }
-});
+    });
 
 /**
  * @param {any} data
@@ -123,12 +99,14 @@ exports.swipeHandler = functions.https.onCall(async (data, context) => {
  */
 function getMatches(data) {
   const matches = [];
-  let allLikes = [];
+  const allLikes = [];
   const matchMap = {};
   for (const eachUser of Object.keys(data)) {
-    const likes = data[eachUser]["likes"];
-    if (likes) {
-      allLikes = allLikes.concat(...likes);
+    const likes = data[eachUser]["swipes"];
+    for (const movieId in likes) {
+      if (likes[movieId]) {
+        allLikes.push(movieId);
+      }
     }
   }
   for (const mediaId of allLikes) {
@@ -345,6 +323,7 @@ async function sendErrorNotification(caller, error) {
     return false;
   }
 }
+
 /**
  * @param  {string} lang
  * @param  {string} genres
@@ -385,27 +364,30 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
  * @param  {number} page
  */
 async function generateTVList(lang, genres, platform, region, sort, page) {
-  const final = {};
   const url = `https://api.themoviedb.org/3/discover/tv?api_key=${apiToken}`;
   const resp = await axios.get(
       `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
+  const res = [];
   for (let i = 0; i < data.length; i++) {
-    const tempDict = {};
-    if (!("order" in final)) {
-      final["order"] = [];
+    const id = data[i].id.toString();
+    const sessionDb = admin.firestore().collection("media").doc(id);
+    const doc = await sessionDb.get();
+    data[i]["title"] = data[i]["original_name"];
+    data[i]["poster"] =
+    "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
+    data[i]["release_date"] = data[i]["first_air_date"];
+    if (!doc.exists) {
+      await admin
+          .firestore()
+          .collection("media")
+          .doc(id)
+          .set(data[i]);
     }
-    final["order"].push(data[i]["id"]);
-    tempDict["title"] = data[i]["original_name"];
-    tempDict["description"] = data[i]["overview"];
-    tempDict["poster"] =
-      "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
-    tempDict["release_date"] = data[i]["first_air_date"];
-    tempDict["adult"] = false;
-    final[data[i]["id"]] = tempDict;
+    res.push(id);
   }
-  return final;
+  return res;
 }
 
 /**
@@ -435,57 +417,6 @@ function randomSessionCode() {
   }
   return result;
 }
-
-// /**
-//  * @param {any} sessionId
-//  * @param {any} userId
-//  * @param {any} sessionData
-//  * @return {any}
-//  */
-// async function leaveSession(sessionId, userId, sessionData) {
-//   for (const [key, value] of Object.entries(sessionData["likes"])) {
-//     // value is the array of userIds who liked the movieId(key)
-//     // {key -> [value], key -> [value]}
-//     // for each key, take value, find index of user, remove that index from value, set new value to that key
-//     const index = value.indexOf(userId);
-//     if (index > -1) {
-//       value.splice(index, 1);
-//     }
-//     sessionData["likes"][key] = value;
-//   }
-//   delete sessionData["participants"][userId];
-//   await admin
-//       .firestore()
-//       .collection("sessions")
-//       .doc(sessionId)
-//       .set(sessionData);
-// }
-
-// /**
-//  * @param {any} sessionId
-//  * @return {any}
-//  */
-// async function endSession(sessionId) {
-//   const data = {
-//     isValid: false,
-//   };
-//   await admin
-//       .firestore()
-//       .collection("sessions")
-//       .doc(sessionId)
-//       .set(data, {merge: true});
-// }
-
-// /**
-//  * @param  {object} doc
-//  * @return {boolean}
-//  */
-// function isValidSession(doc) {
-//   if (doc.exists && doc.data().isValid) {
-//     return true;
-//   }
-//   return false;
-// }
 
 // /**
 //  * @param  {number} numberOfCards
