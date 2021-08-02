@@ -139,7 +139,7 @@
 import Tinder from "vue-tinder";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
-import { signInWithCustomToken } from "firebase/auth";
+import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 
@@ -180,6 +180,7 @@ export default {
   destroyed() {
     document.removeEventListener("keyup", this.keyListener);
     if (this.signedIn) {
+      signOut();
       const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
       off(dbRef);
     }

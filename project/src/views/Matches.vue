@@ -73,10 +73,9 @@
 
 <script>
 import store from "@/plugins/store/index.js";
-import axios from "axios";
 import { sessionDb, auth } from "@/firebase_config.js";
-import { ref, onValue } from "firebase/database";
-import { signInWithCustomToken } from "firebase/auth";
+import { ref, onValue, off } from "firebase/database";
+import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 
@@ -85,7 +84,7 @@ export default {
   store,
   mixins: [notification, cleanup],
   data: () => ({
-    timer: null,
+    signedIn: false,
     lastInteraction: new Date(),
     localMatchStore: [],
     searchField: "",
@@ -108,7 +107,11 @@ export default {
   },
   destroyed() {
     window.removeEventListener("scroll", this.pageActivity);
-    clearTimeout(this.timer);
+    if (this.signedIn) {
+      signOut(auth);
+      const dbRef = ref(sessionDb, `${this.getSessionId()}/sessionActivity`);
+      off(dbRef);
+    }
   },
   watch: {
     searchField(value) {
@@ -134,6 +137,7 @@ export default {
     signIn() {
       signInWithCustomToken(auth, this.getJWT())
         .then(() => {
+          this.signedIn = true;
           this.getMatchData();
           this.$store.state.loader = false;
         })
@@ -212,67 +216,6 @@ export default {
         return false;
       }
       return true;
-    },
-    matchPoll() {
-      if (this.pollAllowed()) {
-        const params = {
-          sessionId: this.getSessionId(),
-          userId: this.getUserId(),
-        };
-        const data = Object.keys(params)
-          .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-          .join("&");
-        axios({
-          url: `${this.backend}/matchPolling`,
-          method: "POST",
-          headers: { "content-type": "application/x-www-form-urlencoded" },
-          data,
-        })
-          .then((response) => {
-            this.$store.state.loader = false;
-            const movieData = response.data.movies;
-            const movieList = [];
-            for (const iterator of Object.keys(movieData)) {
-              let posterlink = movieData[iterator].poster.replace(
-                "http://",
-                "https://"
-              );
-              if (posterlink === "https://image.tmdb.org/t/p/originalnull") {
-                posterlink = "https://i.imgur.com/Sql8s2M.png";
-              }
-              movieList.push({
-                movieId: iterator,
-                title: movieData[iterator].title,
-                posterURL: posterlink,
-                description: movieData[iterator].description,
-                release: movieData[iterator].release_date,
-              });
-            }
-            const userData = response.data.userData;
-            const userDataArray = [];
-            for (const iterator of Object.keys(userData)) {
-              if (iterator !== this.getUserId()) {
-                userDataArray.push({
-                  userId: iterator,
-                  value: userData[iterator],
-                });
-              } else {
-                this.$store.state.totalSwipes = userData[iterator];
-              }
-            }
-            this.updateUsersJoinLeaveNotification(Object.keys(userData));
-            this.$store.state.usersData = userDataArray;
-            this.$store.state.matchData = movieList;
-            if (this.searchField == "") {
-              this.localMatchStore = this.$store.state.matchData;
-            }
-            this.$store.state.totalMatches = movieList.length;
-          })
-          .catch(() => {
-            this.$store.state.loader = false;
-          });
-      }
-      this.timer = setTimeout(() => this.matchPoll(), 10000);
     },
   },
 };
