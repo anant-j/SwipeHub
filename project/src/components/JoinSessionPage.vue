@@ -109,12 +109,12 @@ import store from "@/plugins/store/index.js";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
 import { notification } from "@/mixins/notification.js";
-import { cleanup } from "@/mixins/utilities.js";
+import { cleanup, navigation } from "@/mixins/utilities.js";
 
 export default {
   name: "JoinSessionPage",
   store,
-  mixins: [notification, cleanup],
+  mixins: [notification, cleanup, navigation],
   data() {
     return {
       username: null,

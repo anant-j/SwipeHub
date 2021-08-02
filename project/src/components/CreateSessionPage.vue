@@ -193,10 +193,12 @@ import store from "@/plugins/store/index.js";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
+import { navigation } from "@/mixins/utilities.js";
 
 export default {
   name: "CreateSessionPage",
   store,
+  mixins: [navigation],
   components: {
     Multiselect,
   },
