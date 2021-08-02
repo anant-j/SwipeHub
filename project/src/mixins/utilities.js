@@ -41,15 +41,15 @@ export const cleanup = {
       this.$store.state.isCreator = false;
     },
     leaveSession(kick = false) {
-      if (!kick) {
-        leave();
-      } else {
+      if (kick) {
         this.showAlert(
           "This session has been ended by the creator. Please join or create a new session.",
           "e",
           5000,
           "sessionEnded"
         );
+      } else {
+        leave();
       }
       this.clearSessionHard();
       this.$router.push({ name: "Home" });
