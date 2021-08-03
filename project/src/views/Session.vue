@@ -314,7 +314,7 @@ export default {
 
         const allMovies = data.mediaOrder;
         if (allMovies) {
-          const movieOrder = allMovies.slice(mySwipes, allMovies.length);
+          const movieOrder = allMovies.slice(mySwipes + 1, allMovies.length);
           for (const id of movieOrder) {
             if (!this.$store.state.movieData[id]) {
               this.getMovieData(id).then((movieData) => {
