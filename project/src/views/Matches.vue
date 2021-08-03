@@ -156,7 +156,6 @@ export default {
       const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        console.log(data);
         const matchData = data.matches;
         if (!data) {
           this.leaveSession(true);
