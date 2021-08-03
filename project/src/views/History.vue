@@ -47,7 +47,14 @@
               </h5>
               <p class="card-text">{{ item.description }}</p>
             </div>
-            <div class="card-footer">
+            <div
+              class="card-footer"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
               <small class="text-muted">Released on {{ item.release }}</small>
               <img
                 class="buttonImg"
@@ -206,8 +213,9 @@ export default {
 }
 
 .buttonImg {
-  float: right;
+  position: absolute;
+  right: 10px;
   width: 40px;
-  padding: auto;
+  padding: 5px;
 }
 </style>
