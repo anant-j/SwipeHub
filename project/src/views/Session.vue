@@ -285,13 +285,13 @@ export default {
                 value: userData[iterator].swipes,
               });
             } else {
-              let current = this.$store.state.totalSwipes;
-              if (current != 0) {
-                while (mySwipes > current) {
-                  this.decide("super");
-                  current += 1;
-                }
-              }
+              // let current = this.$store.state.totalSwipes;
+              // if (current != 0) {
+              //   while (mySwipes > current) {
+              //     this.decide("super");
+              //     current += 1;
+              //   }
+              // }
               this.$store.state.totalSwipes = mySwipes;
             }
           }
