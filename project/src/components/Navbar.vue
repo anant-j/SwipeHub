@@ -42,6 +42,11 @@
                 </span>
               </router-link>
             </li>
+            <li class="nav-item" v-if="this.sessionDataPresent">
+              <router-link class="nav-link" to="/history"
+                >My Swipes</router-link
+              >
+            </li>
             <li class="nav-item" v-if="this.$store.state.devmode > 0">
               <a @click="toggleDevMode()" class="nav-link"
                 >Devmode : {{ this.$store.state.devmode }}</a
@@ -187,6 +192,10 @@ export default {
 
 #nav a {
   color: white;
+}
+
+#nav a:hover {
+  color: red;
 }
 
 #nav a.router-link-exact-active {

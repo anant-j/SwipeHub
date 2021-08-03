@@ -12,8 +12,9 @@ export const activeShareModal = false;
 export const sessionState = 0;
 export const movieData = {};
 export const totalSwipes = 0;
-export const matchData = [];
 export const totalMatches = 0;
+export const swipeData = [];
+export const matchData = [];
 export const usersData = [];
 export const hostURL = "https://www.theswipehub.com";
 
@@ -36,6 +37,7 @@ export const cleanup = {
         movieData: movieData,
         totalSwipes: totalSwipes,
         matchData: matchData,
+        swipeData: swipeData,
         totalMatches: totalMatches,
         usersData: usersData,
         hostURL: hostURL,
@@ -45,8 +47,7 @@ export const cleanup = {
       storage.removeItem("sessionId");
       storage.removeItem("userId");
       storage.removeItem("SwipeHub_JWT");
-      this.$store.state.totalSwipes = {};
-      this.$store.state.matchData = [];
+      this.$store.state.totalSwipes = 0;
       this.$store.state.totalMatches = 0;
       this.$store.state.usersData = [];
       this.$store.state.userId = null;

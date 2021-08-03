@@ -12,8 +12,9 @@ import {
   sessionState,
   movieData,
   totalSwipes,
-  matchData,
   totalMatches,
+  swipeData,
+  matchData,
   usersData,
   hostURL,
 } from "@/mixins/utilities.js";
@@ -31,8 +32,9 @@ const defaultStore = {
   sessionState: sessionState,
   movieData: movieData,
   totalSwipes: totalSwipes,
-  matchData: matchData,
   totalMatches: totalMatches,
+  swipeData: swipeData,
+  matchData: matchData,
   usersData: usersData,
   hostURL: hostURL,
 };

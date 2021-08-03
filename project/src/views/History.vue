@@ -1,0 +1,213 @@
+<template>
+  <div v-if="!this.$store.state.loader">
+    <div
+      class="card mx-auto mt-3 text-center"
+      style="max-width: 500px"
+      id="noCards"
+      v-if="this.$store.state.totalSwipes == 0"
+    >
+      <div class="card-body" style="color: black">
+        <h5 class="card-title">No Swipes found</h5>
+        <p class="card-text">
+          Please swipe on more cards for them to appear here
+        </p>
+        <router-link class="btn btn-primary" to="/session"
+          >Start Swiping</router-link
+        >
+      </div>
+    </div>
+    <div v-else>
+      <b-form-input
+        v-model="searchField"
+        style="width: 95%; margin: auto; margin-top: 20px"
+        placeholder="Search via Title, Synopsis or Release Date"
+      ></b-form-input>
+      <div
+        id="cardHolder"
+        class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3 mt-3 mb-3"
+      >
+        <div
+          class="col"
+          v-for="item in this.localSwipeStore"
+          :key="item.movieId"
+        >
+          <div class="card text-white bg-dark h-100 text-center">
+            <img
+              class="card-img-top"
+              style="max-height: 50vh; object-fit: contain; margin-top: 30px"
+              alt="..."
+              v-lazy="{
+                src: item.posterURL,
+                loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+              }"
+            />
+            <div class="card-body">
+              <h5 class="card-title">
+                <b>{{ item.title }}</b>
+              </h5>
+              <p class="card-text">{{ item.description }}</p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Released on {{ item.release }}</small>
+              <img
+                class="buttonImg"
+                src="@/assets/like.png"
+                v-if="item.liked"
+              />
+              <img
+                class="buttonImg"
+                src="@/assets/nope.png"
+                v-if="!item.liked"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import store from "@/plugins/store/index.js";
+import { sessionDb, auth } from "@/firebase_config.js";
+import { ref, get, child } from "firebase/database";
+import { signInWithCustomToken, signOut } from "firebase/auth";
+import { notification } from "@/mixins/notification.js";
+import { cleanup } from "@/mixins/utilities.js";
+
+export default {
+  name: "History",
+  store,
+  mixins: [notification, cleanup],
+  data: () => ({
+    signedIn: false,
+    localSwipeStore: [],
+    searchField: "",
+  }),
+  created() {
+    if (!this.sessionDataPresent) {
+      this.showAlert(
+        "Please join or create a session",
+        "w",
+        5000,
+        "sessionDataNotAvailable"
+      );
+      this.$router.push({ name: "Home" });
+      return;
+    }
+    this.$store.state.loader = true;
+    this.$store.state.activePage = 3;
+    this.signIn();
+  },
+  destroyed() {
+    if (this.signedIn) {
+      signOut(auth);
+    }
+  },
+  watch: {
+    searchField(value) {
+      if (value == "") {
+        this.localSwipeStore = this.$store.state.swipeData;
+      } else {
+        this.localSwipeStore = [];
+        const searchValue = value.toLowerCase().trim();
+        const localMovieData = this.$store.state.swipeData;
+        for (const movie of localMovieData) {
+          if (
+            movie.title.toLowerCase().trim().includes(searchValue) ||
+            movie.release.toLowerCase().trim().includes(searchValue) ||
+            movie.description.toLowerCase().trim().includes(searchValue)
+          )
+            this.localSwipeStore.push(movie);
+        }
+      }
+    },
+  },
+  methods: {
+    signIn() {
+      signInWithCustomToken(auth, this.getJWT)
+        .then(() => {
+          this.signedIn = true;
+          this.getSwipeData();
+          this.$store.state.loader = false;
+        })
+        .catch(() => {
+          this.$store.state.loader = false;
+          this.showAlert(
+            "Please join a session first",
+            "e",
+            5000,
+            "loginFailed"
+          );
+          this.$router.push({ name: "Home" });
+        });
+    },
+    async getSwipeData() {
+      const dbRef = ref(
+        sessionDb,
+        `${this.getSessionId}/users/${this.getUserId}`
+      );
+      get(child(dbRef, `swipes`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const swipeData = snapshot.val();
+            const numSwipes = Object.keys(swipeData).length;
+            this.$store.state.totalSwipes = numSwipes;
+            this.$store.state.swipeData = [];
+            for (const movieId of Object.keys(swipeData)) {
+              if (this.$store.state.movieData[movieId]) {
+                const tempMovieData = {
+                  movieId: movieId,
+                  title: this.$store.state.movieData[movieId].title,
+                  posterURL:
+                    "https://image.tmdb.org/t/p/original/" +
+                    this.$store.state.movieData[movieId].poster_path,
+                  description: this.$store.state.movieData[movieId].overview,
+                  release: this.$store.state.movieData[movieId].release_date,
+                  liked: swipeData[movieId],
+                };
+                this.$store.state.swipeData.push(tempMovieData);
+              } else {
+                this.getMovieData(movieId).then((movieData) => {
+                  this.$store.state.movieData[movieId] = movieData;
+                  const tempMovieData = {
+                    movieId: movieId,
+                    title: movieData.title,
+                    posterURL:
+                      "https://image.tmdb.org/t/p/original/" +
+                      movieData.poster_path,
+                    description: movieData.overview,
+                    release: movieData.release_date,
+                    liked: swipeData[movieId],
+                  };
+                  this.$store.state.swipeData.push(tempMovieData);
+                });
+              }
+            }
+            if (this.searchField == "") {
+              this.localSwipeStore = this.$store.state.swipeData;
+            }
+          } else {
+            console.log("No data available");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
+</script>
+
+<style scoped>
+#cardHolder {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.buttonImg {
+  float: right;
+  width: 40px;
+  padding: auto;
+}
+</style>
