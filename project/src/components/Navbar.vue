@@ -57,7 +57,7 @@
             <li
               class="nav-item"
               @click="
-                createShareLink();
+                showShareModal();
                 hideModal();
               "
               v-if="this.$store.state.activePage"
@@ -177,6 +177,9 @@ export default {
       } else {
         console.log("Not in dev mode");
       }
+    },
+    showShareModal() {
+      this.$store.state.activeShareModal = true;
     },
   },
 };

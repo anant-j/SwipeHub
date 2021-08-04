@@ -33,6 +33,57 @@ export const notification = {
   },
 };
 
+export const memberNotification = {
+  methods: {
+    updatedMemberNotification(newData) {
+      const NotificationStore = {
+        joined: [],
+        left: [],
+      };
+      const oldUserDataPair = this.$store.state.usersData;
+      console.log(oldUserDataPair);
+      const oldData = [];
+      for (const userData of oldUserDataPair) {
+        oldData.push(userData["userId"]);
+      }
+      for (const user of oldData) {
+        if (!newData[user] && user != this.getUserId) {
+          NotificationStore["left"].push(user);
+        }
+      }
+      for (const user of Object.keys(newData)) {
+        if (
+          !oldData.includes(user) &&
+          user != this.getUserId &&
+          newData[user]["joinedAt"] >= newData[this.getUserId]["joinedAt"]
+        ) {
+          NotificationStore["joined"].push(user);
+        }
+      }
+      let NotificationMessage = "";
+      if (NotificationStore["joined"].length > 0) {
+        let joinMessage = "";
+        for (const joiner of NotificationStore["joined"]) {
+          joinMessage += joiner + ", ";
+        }
+        joinMessage = joinMessage.slice(0, -2);
+        NotificationMessage += `${joinMessage} has joined the session. `;
+      }
+      if (NotificationStore["left"].length > 0) {
+        let leaveMessage = "";
+        for (const leaver of NotificationStore["left"]) {
+          leaveMessage += leaver + ", ";
+        }
+        leaveMessage = leaveMessage.slice(0, -2);
+        NotificationMessage += `${leaveMessage} has left the session. `;
+      }
+      if (NotificationMessage != "") {
+        this.showAlert(NotificationMessage, "i", 4000, "userNotification");
+      }
+      return;
+    },
+  },
+};
 function getType(types) {
   types = types.toLowerCase().trim();
   switch (types) {

@@ -30,11 +30,11 @@ export const clipboard = {
 };
 
 export const share = {
+  mixins: [notification],
   methods: {
-    createShareLink() {
+    copyShareLink() {
       const joinLink = this.getShareLink();
       navigator.clipboard.writeText(joinLink);
-      this.$store.state.activeShareModal = true;
       this.showAlert(
         "Shareable link copied to clipboard.",
         "s",
@@ -43,7 +43,7 @@ export const share = {
       );
     },
     getShareLink() {
-      return `${this.$store.state.hostURL}/?join=${this.getSessionId}`;
+      return `${this.hostURL}/?join=${this.getSessionId}`;
     },
     shareLinkNatively() {
       const joinLink = this.getShareLink();

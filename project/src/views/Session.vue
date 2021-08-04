@@ -140,13 +140,13 @@ import Tinder from "vue-tinder";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
-import { notification } from "@/mixins/notification.js";
+import { notification, memberNotification } from "@/mixins/notification.js";
 import { cleanup, mediaTools } from "@/mixins/utilities.js";
 
 export default {
   name: "Session",
   components: { Tinder },
-  mixins: [notification, cleanup, mediaTools],
+  mixins: [notification, cleanup, mediaTools, memberNotification],
   data: () => ({
     showInfo: false,
     rewindAllow: false,
@@ -285,15 +285,9 @@ export default {
                 value: userData[iterator].swipes,
               });
             } else {
-              // let current = this.$store.state.totalSwipes;
-              // if (current != 0) {
-              //   while (mySwipes > current) {
-              //     this.decide("super");
-              //     current += 1;
-              //   }
-              // }
               this.$store.state.totalSwipes = mySwipes;
             }
+            this.updatedMemberNotification(userData);
           }
           this.$store.state.usersData = userDataArray;
         } else {

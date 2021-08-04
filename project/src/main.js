@@ -13,19 +13,25 @@ const storage = window.localStorage;
 import VueLazyload from "vue-lazyload";
 import { movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
+import "@fortawesome/fontawesome-free/css/all.css";
+import "@fortawesome/fontawesome-free/js/all.js";
 
+document.title = "SwipeHub";
+let host = "https://" + window.location.hostname;
 if (window.location.hostname === "localhost") {
-  store.state.hostURL = "http://localhost:" + window.location.port;
+  host = "http://localhost:" + window.location.port;
   document.title = "SwipeHub Dev Mode";
   store.state.devmode = 1;
   Vue.config.productionTip = true;
 } else {
-  document.title = "SwipeHub";
-  store.state.hostURL = "https://" + window.location.hostname;
   store.state.devmode = 0;
   Vue.config.productionTip = false;
 }
+
 Vue.mixin({
+  data: () => ({
+    hostURL: host,
+  }),
   computed: {
     getSessionId() {
       const vuex = this.$store.state.sessionId;
@@ -89,48 +95,6 @@ Vue.mixin({
       } else {
         return null;
       }
-    },
-    updateUsersJoinLeaveNotification(newData) {
-      const NotificationStore = {
-        joined: [],
-        left: [],
-      };
-      const oldUserDataPair = this.$store.state.usersData;
-      const oldData = [];
-      for (const userData of oldUserDataPair) {
-        oldData.push(userData["userId"]);
-      }
-      for (const user of oldData) {
-        if (!newData.includes(user) && user != this.getUserId) {
-          NotificationStore["left"].push(user);
-        }
-      }
-      for (const user of newData) {
-        if (!oldData.includes(user) && user != this.getUserId) {
-          NotificationStore["joined"].push(user);
-        }
-      }
-      let NotificationMessage = "";
-      if (NotificationStore["joined"].length > 0) {
-        let joinMessage = "";
-        for (const joiner of NotificationStore["joined"]) {
-          joinMessage += joiner + ", ";
-        }
-        joinMessage = joinMessage.slice(0, -2);
-        NotificationMessage += `${joinMessage} has joined the session. `;
-      }
-      if (NotificationStore["left"].length > 0) {
-        let leaveMessage = "";
-        for (const leaver of NotificationStore["left"]) {
-          leaveMessage += leaver + ", ";
-        }
-        leaveMessage = leaveMessage.slice(0, -2);
-        NotificationMessage += `${leaveMessage} has left the session. `;
-      }
-      if (NotificationMessage != "") {
-        this.showAlert(NotificationMessage, "i", 4000, "userNotification");
-      }
-      return;
     },
   },
 });
