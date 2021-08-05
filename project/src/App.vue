@@ -20,6 +20,7 @@ import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
 import ShareScreen from "@/components/ShareScreen.vue";
 import store from "@/plugins/store/index.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "App",
@@ -29,6 +30,9 @@ export default {
     ShareScreen,
   },
   store,
+  mounted() {
+    eventLogger("Application Loaded");
+  },
   computed: {
     omitted() {
       const temp = {};

@@ -11,7 +11,6 @@ import InitialPage from "@/components/InitialPage.vue";
 import JoinSessionPage from "@/components/JoinSessionPage.vue";
 import CreateSessionPage from "@/components/CreateSessionPage.vue";
 import store from "@/plugins/store/index.js";
-import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "Home",
@@ -24,7 +23,6 @@ export default {
       this.setSessionId(id);
       this.$store.state.sessionState = 1;
     }
-    eventLogger("Home Page Loaded");
   },
 };
 </script>

@@ -194,6 +194,7 @@ import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
 import { JWTService } from "@/firebase_config.js";
 import { navigation } from "@/mixins/navigation.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "CreateSessionPage",
@@ -339,6 +340,7 @@ export default {
           this.setSessionId(result.data.sessionId);
           this.setUserId(result.data.userId);
           this.setJWT(result.data.token);
+          eventLogger("Session created");
           this.$store.state.isCreator = true;
           this.$store.state.activeShareModal = true;
           this.$router.push({ name: "Session" });

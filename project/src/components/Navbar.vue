@@ -151,6 +151,7 @@ import store from "@/plugins/store/index.js";
 import { cleanup } from "@/mixins/utilities.js";
 import { navigation } from "@/mixins/navigation.js";
 import { clipboard, share } from "@/mixins/share.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "Navbar",
@@ -179,6 +180,7 @@ export default {
       }
     },
     showShareModal() {
+      eventLogger("Share modal displayed");
       this.$store.state.activeShareModal = true;
     },
   },

@@ -1,5 +1,6 @@
 const storage = window.localStorage;
 import { leave } from "@/firebase_config.js";
+import { eventLogger } from "@/firebase_config";
 
 export const cleanup = {
   methods: {
@@ -45,6 +46,7 @@ export const cleanup = {
           "sessionEnded"
         );
       } else {
+        eventLogger("Session ended by user");
         leave();
       }
       this.clearSessionHard();

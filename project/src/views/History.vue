@@ -76,7 +76,7 @@
 
 <script>
 import store from "@/plugins/store/index.js";
-import { sessionDb, auth } from "@/firebase_config.js";
+import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, get, child } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
@@ -105,6 +105,7 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 3;
     this.signIn();
+    eventLogger("History page loaded");
   },
   destroyed() {
     if (this.signedIn) {

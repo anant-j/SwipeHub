@@ -45,8 +45,14 @@ initializeAppCheck(firebaseApp, {
   isTokenAutoRefreshEnabled: true,
 });
 
+/**
+ * @param  {string} event Event to log
+ */
 export function eventLogger(event) {
   if (!localMode) {
     logEvent(analytics, event);
+  } else {
+    let logString = `Firebase Analytics Event: ${event}`;
+    console.log(logString);
   }
 }

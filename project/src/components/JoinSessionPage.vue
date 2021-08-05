@@ -111,6 +111,7 @@ import { JWTService } from "@/firebase_config.js";
 import { notification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 import { navigation } from "@/mixins/navigation.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "JoinSessionPage",
@@ -231,6 +232,7 @@ export default {
             this.setUserId(username);
             this.setJWT(result.data.token);
             this.$store.state.isCreator = result.data.isCreator;
+            eventLogger("Session joined");
             this.$router.push({ name: "Session" });
           }
         })

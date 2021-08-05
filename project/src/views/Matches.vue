@@ -59,7 +59,7 @@
 
 <script>
 import store from "@/plugins/store/index.js";
-import { sessionDb, auth } from "@/firebase_config.js";
+import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
@@ -88,6 +88,7 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 2;
     this.signIn();
+    eventLogger("Matches page loaded");
   },
   destroyed() {
     if (this.signedIn) {
