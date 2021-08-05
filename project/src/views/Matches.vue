@@ -22,23 +22,9 @@
         style="width: 95%; margin: auto; margin-top: 20px"
         placeholder="Search via Title, Synopsis or Release Date"
       ></b-form-input>
-      <!-- <input
-        v-model="searchField"
-        placeholder="Enter Search Field"
-        class="align-self-center"
-        style="
-          width: 97%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin: 10px;
-          padding: 5px;
-        "
-      /> -->
       <div
         id="cardHolder"
         class="row row-cols-1 row-cols-sm-3 row-cols-md-4 g-3 mt-3 mb-3"
-        @click="pageActivity()"
       >
         <div
           class="col"
@@ -85,12 +71,10 @@ export default {
   mixins: [notification, cleanup],
   data: () => ({
     signedIn: false,
-    lastInteraction: new Date(),
     localMatchStore: [],
     searchField: "",
   }),
   created() {
-    window.addEventListener("scroll", this.pageActivity);
     if (!this.sessionDataPresent) {
       this.showAlert(
         "Please join or create a session",
@@ -106,7 +90,6 @@ export default {
     this.signIn();
   },
   destroyed() {
-    window.removeEventListener("scroll", this.pageActivity);
     if (this.signedIn) {
       signOut(auth);
       const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
@@ -115,7 +98,6 @@ export default {
   },
   watch: {
     searchField(value) {
-      this.pageActivity();
       if (value == "") {
         this.localMatchStore = this.$store.state.matchData;
       } else {
@@ -204,19 +186,6 @@ export default {
           }
         }
       });
-    },
-    pageActivity() {
-      this.lastInteraction = new Date();
-    },
-    pollAllowed() {
-      const currentTime = new Date();
-      if ((currentTime - this.lastInteraction) / 1000 > 60) {
-        return false;
-      }
-      if (!document.hasFocus()) {
-        return false;
-      }
-      return true;
     },
   },
 };
