@@ -310,6 +310,9 @@ export default {
         if (allMovies) {
           const movieOrder = allMovies.slice(mySwipes, allMovies.length);
           for (const id of movieOrder) {
+            if (id == -1 || id == "null") {
+              this.addCard("null");
+            }
             if (!this.$store.state.movieData[id]) {
               this.getMovieData(id).then((movieData) => {
                 this.$store.state.movieData[id] = movieData;
@@ -319,18 +322,18 @@ export default {
               this.addCard(id);
             }
           }
-          if (allMovies.length === mySwipes) {
-            this.addLastCard();
-          }
         }
       });
     },
     addLastCard() {
+      if (this.shown.has(-1)) {
+        return;
+      }
       const list = [];
       const posterLink = this.noCardUrl;
       this.$store.state.movieData[-1] = {
         overview:
-          "We've run out of cards to show you!<br><br><h3 style='color: red;'>Swipe Left to Leave Session</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
+          "We've run out of cards to show you!<br><br><h3 style='color: cyan;'>Swipe Left to View Swipe History</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
         poster: posterLink,
         release_date: "N/A",
         title: "Uh-oh",
@@ -339,9 +342,13 @@ export default {
         id: posterLink + `?id=-1`,
       });
       this.queue = this.queue.concat(list);
+      this.shown.add(-1);
       return;
     },
     addCard(id) {
+      if (id == -1 || id == "null") {
+        this.addLastCard();
+      }
       if (this.shown.has(id)) {
         return;
       }
@@ -368,7 +375,7 @@ export default {
       const id = this.getIdfromURL(choice.item.id);
       if (id == "-1") {
         if (choice.type === "nope") {
-          this.leaveSession();
+          this.$router.push({ name: "History" });
         }
         if (choice.type === "like") {
           this.$router.push({ name: "Matches" });
