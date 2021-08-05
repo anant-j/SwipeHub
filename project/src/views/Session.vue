@@ -242,7 +242,6 @@ export default {
         .then(() => {
           this.getSessionData();
           this.signedIn = true;
-          this.$store.state.loader = false;
         })
         .catch(() => {
           this.$store.state.loader = false;
@@ -346,6 +345,7 @@ export default {
       return;
     },
     addCard(id) {
+      this.$store.state.loader = false;
       if (id == -1 || id == "null") {
         this.addLastCard();
       }
