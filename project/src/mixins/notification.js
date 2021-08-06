@@ -41,7 +41,6 @@ export const memberNotification = {
         left: [],
       };
       const oldUserDataPair = this.$store.state.usersData;
-      console.log(oldUserDataPair);
       const oldData = [];
       for (const userData of oldUserDataPair) {
         oldData.push(userData["userId"]);

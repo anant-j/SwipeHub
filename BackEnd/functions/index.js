@@ -311,6 +311,7 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
     const id = data[i].id.toString();
     const sessionDb = admin.firestore().collection("media").doc(id);
     const doc = await sessionDb.get();
+    data[i]["poster_path"] = `https://image.tmdb.org/t/p/original${data[i].poster_path}`;
     if (!doc.exists) {
       await admin
           .firestore()

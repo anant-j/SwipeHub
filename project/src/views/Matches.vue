@@ -159,9 +159,10 @@ export default {
               const tempMovieData = {
                 movieId: movieId,
                 title: this.$store.state.movieData[movieId].title,
-                posterURL:
-                  "https://image.tmdb.org/t/p/original/" +
-                  this.$store.state.movieData[movieId].poster_path,
+                posterURL: this.getImageURL(
+                  movieId,
+                  this.$store.state.movieData[movieId].poster_path
+                ).url,
                 description: this.$store.state.movieData[movieId].overview,
                 release: this.$store.state.movieData[movieId].release_date,
               };
@@ -172,9 +173,8 @@ export default {
                 const tempMovieData = {
                   movieId: movieId,
                   title: movieData.title,
-                  posterURL:
-                    "https://image.tmdb.org/t/p/original/" +
-                    movieData.poster_path,
+                  posterURL: this.getImageURL(movieId, movieData.poster_path)
+                    .url,
                   description: movieData.overview,
                   release: movieData.release_date,
                 };

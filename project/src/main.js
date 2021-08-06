@@ -31,6 +31,9 @@ if (window.location.hostname === "localhost") {
 Vue.mixin({
   data: () => ({
     hostURL: host,
+    noCardUrl: "https://i.imgur.com/8MfHjli.png",
+    noImageUrl: "https://i.imgur.com/Sql8s2M.png",
+    TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   computed: {
     getSessionId() {
@@ -74,6 +77,28 @@ Vue.mixin({
     },
   },
   methods: {
+    getImageURL(id, imgUrl) {
+      if (imgUrl.includes("?id=")) {
+        id = imgUrl.split("?id=")[1];
+        imgUrl = imgUrl.split("?id=")[0];
+      }
+      imgUrl = imgUrl.replace("http://", "https://");
+      if (imgUrl == this.TMDBNull) {
+        return {
+          type: "no image",
+          valid: false,
+          url: `${this.noImageUrl}?id=${id}`,
+        };
+      }
+      if (imgUrl == this.noCardUrl) {
+        return {
+          type: "no card",
+          valid: false,
+          url: `${this.noCardUrl}?id=${id}`,
+        };
+      }
+      return { type: "regular", valid: true, url: `${imgUrl}?id=${id}` };
+    },
     setSessionId(sessionId) {
       const validatedSessionId = sessionId.toString().toUpperCase();
       this.$store.state.sessionId = validatedSessionId;

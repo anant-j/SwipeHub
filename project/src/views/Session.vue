@@ -156,9 +156,6 @@ export default {
     shown: new Set(),
     activeDescriptionModal: false,
     signedIn: false,
-    noCardUrl: "https://i.imgur.com/8MfHjli.png",
-    noImageUrl: "https://i.imgur.com/Sql8s2M.png",
-    TMDBNull: "https://image.tmdb.org/t/p/originalnull",
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -188,12 +185,11 @@ export default {
   computed: {
     photoAvailable() {
       const inputId = this.queue[0].id;
-      const posterlink = inputId.split("?id=")[0];
-      if (
-        posterlink === this.TMDBNull ||
-        posterlink === this.noImageUrl ||
-        posterlink === this.noCardUrl
-      ) {
+      const poster = this.getImageURL(
+        inputId.split("?id=")[1],
+        inputId.split("?id=")[0]
+      );
+      if (!poster.valid) {
         return false;
       }
       return true;
@@ -346,23 +342,18 @@ export default {
     },
     addCard(id) {
       this.$store.state.loader = false;
-      if (id == -1 || id == "null") {
+      if (id == -1 || id == "null" || id == null) {
         this.addLastCard();
+        return;
       }
       if (this.shown.has(id)) {
         return;
       }
       const cardData = this.$store.state.movieData[id];
       const list = [];
-      let posterlink =
-        "https://image.tmdb.org/t/p/original" + cardData.poster_path;
-      if (posterlink === this.TMDBNull) {
-        posterlink = this.noImageUrl;
-      }
-      posterlink = posterlink.replace("http://", "https://");
-      const finalPosterLink = posterlink + `?id=${id}`;
+      let posterlink = this.getImageURL(id, cardData.poster_path).url;
       list.push({
-        id: finalPosterLink,
+        id: posterlink,
       });
       this.queue = this.queue.concat(list);
       this.shown.add(id);
