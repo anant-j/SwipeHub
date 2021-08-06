@@ -23,6 +23,12 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
       if (!snap.val()) {
         return ({status: "error", message: "SessionId is not valid!"});
       }
+      if (!(snap.val()["sessionActivity"]["isValid"])) {
+        return ({status: "error", message: "This session has ended. Please create a new session!"});
+      }
+      if (!snap.val()["users"][username] && Object.keys(snap.val()["users"]).length >= 8) {
+        return ({status: "error", message: "Session is currently full. Please join another session or create a new one."});
+      }
       const isCreator = snap.val()["sessionInfo"]["creator"] == username;
       const token = await generateJWTToken(username, sessionId, isCreator);
       sessionDb.ref(sessionId).child("users").child(username).update({
@@ -138,7 +144,6 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
     const userId = context.auth.token.userId;
     const sessionId = context.auth.token.sessionId;
     const isCreator = context.auth.token.isCreator;
-    await admin.auth().deleteUser(`${sessionId}|${userId}`);
     if (isCreator) {
       sessionDb.ref(sessionId).child("sessionActivity").update({
         isValid: false,
@@ -154,6 +159,7 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
     sessionDb.ref(sessionId).child("sessionActivity").update({
       matches: matches,
     });
+    await admin.auth().deleteUser(`${sessionId}|${userId}|${isCreator}`);
     return;
   } catch (err) {
     sendErrorNotification("Leave Session", err);
