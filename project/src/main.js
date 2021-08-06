@@ -86,7 +86,7 @@ Vue.mixin({
     getDataFromUid(uid) {
       const sessionId = uid.split("|")[0];
       const userId = uid.split("|")[1];
-      const isCreator = uid.split("|")[2];
+      const isCreator = uid.split("|")[2] == "true";
       if (!sessionId || !userId) {
         return null;
       }
