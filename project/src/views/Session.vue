@@ -171,11 +171,11 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
     this.signIn();
-    document.addEventListener("keyup", this.keyListener);
+    document.addEventListener("keydown", this.keyListener);
     eventLogger("Session Page Loaded");
   },
   destroyed() {
-    document.removeEventListener("keyup", this.keyListener);
+    document.removeEventListener("keydown", this.keyListener);
     if (this.signedIn) {
       signOut(auth);
       const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
@@ -412,10 +412,18 @@ export default {
       this.showInfo = !this.showInfo;
     },
     keyListener: function (evt) {
-      if (evt.keyCode === 37) {
+      if (
+        evt.code === "ArrowLeft" &&
+        document.hasFocus() &&
+        !this.$store.state.activeShareModal
+      ) {
         this.decide("nope");
       }
-      if (evt.keyCode === 39) {
+      if (
+        evt.code === "ArrowRight" &&
+        document.hasFocus() &&
+        !this.$store.state.activeShareModal
+      ) {
         this.decide("like");
       }
     },
