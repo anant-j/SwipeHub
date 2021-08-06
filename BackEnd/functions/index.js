@@ -422,6 +422,6 @@ async function generateJWTToken(userId, sessionId, isCreator = false) {
     sessionId: sessionId,
     userId: userId,
   };
-  const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}`, additionalClaims);
+  const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}|${isCreator}`, additionalClaims);
   return customToken;
 }

@@ -119,25 +119,35 @@ export default {
   methods: {
     signIn() {
       signInWithCustomToken(auth, this.getJWT)
-        .then(() => {
-          this.signedIn = true;
+        .then((auth) => {
+          const uid = auth.user.uid;
+          const dataFromUid = this.getDataFromUid(uid);
+          if (dataFromUid == null) {
+            this.signInFail();
+            return;
+          }
+          const uidSessionId = dataFromUid.sessionId;
+          const uiduserId = dataFromUid.userId;
+          if (
+            uiduserId !== this.getUserId ||
+            uidSessionId !== this.getSessionId
+          ) {
+            this.signInFail();
+            return;
+          }
+          this.$store.state.isCreator = dataFromUid.isCreator;
           this.getMatchData();
-          this.$store.state.loader = false;
+          this.signedIn = true;
         })
         .catch(() => {
-          this.$store.state.loader = false;
-          this.showAlert(
-            "Please join a session first",
-            "e",
-            5000,
-            "loginFailed"
-          );
-          this.$router.push({ name: "Home" });
+          this.signInFail();
+          return;
         });
     },
     async getMatchData() {
       const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
       onValue(dbRef, (snapshot) => {
+        this.$store.state.loader = false;
         const data = snapshot.val();
         const matchData = data.matches;
         if (!data) {

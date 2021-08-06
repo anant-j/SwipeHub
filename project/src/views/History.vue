@@ -134,20 +134,29 @@ export default {
   methods: {
     signIn() {
       signInWithCustomToken(auth, this.getJWT)
-        .then(() => {
-          this.signedIn = true;
+        .then((auth) => {
+          const uid = auth.user.uid;
+          const dataFromUid = this.getDataFromUid(uid);
+          if (dataFromUid == null) {
+            this.signInFail();
+            return;
+          }
+          const uidSessionId = dataFromUid.sessionId;
+          const uiduserId = dataFromUid.userId;
+          if (
+            uiduserId !== this.getUserId ||
+            uidSessionId !== this.getSessionId
+          ) {
+            this.signInFail();
+            return;
+          }
+          this.$store.state.isCreator = dataFromUid.isCreator;
           this.getSwipeData();
-          this.$store.state.loader = false;
+          this.signedIn = true;
         })
         .catch(() => {
-          this.$store.state.loader = false;
-          this.showAlert(
-            "Please join a session first",
-            "e",
-            5000,
-            "loginFailed"
-          );
-          this.$router.push({ name: "Home" });
+          this.signInFail();
+          return;
         });
     },
     async getSwipeData() {
@@ -157,6 +166,7 @@ export default {
       );
       get(child(dbRef, `swipes`))
         .then((snapshot) => {
+          this.$store.state.loader = false;
           if (snapshot.exists()) {
             const swipeData = snapshot.val();
             const numSwipes = Object.keys(swipeData).length;

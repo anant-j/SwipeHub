@@ -77,6 +77,21 @@ Vue.mixin({
     },
   },
   methods: {
+    signInFail() {
+      this.$store.state.loader = false;
+      this.showAlert("Please join a session first", "e", 5000, "loginFailed");
+      this.$router.push({ name: "Home" });
+      return;
+    },
+    getDataFromUid(uid) {
+      const sessionId = uid.split("|")[0];
+      const userId = uid.split("|")[1];
+      const isCreator = uid.split("|")[2];
+      if (!sessionId || !userId) {
+        return null;
+      }
+      return { sessionId: sessionId, userId: userId, isCreator: isCreator };
+    },
     getImageURL(id, imgUrl) {
       if (imgUrl.includes("?id=")) {
         id = imgUrl.split("?id=")[1];
