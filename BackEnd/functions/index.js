@@ -10,72 +10,76 @@ const expectedToken = TelegramToken.split(":")[1].toLowerCase();
 const sessionDb = admin.database();
 
 exports.registerTenant = functions.https.onCall(async (data, context) => {
-  if (context.app == undefined) {
-    throw new functions.https.HttpsError(
-        "failed-precondition",
-        "The function must be called from an App Check verified app.");
-  }
-  if (data.requestType === "join") {
-    const username = data.username;
-    const sessionId = data.sessionId;
-    const snap = await sessionDb.ref(sessionId).once("value");
-    if (!snap.val()) {
-      return ({status: "error", message: "SessionId is not valid!"});
+  try {
+    if (context.app == undefined) {
+      throw new functions.https.HttpsError(
+          "failed-precondition",
+          "The function must be called from an App Check verified app.");
     }
-    const isCreator = snap.val()["sessionInfo"]["creator"] == username;
-    const token = await generateJWTToken(username, sessionId, isCreator);
-    sessionDb.ref(sessionId).child("users").child(username).update({
-      isActive: true,
-    });
-    sessionDb.ref(sessionId).update({
-      [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
-      [`users/${username}/isActive`]: true,
-      "sessionActivity/matches": [],
-    });
-    return ({status: "success", token: token, isCreator: isCreator});
-  } else if (data.requestType === "create") {
-    const sessionId = await generateSessionId();
-    const username=data.username;
-    const categories=data.categories;
-    const languages=data.language;
-    const platform=data.platform;
-    const region=data.region;
-    const type=data.type;
-    const order=data.order;
-    sessionDb.ref(sessionId).set({
-      sessionInfo: {
-        categories: categories,
-        creator: username,
-        languages: languages,
-        platform: platform,
-        region: region,
-        isMovie: type,
-        order: order,
-      },
-      sessionActivity: {
-        matches: [],
-        contentOrder: [],
-        isValid: true,
-        users:
+    if (data.requestType === "join") {
+      const username = data.username;
+      const sessionId = data.sessionId;
+      const snap = await sessionDb.ref(sessionId).once("value");
+      if (!snap.val()) {
+        return ({status: "error", message: "SessionId is not valid!"});
+      }
+      const isCreator = snap.val()["sessionInfo"]["creator"] == username;
+      const token = await generateJWTToken(username, sessionId, isCreator);
+      sessionDb.ref(sessionId).child("users").child(username).update({
+        isActive: true,
+      });
+      sessionDb.ref(sessionId).update({
+        [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
+        [`users/${username}/isActive`]: true,
+        "sessionActivity/matches": [],
+      });
+      return ({status: "success", token: token, isCreator: isCreator});
+    } else if (data.requestType === "create") {
+      const sessionId = await generateSessionId();
+      const username=data.username;
+      const categories=data.categories;
+      const languages=data.language;
+      const platform=data.platform;
+      const region=data.region;
+      const type=data.type;
+      const order=data.order;
+      sessionDb.ref(sessionId).set({
+        sessionInfo: {
+          categories: categories,
+          creator: username,
+          languages: languages,
+          platform: platform,
+          region: region,
+          isMovie: type,
+          order: order,
+        },
+        sessionActivity: {
+          matches: [],
+          contentOrder: [],
+          isValid: true,
+          users:
       {
         [username]: {
           swipes: 0,
           joinedAt: new Date().getTime(),
         },
       },
-      },
-      users: {
-        [username]: {
-          likes: [],
-          dislikes: [],
-          isActive: true,
         },
-      },
-    });
-    const token = await generateJWTToken(username, sessionId, true);
-    return ({token: token, sessionId: sessionId, userId: username});
-  } else {
-    throw new functions.https.HttpsError("invalid-argument", "The function must be called with correct request type");
+        users: {
+          [username]: {
+            likes: [],
+            dislikes: [],
+            isActive: true,
+          },
+        },
+      });
+      const token = await generateJWTToken(username, sessionId, true);
+      return ({token: token, sessionId: sessionId, userId: username});
+    } else {
+      throw new functions.https.HttpsError("invalid-argument", "The function must be called with correct request type");
+    }
+  } catch (err) {
+    sendErrorNotification("Register Tenant", err);
   }
 });
 
@@ -125,31 +129,35 @@ exports.generateInitialData = functions.database.ref("{sessionId}")
     });
 
 exports.leaveSession = functions.https.onCall(async (data, context) => {
-  if (context.app == undefined) {
-    throw new functions.https.HttpsError(
-        "failed-precondition",
-        "The function must be called from an App Check verified app.");
-  }
-  const userId = context.auth.token.userId;
-  const sessionId = context.auth.token.sessionId;
-  const isCreator = context.auth.token.isCreator;
-  await admin.auth().deleteUser(`${sessionId}|${userId}`);
-  if (isCreator) {
+  try {
+    if (context.app == undefined) {
+      throw new functions.https.HttpsError(
+          "failed-precondition",
+          "The function must be called from an App Check verified app.");
+    }
+    const userId = context.auth.token.userId;
+    const sessionId = context.auth.token.sessionId;
+    const isCreator = context.auth.token.isCreator;
+    await admin.auth().deleteUser(`${sessionId}|${userId}`);
+    if (isCreator) {
+      sessionDb.ref(sessionId).child("sessionActivity").update({
+        isValid: false,
+      });
+    } else {
+      sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
+      });
+      sessionDb.ref(sessionId).child("users").child(userId).set({
+      });
+    }
+    const snap = await sessionDb.ref(sessionId).child("users").once("value");
+    const matches = getMatches(snap.val());
     sessionDb.ref(sessionId).child("sessionActivity").update({
-      isValid: false,
+      matches: matches,
     });
-  } else {
-    sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
-    });
-    sessionDb.ref(sessionId).child("users").child(userId).set({
-    });
+    return;
+  } catch (err) {
+    sendErrorNotification("Leave Session", err);
   }
-  const snap = await sessionDb.ref(sessionId).child("users").once("value");
-  const matches = getMatches(snap.val());
-  sessionDb.ref(sessionId).child("sessionActivity").update({
-    matches: matches,
-  });
-  return;
 });
 
 exports.deploymessages = functions.https.onRequest(async (req, res) => {
@@ -182,7 +190,7 @@ exports.deploymessages = functions.https.onRequest(async (req, res) => {
     }
     return;
   } catch (error) {
-    console.error(error);
+    functions.logger.error(error);
     sendErrorNotification("deploymessages", error);
     res.status(500).send("error");
   }
@@ -285,9 +293,10 @@ async function sendErrorNotification(caller, error) {
     await axios.get(
         `${TelegramURL}/${TelegramToken}/sendMessage?text=${content}&chat_id=${TelegramChatID}`,
     );
+    functions.logger.error(error);
     return true;
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    functions.logger.error(err);
     return false;
   }
 }
