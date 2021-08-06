@@ -77,6 +77,9 @@ Vue.mixin({
     },
   },
   methods: {
+    delay(ms) {
+      return new Promise((res) => setTimeout(res, ms));
+    },
     signInFail() {
       this.$store.state.loader = false;
       this.showAlert("Please join a session first", "e", 5000, "loginFailed");

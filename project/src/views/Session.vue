@@ -152,6 +152,7 @@ export default {
     showInfo: false,
     rewindAllow: false,
     superAllowed: false,
+    keyAllowed: true,
     superThreshold: 5,
     queue: [],
     shown: new Set(),
@@ -172,11 +173,13 @@ export default {
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
     this.signIn();
-    document.addEventListener("keydown", this.keyListener);
+    document.addEventListener("keydown", this.keyDownListener);
+    document.addEventListener("keyup", this.keyUpListener);
     eventLogger("Session Page Loaded");
   },
   destroyed() {
-    document.removeEventListener("keydown", this.keyListener);
+    document.removeEventListener("keydown", this.keyDownListener);
+    document.removeEventListener("keyup", this.keyUpListener);
     if (this.signedIn) {
       signOut(auth);
       const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
@@ -405,27 +408,44 @@ export default {
       //     this.rewindAllow = false;
       //   }
       // } else {
-      this.$refs.tinder.decide(choice);
-      // }
+      try {
+        this.$refs.tinder.decide(choice);
+      } catch (error) {
+        this.$store.state.loader = true;
+        await this.delay(5000);
+        if (this.$store.state.loader == true) {
+          this.$store.state.loader == false;
+          this.addLastCard();
+        }
+      }
       return;
     },
     cardClicked() {
       this.showInfo = !this.showInfo;
     },
-    keyListener: function (evt) {
+    keyDownListener: function (evt) {
       if (
         evt.code === "ArrowLeft" &&
         document.hasFocus() &&
-        !this.$store.state.activeShareModal
+        !this.$store.state.activeShareModal &&
+        this.keyAllowed == true
       ) {
+        this.keyAllowed = false;
         this.decide("nope");
       }
       if (
         evt.code === "ArrowRight" &&
         document.hasFocus() &&
-        !this.$store.state.activeShareModal
+        !this.$store.state.activeShareModal &&
+        this.keyAllowed == true
       ) {
+        this.keyAllowed = false;
         this.decide("like");
+      }
+    },
+    keyUpListener: function (evt) {
+      if (evt.code === "ArrowLeft" || evt.code === "ArrowRight") {
+        this.keyAllowed = true;
       }
     },
   },
