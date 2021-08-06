@@ -130,6 +130,7 @@
         @click="decide('rewind')"
       /> -->
       <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
+      <img src="@/assets/help.png" @click="cardClicked()" />
       <img src="@/assets/like.png" @click="decide('like')" />
     </div>
   </div>
