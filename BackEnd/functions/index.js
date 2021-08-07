@@ -19,9 +19,12 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
     if (data.requestType === "join") {
       const username = data.username;
       const sessionId = data.sessionId;
+      if (!usernameValidator(username) || !sessionIdValidator(sessionId)) {
+        return ({status: "error", message: "Username or SessionId is not valid!"});
+      }
       const snap = await sessionDb.ref(sessionId).once("value");
       if (!snap.val()) {
-        return ({status: "error", message: "SessionId is not valid!"});
+        return ({status: "error", message: "SessionId does not exist!"});
       }
       if (!(snap.val()["sessionActivity"]["isValid"])) {
         return ({status: "error", message: "This session has ended. Please create a new session!"});
@@ -43,6 +46,9 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
     } else if (data.requestType === "create") {
       const sessionId = await generateSessionId();
       const username=data.username;
+      if (!usernameValidator(username)) {
+        return ({status: "error", message: "Username is not valid!"});
+      }
       const categories=data.categories;
       const languages=data.language;
       const platform=data.platform;
@@ -394,7 +400,7 @@ async function generateSessionId() {
  */
 function randomSessionCode() {
   const length = 6;
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const chars = "123456789ABCDEFGHJKMNPQRSTUVWXYZ";
   let result = "";
   for (let i = length; i > 0; --i) {
     result += chars[Math.floor(Math.random() * chars.length)];
@@ -431,3 +437,92 @@ async function generateJWTToken(userId, sessionId, isCreator = false) {
   const customToken = await admin.auth().createCustomToken(`${sessionId}|${userId}|${isCreator}`, additionalClaims);
   return customToken;
 }
+
+
+/**
+ * @param  {string} username
+ * @return {boolean} if valid or not
+ */
+function usernameValidator(username) {
+  if (username == null || username.length == 0) {
+    return false;
+  }
+  if (reservedKeywords.includes(username.trim().toLowerCase())) {
+    return false;
+  }
+  if (
+    !username
+        .toLowerCase()
+        .split("")
+        .every((char) => alphaNumeric.includes(char))
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * @param  {string} sessionId
+ * @return {boolean} if valid or not
+ */
+function sessionIdValidator(sessionId) {
+  if (sessionId == null || sessionId.length != 6) {
+    return false;
+  }
+  if (reservedKeywords.includes(sessionId.trim().toLowerCase())) {
+    return false;
+  }
+  if (
+    !sessionId
+        .toLowerCase()
+        .split("")
+        .every((char) => alphaNumeric.includes(char))
+  ) {
+    return false;
+  }
+  return true;
+}
+
+
+const reservedKeywords = [
+  "nigga",
+];
+
+const alphaNumeric = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+];
