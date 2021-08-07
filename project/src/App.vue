@@ -19,7 +19,8 @@
 import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
 import ShareScreen from "@/components/ShareScreen.vue";
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "App",
@@ -29,15 +30,17 @@ export default {
     ShareScreen,
   },
   store,
+  mounted() {
+    eventLogger("Application Loaded");
+  },
   computed: {
     omitted() {
       const temp = {};
       for (const [key, value] of Object.entries(this.$store.state)) {
-        if (key != "movieData" && key != "swipeHistory" && key != "likedList") {
+        if (key != "movieData" && key != "likedList") {
           temp[key] = value;
         }
         if (key == "likedList") {
-          // console.log(this.$store.state.likedList);
           temp[key] = Array.from(this.$store.state.likedList);
         }
       }

@@ -8,14 +8,13 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
-import router from "@/router";
+import store from "@/plugins/store/index.js";
 export default {
   name: "MatchNotification",
   store,
   methods: {
     toMatchPage() {
-      router.push({ name: "Matches" });
+      this.$router.push({ name: "Matches" });
     },
   },
 };

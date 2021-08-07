@@ -35,15 +35,17 @@
               <router-link class="nav-link" to="/session">Session</router-link>
             </li>
             <li class="nav-item" v-if="this.sessionDataPresent">
-              <router-link
-                class="nav-link"
-                to="/matches"
-                @click.native="checkPollPending()"
+              <router-link class="nav-link" to="/matches"
                 >Matches
                 <span v-if="this.$store.state.totalMatches > 0"
                   >({{ this.$store.state.totalMatches }})
                 </span>
               </router-link>
+            </li>
+            <li class="nav-item" v-if="this.sessionDataPresent">
+              <router-link class="nav-link" to="/history"
+                >My Swipes</router-link
+              >
             </li>
             <li class="nav-item" v-if="this.$store.state.devmode > 0">
               <a @click="toggleDevMode()" class="nav-link"
@@ -55,7 +57,7 @@
             <li
               class="nav-item"
               @click="
-                createShareLink();
+                showShareModal();
                 hideModal();
               "
               v-if="this.$store.state.activePage"
@@ -145,10 +147,16 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "jquery/src/jquery.js";
 import "bootstrap/dist/js/bootstrap.min.js";
-import store from "../store/index.js";
+import store from "@/plugins/store/index.js";
+import { cleanup } from "@/mixins/utilities.js";
+import { navigation } from "@/mixins/navigation.js";
+import { clipboard, share } from "@/mixins/share.js";
+import { eventLogger } from "@/firebase_config.js";
+
 export default {
   name: "Navbar",
   store,
+  mixins: [cleanup, navigation, clipboard, share],
   watch: {
     $route() {
       document
@@ -162,11 +170,6 @@ export default {
         .getElementById("navbarSupportedContent")
         .classList.toggle("show");
     },
-    checkPollPending() {
-      if (this.$store.state.likedSet.size > 0) {
-        this.globalSessionPoll();
-      }
-    },
     toggleDevMode() {
       if (this.$store.state.devmode == 1) {
         this.$store.state.devmode = 2;
@@ -175,6 +178,10 @@ export default {
       } else {
         console.log("Not in dev mode");
       }
+    },
+    showShareModal() {
+      eventLogger("Share modal displayed");
+      this.$store.state.activeShareModal = true;
     },
   },
 };
@@ -190,6 +197,10 @@ export default {
 
 #nav a {
   color: white;
+}
+
+#nav a:hover {
+  color: red;
 }
 
 #nav a.router-link-exact-active {

@@ -4,12 +4,12 @@
       class="card mx-auto mt-3 text-center"
       style="max-width: 500px"
       id="noCards"
-      v-if="this.$store.state.totalMatches == 0"
+      v-if="this.$store.state.totalSwipes == 0"
     >
       <div class="card-body" style="color: black">
-        <h5 class="card-title">No matches found</h5>
+        <h5 class="card-title">No Swipes found</h5>
         <p class="card-text">
-          Please swipe right on more cards for matches to appear
+          Please swipe on more cards for them to appear here
         </p>
         <router-link class="btn btn-primary" to="/session"
           >Start Swiping</router-link
@@ -28,7 +28,7 @@
       >
         <div
           class="col"
-          v-for="item in this.localMatchStore"
+          v-for="item in this.localSwipeStore"
           :key="item.movieId"
         >
           <div class="card text-white bg-dark h-100 text-center">
@@ -47,8 +47,25 @@
               </h5>
               <p class="card-text">{{ item.description }}</p>
             </div>
-            <div class="card-footer">
+            <div
+              class="card-footer"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
               <small class="text-muted">Released on {{ item.release }}</small>
+              <img
+                class="buttonImg"
+                src="@/assets/like.png"
+                v-if="item.liked"
+              />
+              <img
+                class="buttonImg"
+                src="@/assets/nope.png"
+                v-if="!item.liked"
+              />
             </div>
           </div>
         </div>
@@ -60,18 +77,18 @@
 <script>
 import store from "@/plugins/store/index.js";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
-import { ref, onValue, off } from "firebase/database";
+import { ref, get, child } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 
 export default {
-  name: "Matches",
+  name: "History",
   store,
   mixins: [notification, cleanup],
   data: () => ({
     signedIn: false,
-    localMatchStore: [],
+    localSwipeStore: [],
     searchField: "",
   }),
   created() {
@@ -86,32 +103,30 @@ export default {
       return;
     }
     this.$store.state.loader = true;
-    this.$store.state.activePage = 2;
+    this.$store.state.activePage = 3;
     this.signIn();
-    eventLogger("Matches page loaded");
+    eventLogger("History page loaded");
   },
   destroyed() {
     if (this.signedIn) {
       signOut(auth);
-      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
-      off(dbRef);
     }
   },
   watch: {
     searchField(value) {
       if (value == "") {
-        this.localMatchStore = this.$store.state.matchData;
+        this.localSwipeStore = this.$store.state.swipeData;
       } else {
-        this.localMatchStore = [];
+        this.localSwipeStore = [];
         const searchValue = value.toLowerCase().trim();
-        const localMovieData = this.$store.state.matchData;
+        const localMovieData = this.$store.state.swipeData;
         for (const movie of localMovieData) {
           if (
             movie.title.toLowerCase().trim().includes(searchValue) ||
             movie.release.toLowerCase().trim().includes(searchValue) ||
             movie.description.toLowerCase().trim().includes(searchValue)
           )
-            this.localMatchStore.push(movie);
+            this.localSwipeStore.push(movie);
         }
       }
     },
@@ -136,7 +151,7 @@ export default {
             return;
           }
           this.$store.state.isCreator = dataFromUid.isCreator;
-          this.getMatchData();
+          this.getSwipeData();
           this.signedIn = true;
         })
         .catch(() => {
@@ -144,59 +159,57 @@ export default {
           return;
         });
     },
-    async getMatchData() {
-      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
-      onValue(dbRef, (snapshot) => {
-        this.$store.state.loader = false;
-        const data = snapshot.val();
-        const matchData = data.matches;
-        if (!data) {
-          this.leaveSession(true);
-          return;
-        }
-        if (data.isValid != undefined && data.isValid != null) {
-          if (!data.isValid) {
-            this.leaveSession(true);
-            return;
-          }
-        }
-        if (matchData) {
-          const numMatch = matchData.length;
-          this.$store.state.totalMatches = numMatch;
-          this.$store.state.matchData = [];
-          for (const movieId of matchData) {
-            if (this.$store.state.movieData[movieId]) {
-              const tempMovieData = {
-                movieId: movieId,
-                title: this.$store.state.movieData[movieId].title,
-                posterURL: this.getImageURL(
-                  movieId,
-                  this.$store.state.movieData[movieId].poster_path
-                ).url,
-                description: this.$store.state.movieData[movieId].overview,
-                release: this.$store.state.movieData[movieId].release_date,
-              };
-              this.$store.state.matchData.push(tempMovieData);
-            } else {
-              this.getMovieData(movieId).then((movieData) => {
-                this.$store.state.movieData[movieId] = movieData;
+    async getSwipeData() {
+      const dbRef = ref(
+        sessionDb,
+        `${this.getSessionId}/users/${this.getUserId}`
+      );
+      get(child(dbRef, `swipes`))
+        .then((snapshot) => {
+          this.$store.state.loader = false;
+          if (snapshot.exists()) {
+            const swipeData = snapshot.val();
+            const numSwipes = Object.keys(swipeData).length;
+            this.$store.state.totalSwipes = numSwipes;
+            this.$store.state.swipeData = [];
+            for (const movieId of Object.keys(swipeData)) {
+              if (this.$store.state.movieData[movieId]) {
                 const tempMovieData = {
                   movieId: movieId,
-                  title: movieData.title,
-                  posterURL: this.getImageURL(movieId, movieData.poster_path)
-                    .url,
-                  description: movieData.overview,
-                  release: movieData.release_date,
+                  title: this.$store.state.movieData[movieId].title,
+                  posterURL: this.getImageURL(
+                    movieId,
+                    this.$store.state.movieData[movieId].poster_path
+                  ).url,
+                  description: this.$store.state.movieData[movieId].overview,
+                  release: this.$store.state.movieData[movieId].release_date,
+                  liked: swipeData[movieId],
                 };
-                this.$store.state.matchData.push(tempMovieData);
-              });
+                this.$store.state.swipeData.push(tempMovieData);
+              } else {
+                this.getMovieData(movieId).then((movieData) => {
+                  this.$store.state.movieData[movieId] = movieData;
+                  const tempMovieData = {
+                    movieId: movieId,
+                    title: movieData.title,
+                    posterURL: this.getImageURL(movieId, movieData.poster_path)
+                      .url,
+                    description: movieData.overview,
+                    release: movieData.release_date,
+                    liked: swipeData[movieId],
+                  };
+                  this.$store.state.swipeData.push(tempMovieData);
+                });
+              }
             }
             if (this.searchField == "") {
-              this.localMatchStore = this.$store.state.matchData;
+              this.localSwipeStore = this.$store.state.swipeData;
             }
           }
-        }
-      });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };
@@ -206,5 +219,12 @@ export default {
 #cardHolder {
   margin-left: 15px;
   margin-right: 15px;
+}
+
+.buttonImg {
+  position: absolute;
+  right: 10px;
+  width: 40px;
+  padding: 5px;
 }
 </style>

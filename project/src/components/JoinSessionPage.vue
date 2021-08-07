@@ -105,13 +105,18 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
-import axios from "axios";
+import store from "@/plugins/store/index.js";
 import { reservedKeywords, alphaNumeric } from "@/assets/data.js";
+import { JWTService } from "@/firebase_config.js";
+import { notification } from "@/mixins/notification.js";
+import { cleanup } from "@/mixins/utilities.js";
+import { navigation } from "@/mixins/navigation.js";
+import { eventLogger } from "@/firebase_config.js";
 
 export default {
   name: "JoinSessionPage",
   store,
+  mixins: [notification, cleanup, navigation],
   data() {
     return {
       username: null,
@@ -125,7 +130,7 @@ export default {
     };
   },
   mounted() {
-    if (this.getSessionId !== null || this.getSessionId !== undefined) {
+    if (this.getSessionId) {
       this.sessionId = this.getSessionId;
     }
   },
@@ -206,39 +211,33 @@ export default {
       if (!this.validateState()) {
         return;
       }
-      this.isSessionValid();
+      this.join();
     },
-    isSessionValid() {
+    join() {
+      this.clearSessionSoft();
       const username = this.username;
       const sessionId = this.sessionId;
       this.$store.state.loader = true;
-      axios
-        .get(`${this.backend}/sessionValid?id=${sessionId}`, {
-          validateStatus: false,
-        })
+      JWTService({
+        requestType: "join",
+        username: username,
+        sessionId: sessionId,
+      })
         .then((result) => {
-          if (result.status === 200) {
+          if (result.data.status == "error") {
+            this.showAlert(result.data.message, "e", 5000, "JWTError");
+            this.$store.state.loader = false;
+          } else {
             this.setSessionId(sessionId);
             this.setUserId(username);
+            this.setJWT(result.data.token);
+            this.$store.state.isCreator = result.data.isCreator;
+            eventLogger("Session joined");
             this.$router.push({ name: "Session" });
-          } else {
-            this.showAlert(
-              "This session could not be found!",
-              "e",
-              4800,
-              "sessionNotFound"
-            );
-            this.$store.state.loader = false;
           }
         })
-        .catch(() => {
-          this.showAlert(
-            "This session could not be found!",
-            "e",
-            4800,
-            "sessionNotFound"
-          );
-          this.$store.state.loader = false;
+        .catch((error) => {
+          console.log(error);
         });
     },
   },

@@ -23,10 +23,12 @@
 </template>
 
 <script>
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
+import { navigation } from "@/mixins/navigation.js";
 
 export default {
   name: "InitialPage",
+  mixins: [navigation],
   store,
 };
 </script>

@@ -189,14 +189,17 @@
 
 <script>
 import "vue-multiselect/dist/vue-multiselect.min.css";
-import axios from "axios";
-
-import store from "@/store/index.js";
+import store from "@/plugins/store/index.js";
 import Multiselect from "vue-multiselect";
 import * as data from "@/assets/data.js";
+import { JWTService } from "@/firebase_config.js";
+import { navigation } from "@/mixins/navigation.js";
+import { eventLogger } from "@/firebase_config.js";
+
 export default {
   name: "CreateSessionPage",
   store,
+  mixins: [navigation],
   components: {
     Multiselect,
   },
@@ -323,47 +326,27 @@ export default {
         }
         categoryList = categoryList.substring(0, categoryList.length - 1);
       }
-      const params = {
+      JWTService({
+        requestType: "create",
         username: username,
         categories: categoryList,
-        languages: language,
+        language: language,
         platform: platform,
         region: country,
         type: type,
         order: order,
-      };
-      const data = Object.keys(params)
-        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-        .join("&");
-      axios({
-        url: `${this.backend}/createSession`,
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data,
       })
-        .then((response) => {
-          if (response.status === 200) {
-            const sessionId = response.data.sessionId;
-            this.setSessionId(sessionId);
-            this.setUserId(username);
-            this.$router.push({ name: "Session" });
-          } else {
-            this.showAlert(
-              "This session could not be created!",
-              "e",
-              4800,
-              "sessionCreateAlert"
-            );
-          }
+        .then((result) => {
+          this.setSessionId(result.data.sessionId);
+          this.setUserId(result.data.userId);
+          this.setJWT(result.data.token);
+          eventLogger("Session created");
+          this.$store.state.isCreator = true;
+          this.$store.state.activeShareModal = true;
+          this.$router.push({ name: "Session" });
         })
-        .catch(() => {
-          this.showAlert(
-            "The session could not be created! Please try again later",
-            "e",
-            5000,
-            "sessionCreateAlert"
-          );
-          this.$store.state.loader = false;
+        .catch((error) => {
+          console.log(error);
         });
     },
   },

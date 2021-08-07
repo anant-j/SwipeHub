@@ -5,6 +5,7 @@
       key-name="id"
       :queue.sync="queue"
       :offset-y="-15"
+      :allowSuper="superAllowed"
       @submit="onSubmit"
     >
       <template slot-scope="scope">
@@ -74,7 +75,7 @@
                     margin-right: 10px;
                     margin-bottom: 0px;
                   "
-                  src="../assets/nope.png"
+                  src="@/assets/nope.png"
                   @click="decide('nope')"
                 />
                 <img
@@ -86,7 +87,7 @@
                     margin-left: 10px;
                     margin-bottom: 0px;
                   "
-                  src="../assets/like.png"
+                  src="@/assets/like.png"
                   @click="decide('like')"
                 />
               </div>
@@ -103,56 +104,60 @@
       <img
         class="card-overlay like-pointer"
         slot="like"
-        src="../assets/like.png"
+        src="@/assets/like.png"
       />
       <img
         class="card-overlay nope-pointer"
         slot="nope"
-        src="../assets/nope.png"
+        src="@/assets/nope.png"
       />
-      <img
+      <!-- <img
         class="card-overlay super-pointer"
         slot="super"
-        src="../assets/like.png"
-      />
+        src="@/assets/like.png"
+      /> -->
       <img
         class="card-overlay rewind-pointer"
         slot="rewind"
-        src="../assets/rewind.png"
+        src="@/assets/rewind.png"
       />
     </Tinder>
     <div class="btns">
-      <img src="../assets/nope.png" @click="decide('nope')" />
+      <img src="@/assets/nope.png" @click="decide('nope')" />
       <!-- <img
-        src="../assets/rewind.png"
+        src="@/assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
       /> -->
-      <!-- <img src="../assets/super-like.png" @click="decide('super')" /> -->
-      <img src="../assets/like.png" @click="decide('like')" />
+      <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
+      <img src="@/assets/help.png" @click="cardClicked()" />
+      <img src="@/assets/like.png" @click="decide('like')" />
     </div>
   </div>
 </template>
 
 <script>
 import Tinder from "vue-tinder";
-import axios from "axios";
+import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
+import { ref, onValue, off, set } from "firebase/database";
+import { signInWithCustomToken, signOut } from "firebase/auth";
+import { notification, memberNotification } from "@/mixins/notification.js";
+import { cleanup, mediaTools } from "@/mixins/utilities.js";
 
 export default {
   name: "Session",
   components: { Tinder },
+  mixins: [notification, cleanup, mediaTools, memberNotification],
   data: () => ({
     showInfo: false,
     rewindAllow: false,
+    superAllowed: false,
+    keyAllowed: true,
+    superThreshold: 5,
     queue: [],
-    lastInteraction: 0,
-    sessionPausedNotifications: true,
+    shown: new Set(),
     activeDescriptionModal: false,
-    timer: null,
-    subsequentPollAllowed: true,
-    noCardUrl: "https://i.imgur.com/8MfHjli.png",
-    noImageUrl: "https://i.imgur.com/Sql8s2M.png",
-    TMDBNull: "https://image.tmdb.org/t/p/originalnull",
+    signedIn: false,
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -167,26 +172,28 @@ export default {
     }
     this.$store.state.loader = true;
     this.$store.state.activePage = 1;
-    this.lastInteraction = 0;
-    this.getCards(
-      `${this.backend}/joinSession?id=${this.getSessionId}&user=${this.getUserId}`
-    );
-    this.poll();
-    document.addEventListener("keyup", this.keyListener);
+    this.signIn();
+    document.addEventListener("keydown", this.keyDownListener);
+    document.addEventListener("keyup", this.keyUpListener);
+    eventLogger("Session Page Loaded");
   },
   destroyed() {
-    document.removeEventListener("keyup", this.keyListener);
-    clearTimeout(this.timer);
+    document.removeEventListener("keydown", this.keyDownListener);
+    document.removeEventListener("keyup", this.keyUpListener);
+    if (this.signedIn) {
+      signOut(auth);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
+      off(dbRef);
+    }
   },
   computed: {
     photoAvailable() {
       const inputId = this.queue[0].id;
-      const posterlink = inputId.split("?id=")[0];
-      if (
-        posterlink === this.TMDBNull ||
-        posterlink === this.noImageUrl ||
-        posterlink === this.noCardUrl
-      ) {
+      const poster = this.getImageURL(
+        inputId.split("?id=")[1],
+        inputId.split("?id=")[0]
+      );
+      if (!poster.valid) {
         return false;
       }
       return true;
@@ -205,7 +212,7 @@ export default {
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
-      const movieDescription = this.$store.state.movieData[movieId].description;
+      const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
     getFontSize() {
@@ -230,13 +237,112 @@ export default {
     },
   },
   methods: {
+    signIn() {
+      signInWithCustomToken(auth, this.getJWT)
+        .then((auth) => {
+          const uid = auth.user.uid;
+          const dataFromUid = this.getDataFromUid(uid);
+          if (dataFromUid == null) {
+            this.signInFail();
+            return;
+          }
+          const uidSessionId = dataFromUid.sessionId;
+          const uiduserId = dataFromUid.userId;
+          if (
+            uiduserId !== this.getUserId ||
+            uidSessionId !== this.getSessionId
+          ) {
+            this.signInFail();
+            return;
+          }
+          this.$store.state.isCreator = dataFromUid.isCreator;
+          this.getSessionData();
+          this.signedIn = true;
+        })
+        .catch(() => {
+          this.signInFail();
+          return;
+        });
+    },
+    async getSessionData() {
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+          this.leaveSession(true);
+          off(dbRef);
+          return;
+        }
+        if (data.isValid != undefined && data.isValid != null) {
+          if (!data.isValid) {
+            this.leaveSession(true);
+            off(dbRef);
+            return;
+          }
+        }
+        const userData = data.users;
+        const mySwipes = userData[this.getUserId].swipes || 0;
+        if (userData) {
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (!userData[iterator].swipes) {
+              userData[iterator]["swipes"] = 0;
+            }
+            if (iterator !== this.getUserId) {
+              userDataArray.push({
+                userId: iterator,
+                value: userData[iterator].swipes,
+              });
+            } else {
+              this.$store.state.totalSwipes = mySwipes;
+            }
+            this.updatedMemberNotification(userData);
+          }
+          this.$store.state.usersData = userDataArray;
+        } else {
+          this.$store.state.usersData = [];
+        }
+
+        const matches = data.matches;
+        if (matches) {
+          const numMatch = matches.length;
+          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
+            this.$store.state.totalMatches = numMatch;
+            this.showAlert(`temp`, "s", 4800, "matchesAlert");
+          }
+          this.$store.state.totalMatches = numMatch;
+        } else {
+          this.$store.state.totalMatches = 0;
+        }
+
+        const allMovies = data.mediaOrder;
+        if (allMovies) {
+          const movieOrder = allMovies.slice(mySwipes, allMovies.length);
+          for (const id of movieOrder) {
+            if (id == -1 || id == "null") {
+              this.addCard("null");
+            }
+            if (!this.$store.state.movieData[id]) {
+              this.getMovieData(id).then((movieData) => {
+                this.$store.state.movieData[id] = movieData;
+                this.addCard(id);
+              });
+            } else {
+              this.addCard(id);
+            }
+          }
+        }
+      });
+    },
     addLastCard() {
+      if (this.shown.has(-1)) {
+        return;
+      }
       const list = [];
       const posterLink = this.noCardUrl;
       this.$store.state.movieData[-1] = {
-        adult: false,
-        description:
-          "We've run out of cards to show you!<br><br><h3 style='color: red;'>Swipe Left to Leave Session</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
+        overview:
+          "We've run out of cards to show you!<br><br><h3 style='color: cyan;'>Swipe Left to View Swipe History</h3><br>OR<br><br><h3 style='color: #66ff00;'>Swipe Right to View Matches</h3>",
         poster: posterLink,
         release_date: "N/A",
         title: "Uh-oh",
@@ -245,129 +351,101 @@ export default {
         id: posterLink + `?id=-1`,
       });
       this.queue = this.queue.concat(list);
-      this.subsequentPollAllowed = false;
+      this.shown.add(-1);
       return;
     },
-    getCards(url) {
-      axios
-        .get(url, {
-          validateStatus: false,
-        })
-        .then((result) => {
-          this.$store.state.loader = false;
-          if (result.data.totalSwipes !== undefined) {
-            this.$store.state.totalSwipes = result.data.totalSwipes;
-          }
-          if (result.data.isCreator !== undefined) {
-            this.$store.state.isCreator = result.data.isCreator;
-          }
-          const order = result.data.movies.order;
-          if (order.length == 0) {
-            this.addLastCard();
-            return;
-          }
-          const list = [];
-          for (let i = 0; i < order.length; i++) {
-            if (order[i] == null) {
-              this.addLastCard();
-              return;
-            }
-            // if (!(order[i] in this.$store.state.movieData)) {
-            this.$store.state.movieData[order[i]] =
-              result.data.movies[order[i]];
-            let posterlink = result.data.movies[order[i]].poster;
-            if (posterlink === this.TMDBNull) {
-              posterlink = this.noImageUrl;
-            }
-            posterlink = posterlink.replace("http://", "https://");
-            const finalPosterLink = posterlink + `?id=${order[i]}`;
-            if (!this.queue.includes(finalPosterLink)) {
-              list.push({
-                id: finalPosterLink,
-              });
-            }
-          }
-          this.queue = this.queue.concat(list);
-        })
-        .catch(() => {
-          this.addLastCard();
-        });
-    },
-    poll() {
-      if (this.pollAllowed()) {
-        if (document.hasFocus()) {
-          this.sessionPausedNotifications = false;
-          this.globalSessionPoll();
-        }
-      } else {
-        if (!this.sessionPausedNotifications) {
-          this.showAlert(
-            "Session is paused. Swipe again to receive session updates",
-            "w",
-            4900,
-            "sessionPausedAlert"
-          );
-          this.sessionPausedNotifications = true;
-        }
+    addCard(id) {
+      this.$store.state.loader = false;
+      if (id == -1 || id == "null" || id == null) {
+        this.addLastCard();
+        return;
       }
-      this.timer = setTimeout(() => this.poll(), 5000);
+      if (this.shown.has(id)) {
+        return;
+      }
+      const cardData = this.$store.state.movieData[id];
+      const list = [];
+      let posterlink = this.getImageURL(id, cardData.poster_path).url;
+      list.push({
+        id: posterlink,
+      });
+      this.queue = this.queue.concat(list);
+      this.shown.add(id);
     },
     onSubmit(choice) {
-      this.lastInteraction = new Date();
       this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
-      const id = this.getId(choice.item.id);
+      const id = this.getIdfromURL(choice.item.id);
       if (id == "-1") {
         if (choice.type === "nope") {
-          this.leaveSession();
+          this.$router.push({ name: "History" });
         }
-        if (choice.type === "like" || choice.type === "super") {
+        if (choice.type === "like") {
           this.$router.push({ name: "Matches" });
         }
         return;
       }
-      if (this.queue.length === 9 && this.subsequentPollAllowed) {
-        this.getCards(
-          `${this.backend}/subsequentCards?id=${this.getSessionId}&userId=${this.getUserId}&totalCards=${this.$store.state.totalSwipes}`
-        );
+      this.swipe(id, choice.type);
+    },
+    swipe(id, type) {
+      const dbRef = ref(
+        sessionDb,
+        `${this.getSessionId}/users/${this.getUserId}/swipes/${id}`
+      );
+      if (type === "like") {
+        set(dbRef, true);
+      } else if (type === "nope") {
+        set(dbRef, false);
       }
-      if (choice.type === "like" || choice.type === "super") {
-        this.$store.state.likedSet.add(id);
-      }
-      this.$store.state.swipeHistory.push(choice.item);
+      return;
     },
     async decide(choice) {
-      if (choice === "rewind") {
-        if (this.$store.state.swipeHistory.length && this.rewindAllow) {
-          this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
-          this.rewindAllow = false;
-        }
-      } else {
+      // if (choice === "rewind") {
+      //   if (this.$store.state.swipeHistory.length && this.rewindAllow) {
+      //     this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
+      //     this.rewindAllow = false;
+      //   }
+      // } else {
+      try {
         this.$refs.tinder.decide(choice);
+      } catch (error) {
+        this.$store.state.loader = true;
+        await this.delay(5000);
+        if (this.$store.state.loader == true) {
+          this.$store.state.loader == false;
+          this.addLastCard();
+        }
       }
+      return;
     },
     cardClicked() {
-      this.lastInteraction = new Date();
       this.showInfo = !this.showInfo;
     },
-    pollAllowed() {
-      const currentTime = new Date();
+    keyDownListener: function (evt) {
       if (
-        (currentTime - this.lastInteraction) / 1000 > 60 ||
-        this.lastInteraction === 0
+        evt.code === "ArrowLeft" &&
+        document.hasFocus() &&
+        !this.$store.state.activeShareModal &&
+        this.keyAllowed == true
       ) {
-        return false;
-      }
-      return true;
-    },
-    keyListener: function (evt) {
-      if (evt.keyCode === 37) {
+        this.keyAllowed = false;
         this.decide("nope");
       }
-      if (evt.keyCode === 39) {
+      if (
+        evt.code === "ArrowRight" &&
+        document.hasFocus() &&
+        !this.$store.state.activeShareModal &&
+        this.keyAllowed == true
+      ) {
+        this.keyAllowed = false;
         this.decide("like");
+      }
+    },
+    keyUpListener: function (evt) {
+      if (evt.code === "ArrowLeft" || evt.code === "ArrowRight") {
+        this.keyAllowed = true;
       }
     },
   },
