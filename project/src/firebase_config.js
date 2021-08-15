@@ -24,6 +24,10 @@ export const auth = getAuth(firebaseApp);
 export const functions = getFunctions(firebaseApp);
 export const JWTService = httpsCallable(functions, "registerTenant");
 export const leave = httpsCallable(functions, "leaveSession");
+export const requestSubsequentCards = httpsCallable(
+  functions,
+  "subsequentCards"
+);
 let analytics;
 
 if (localMode) {

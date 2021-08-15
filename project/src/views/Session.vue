@@ -124,11 +124,11 @@
     </Tinder>
     <div class="btns">
       <img src="@/assets/nope.png" @click="decide('nope')" />
-      <!-- <img
+      <img
         src="@/assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
-      /> -->
+      />
       <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
       <img src="@/assets/help.png" @click="cardClicked()" />
       <img src="@/assets/like.png" @click="decide('like')" />
@@ -143,6 +143,7 @@ import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification, memberNotification } from "@/mixins/notification.js";
 import { cleanup, mediaTools } from "@/mixins/utilities.js";
+import { requestSubsequentCards } from "@/firebase_config.js";
 
 export default {
   name: "Session",
@@ -152,8 +153,8 @@ export default {
     showInfo: false,
     rewindAllow: false,
     superAllowed: false,
+    subsequentAllowed: true,
     keyAllowed: true,
-    superThreshold: 5,
     queue: [],
     shown: new Set(),
     activeDescriptionModal: false,
@@ -281,8 +282,7 @@ export default {
           }
         }
         const userData = data.users;
-        const mySwipes =
-          Object.keys(userData[this.getUserId]["swipes"] || {}).length || 0;
+        const mySwipes = userData[this.getUserId]["swipes"] || {};
         if (userData) {
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
@@ -295,7 +295,7 @@ export default {
                 value: Object.keys(userData[iterator].swipes).length,
               });
             } else {
-              this.$store.state.totalSwipes = mySwipes;
+              this.$store.state.totalSwipes = Object.keys(mySwipes).length;
             }
             this.updatedMemberNotification(userData);
           }
@@ -318,11 +318,7 @@ export default {
         const allMovies = data.mediaOrder;
         if (allMovies) {
           for (const id of allMovies) {
-            if (
-              !Object.keys(userData[this.getUserId]["swipes"] || {}).includes(
-                id
-              )
-            ) {
+            if (!Object.keys(mySwipes).includes(id)) {
               if (id == -1 || id == "null") {
                 this.addCard("null");
               }
@@ -337,6 +333,9 @@ export default {
             } else {
               this.removeCard(id);
             }
+          }
+          if (allMovies.includes("null")) {
+            this.subsequentAllowed = false;
           }
         }
       });
@@ -389,11 +388,14 @@ export default {
       this.shown.add(id);
     },
     onSubmit(choice) {
-      this.rewindAllow = true;
+      // this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
+      if (this.queue.length == 9 && this.subsequentAllowed) {
+        requestSubsequentCards();
+      }
       if (id == "-1") {
         if (choice.type === "nope") {
           this.$router.push({ name: "History" });
@@ -418,14 +420,15 @@ export default {
       return;
     },
     async decide(choice) {
-      // if (choice === "rewind") {
-      //   if (this.$store.state.swipeHistory.length && this.rewindAllow) {
-      //     this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
-      //     this.rewindAllow = false;
-      //   }
-      // } else {
       try {
-        this.$refs.tinder.decide(choice);
+        if (choice === "rewind") {
+          if (this.$store.state.swipeHistory.length && this.rewindAllow) {
+            this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
+            this.rewindAllow = false;
+          }
+        } else {
+          this.$refs.tinder.decide(choice);
+        }
       } catch (error) {
         this.$store.state.loader = true;
         await this.delay(5000);

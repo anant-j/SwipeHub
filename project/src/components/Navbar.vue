@@ -44,8 +44,11 @@
             </li>
             <li class="nav-item" v-if="this.sessionDataPresent">
               <router-link class="nav-link" to="/history"
-                >My Swipes</router-link
-              >
+                >My Swipes
+                <span v-if="this.$store.state.totalSwipes > 0"
+                  >({{ $store.state.totalSwipes }})
+                </span>
+              </router-link>
             </li>
             <li class="nav-item" v-if="this.$store.state.devmode > 0">
               <a @click="toggleDevMode()" class="nav-link"

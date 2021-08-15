@@ -83,6 +83,43 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
   }
 });
 
+exports.subsequentCards = functions.https.onCall(async (data, context) => {
+  try {
+    if (context.app == undefined) {
+      throw new functions.https.HttpsError(
+          "failed-precondition",
+          "The function must be called from an App Check verified app.");
+    }
+    const sessionId = context.auth.token.sessionId;
+    const snap = await sessionDb.ref(sessionId).once("value");
+    if (!snap.val() || !snap.val()["sessionActivity"]["isValid"]) {
+      return ({status: "error", message: "Session has ended. Please create a new session!"});
+    }
+    const mediaOrder = snap.val()["sessionActivity"]["mediaOrder"];
+    const mediaOrderLength = mediaOrder.length;
+    if (mediaOrderLength >= 300) {
+      if (!(mediaOrder.includes("null"))) {
+        mediaOrder.push("null");
+      }
+    } else if (!(mediaOrder.includes("null"))) {
+      const page = getPageNumber(mediaOrderLength);
+      const sessionInfo = snap.val()["sessionInfo"];
+      const newData = await mediaData(sessionInfo, page);
+      for (const mediaId of newData) {
+        if (!(mediaOrder.includes(mediaId))) {
+          mediaOrder.push(mediaId);
+        }
+      }
+    }
+    sessionDb.ref(sessionId).update({
+      "sessionActivity/mediaOrder": mediaOrder,
+    });
+    return;
+  } catch (err) {
+    sendErrorNotification("Register Tenant", err);
+  }
+});
+
 // exports.swipe = functions.database.ref("{sessionId}/users/{userId}/swipes")
 //     .onWrite(async (change, context) => {
 //       if (!change.after.exists()) {
@@ -146,11 +183,6 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
       sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
       });
     }
-    // const snap = await sessionDb.ref(sessionId).child("users").once("value");
-    // const matches = getMatches(snap.val());
-    // sessionDb.ref(sessionId).child("sessionActivity").update({
-    //   matches: matches,
-    // });
     await admin.auth().deleteUser(`${sessionId}|${userId}|${isCreator}`);
     return;
   } catch (err) {
