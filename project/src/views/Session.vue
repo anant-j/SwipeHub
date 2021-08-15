@@ -281,17 +281,18 @@ export default {
           }
         }
         const userData = data.users;
-        const mySwipes = userData[this.getUserId].swipes || 0;
+        const mySwipes =
+          Object.keys(userData[this.getUserId]["swipes"] || {}).length || 0;
         if (userData) {
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
             if (!userData[iterator].swipes) {
-              userData[iterator]["swipes"] = 0;
+              userData[iterator]["swipes"] = {};
             }
             if (iterator !== this.getUserId) {
               userDataArray.push({
                 userId: iterator,
-                value: userData[iterator].swipes,
+                value: Object.keys(userData[iterator].swipes).length,
               });
             } else {
               this.$store.state.totalSwipes = mySwipes;
@@ -303,7 +304,7 @@ export default {
           this.$store.state.usersData = [];
         }
 
-        const matches = data.matches;
+        const matches = this.computeMatches(userData);
         if (matches) {
           const numMatch = matches.length;
           if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
@@ -314,21 +315,27 @@ export default {
         } else {
           this.$store.state.totalMatches = 0;
         }
-
         const allMovies = data.mediaOrder;
         if (allMovies) {
-          const movieOrder = allMovies.slice(mySwipes, allMovies.length);
-          for (const id of movieOrder) {
-            if (id == -1 || id == "null") {
-              this.addCard("null");
-            }
-            if (!this.$store.state.movieData[id]) {
-              this.getMovieData(id).then((movieData) => {
-                this.$store.state.movieData[id] = movieData;
+          for (const id of allMovies) {
+            if (
+              !Object.keys(userData[this.getUserId]["swipes"] || {}).includes(
+                id
+              )
+            ) {
+              if (id == -1 || id == "null") {
+                this.addCard("null");
+              }
+              if (!this.$store.state.movieData[id]) {
+                this.getMovieData(id).then((movieData) => {
+                  this.$store.state.movieData[id] = movieData;
+                  this.addCard(id);
+                });
+              } else {
                 this.addCard(id);
-              });
+              }
             } else {
-              this.addCard(id);
+              this.removeCard(id);
             }
           }
         }
@@ -352,6 +359,15 @@ export default {
       });
       this.queue = this.queue.concat(list);
       this.shown.add(-1);
+      return;
+    },
+    removeCard(id) {
+      const index = this.queue.findIndex(
+        (item) => item.id.split("?id=")[1] === id
+      );
+      if (index > -1) {
+        this.queue.splice(index, 1);
+      }
       return;
     },
     addCard(id) {
@@ -392,7 +408,7 @@ export default {
     swipe(id, type) {
       const dbRef = ref(
         sessionDb,
-        `${this.getSessionId}/users/${this.getUserId}/swipes/${id}`
+        `${this.getSessionId}/sessionActivity/users/${this.getUserId}/swipes/${id}`
       );
       if (type === "like") {
         set(dbRef, true);
