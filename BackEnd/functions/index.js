@@ -120,41 +120,6 @@ exports.subsequentCards = functions.https.onCall(async (data, context) => {
   }
 });
 
-// exports.swipe = functions.database.ref("{sessionId}/users/{userId}/swipes")
-//     .onWrite(async (change, context) => {
-//       if (!change.after.exists()) {
-//         return null;
-//       }
-//       const sessionId = context.params.sessionId;
-//       const userId = context.params.userId;
-//       const mySwipes = change.after.val();
-//       const snap = await sessionDb.ref(sessionId).once("value");
-//       const matches = getMatches(snap.val()["users"]);
-//       const mySwipesLength = Object.keys(mySwipes).length;
-//       const mediaOrder = snap.val()["sessionActivity"]["mediaOrder"];
-//       const mediaOrderLength = mediaOrder.length;
-//       if (mediaOrderLength >= 300) {
-//         if (!(mediaOrder.includes("null"))) {
-//           mediaOrder.push("null");
-//         }
-//       } else if ((mediaOrderLength - mySwipesLength == 9) && (!(mediaOrder[mediaOrderLength - 1] == "null"))) {
-//         const page = getPageNumber(mediaOrderLength);
-//         const sessionInfo = snap.val()["sessionInfo"];
-//         const newData = await mediaData(sessionInfo, page);
-//         for (const mediaId of newData) {
-//           if (!(mediaOrder.includes(mediaId))) {
-//             mediaOrder.push(mediaId);
-//           }
-//         }
-//       }
-//       sessionDb.ref(sessionId).update({
-//         [`sessionActivity/users/${userId}/swipes`]: mySwipesLength,
-//         "sessionActivity/matches": matches,
-//         "sessionActivity/mediaOrder": mediaOrder,
-//       });
-//       return;
-//     });
-
 exports.generateInitialData = functions.database.ref("{sessionId}")
     .onCreate(async (snapshot, context) => {
       const sessionInfo = snapshot.val().sessionInfo;
@@ -225,41 +190,6 @@ exports.deploymessages = functions.https.onRequest(async (req, res) => {
     res.status(500).send("error");
   }
 });
-
-// /**
-//  * @param {any} data
-//  * @param {any} userId
-//  * @param {any} movieId
-//  * @param {any} updateVariable
-//  * @return {any}
-//  */
-// function getMatches(data) {
-//   const matches = [];
-//   const allLikes = [];
-//   const matchMap = {};
-//   if (Object.keys(data).length <=1) {
-//     return matches;
-//   }
-//   for (const eachUser of Object.keys(data)) {
-//     const likes = data[eachUser]["swipes"];
-//     for (const movieId in likes) {
-//       if (likes[movieId]) {
-//         allLikes.push(movieId);
-//       }
-//     }
-//   }
-//   for (const mediaId of allLikes) {
-//     if (!matchMap[mediaId]) {
-//       matchMap[mediaId] = 1;
-//     } else {
-//       matchMap[mediaId] += 1;
-//     }
-//     if (matchMap[mediaId] == Object.keys(data).length && Object.keys(data).length > 1) {
-//       matches.push(mediaId);
-//     }
-//   }
-//   return matches;
-// }
 
 /**
  * @param  {string} sessionInfo
