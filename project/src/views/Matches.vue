@@ -161,7 +161,13 @@ export default {
             return;
           }
         }
-        const userData = data.users;
+        const allUserData = data.users;
+        const userData = {};
+        for (const iterator of Object.keys(allUserData)) {
+          if (allUserData[iterator].isActive) {
+            userData[iterator] = allUserData[iterator];
+          }
+        }
         const mySwipes = userData[this.getUserId]["swipes"] || {};
         if (userData) {
           const userDataArray = [];
