@@ -34,10 +34,18 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
       }
       const isCreator = snap.val()["sessionInfo"]["creator"] == username;
       const token = await generateJWTToken(username, sessionId, isCreator);
-      sessionDb.ref(sessionId).update({
-        [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
-        [`sessionActivity/users/${username}/isActive`]: true,
-      });
+      if (snap.val()["sessionActivity"]["users"][username].isActive == false) {
+        sessionDb.ref(sessionId).update({
+          [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
+          [`sessionActivity/users/${username}/isActive`]: true,
+          [`sessionActivity/users/${username}/swipes`]: {},
+        });
+      } else {
+        sessionDb.ref(sessionId).update({
+          [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
+          [`sessionActivity/users/${username}/isActive`]: true,
+        });
+      }
       return ({status: "success", token: token, isCreator: isCreator});
     } else if (data.requestType === "create") {
       const sessionId = await generateSessionId();
@@ -60,6 +68,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
           region: region,
           isMovie: type,
           order: order,
+          createdAt: new Date().getTime(),
         },
         sessionActivity: {
           contentOrder: [],
@@ -145,7 +154,8 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
         isValid: false,
       });
     } else {
-      sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
+      sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).update({
+        isActive: false,
       });
     }
     await admin.auth().deleteUser(`${sessionId}|${userId}|${isCreator}`);
