@@ -34,7 +34,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
       }
       const isCreator = snap.val()["sessionInfo"]["creator"] == username;
       const token = await generateJWTToken(username, sessionId, isCreator);
-      if (snap.val()["sessionActivity"]["users"][username].isActive == false) {
+      if (!snap.val().sessionActivity.users[username] || !snap.val().sessionActivity.users[username]["isActive"]) {
         sessionDb.ref(sessionId).update({
           [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
           [`sessionActivity/users/${username}/isActive`]: true,
