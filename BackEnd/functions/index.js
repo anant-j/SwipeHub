@@ -29,18 +29,14 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
       if (!(snap.val()["sessionActivity"]["isValid"])) {
         return ({status: "error", message: "This session has ended. Please create a new session!"});
       }
-      if (!snap.val()["users"][username] && Object.keys(snap.val()["users"]).length >= 8) {
+      if (!snap.val()["sessionActivity"]["users"][username] && Object.keys(snap.val()["sessionActivity"]["users"]).length >= 8) {
         return ({status: "error", message: "Session is currently full. Please join another session or create a new one."});
       }
       const isCreator = snap.val()["sessionInfo"]["creator"] == username;
       const token = await generateJWTToken(username, sessionId, isCreator);
-      sessionDb.ref(sessionId).child("users").child(username).update({
-        isActive: true,
-      });
       sessionDb.ref(sessionId).update({
         [`sessionActivity/users/${username}/joinedAt`]: new Date().getTime(),
-        [`users/${username}/isActive`]: true,
-        "sessionActivity/matches": [],
+        [`sessionActivity/users/${username}/isActive`]: true,
       });
       return ({status: "success", token: token, isCreator: isCreator});
     } else if (data.requestType === "create") {
@@ -66,23 +62,15 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
           order: order,
         },
         sessionActivity: {
-          matches: [],
           contentOrder: [],
           isValid: true,
           users:
       {
         [username]: {
-          swipes: 0,
           joinedAt: new Date().getTime(),
+          isActive: true,
         },
       },
-        },
-        users: {
-          [username]: {
-            likes: [],
-            dislikes: [],
-            isActive: true,
-          },
         },
       });
       const token = await generateJWTToken(username, sessionId, true);
@@ -95,40 +83,42 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
   }
 });
 
-exports.swipe = functions.database.ref("{sessionId}/users/{userId}/swipes")
-    .onWrite(async (change, context) => {
-      if (!change.after.exists()) {
-        return null;
+exports.subsequentCards = functions.https.onCall(async (data, context) => {
+  try {
+    if (context.app == undefined) {
+      throw new functions.https.HttpsError(
+          "failed-precondition",
+          "The function must be called from an App Check verified app.");
+    }
+    const sessionId = context.auth.token.sessionId;
+    const snap = await sessionDb.ref(sessionId).once("value");
+    if (!snap.val() || !snap.val()["sessionActivity"]["isValid"]) {
+      return ({status: "error", message: "Session has ended. Please create a new session!"});
+    }
+    const mediaOrder = snap.val()["sessionActivity"]["mediaOrder"];
+    const mediaOrderLength = mediaOrder.length;
+    if (mediaOrderLength >= 300) {
+      if (!(mediaOrder.includes("null"))) {
+        mediaOrder.push("null");
       }
-      const sessionId = context.params.sessionId;
-      const userId = context.params.userId;
-      const mySwipes = change.after.val();
-      const snap = await sessionDb.ref(sessionId).once("value");
-      const matches = getMatches(snap.val()["users"]);
-      const mySwipesLength = Object.keys(mySwipes).length;
-      const mediaOrder = snap.val()["sessionActivity"]["mediaOrder"];
-      const mediaOrderLength = mediaOrder.length;
-      if (mediaOrderLength >= 300) {
-        if (!(mediaOrder.includes("null"))) {
-          mediaOrder.push("null");
-        }
-      } else if ((mediaOrderLength - mySwipesLength == 9) && (!(mediaOrder[mediaOrderLength - 1] == "null"))) {
-        const page = getPageNumber(mediaOrderLength);
-        const sessionInfo = snap.val()["sessionInfo"];
-        const newData = await mediaData(sessionInfo, page);
-        for (const mediaId of newData) {
-          if (!(mediaOrder.includes(mediaId))) {
-            mediaOrder.push(mediaId);
-          }
+    } else if (!(mediaOrder.includes("null"))) {
+      const page = getPageNumber(mediaOrderLength);
+      const sessionInfo = snap.val()["sessionInfo"];
+      const newData = await mediaData(sessionInfo, page);
+      for (const mediaId of newData) {
+        if (!(mediaOrder.includes(mediaId))) {
+          mediaOrder.push(mediaId);
         }
       }
-      sessionDb.ref(sessionId).update({
-        [`sessionActivity/users/${userId}/swipes`]: mySwipesLength,
-        "sessionActivity/matches": matches,
-        "sessionActivity/mediaOrder": mediaOrder,
-      });
-      return;
+    }
+    sessionDb.ref(sessionId).update({
+      "sessionActivity/mediaOrder": mediaOrder,
     });
+    return;
+  } catch (err) {
+    sendErrorNotification("Register Tenant", err);
+  }
+});
 
 exports.generateInitialData = functions.database.ref("{sessionId}")
     .onCreate(async (snapshot, context) => {
@@ -157,14 +147,7 @@ exports.leaveSession = functions.https.onCall(async (data, context) => {
     } else {
       sessionDb.ref(sessionId).child("sessionActivity").child("users").child(userId).set({
       });
-      sessionDb.ref(sessionId).child("users").child(userId).set({
-      });
     }
-    const snap = await sessionDb.ref(sessionId).child("users").once("value");
-    const matches = getMatches(snap.val());
-    sessionDb.ref(sessionId).child("sessionActivity").update({
-      matches: matches,
-    });
     await admin.auth().deleteUser(`${sessionId}|${userId}|${isCreator}`);
     return;
   } catch (err) {
@@ -207,41 +190,6 @@ exports.deploymessages = functions.https.onRequest(async (req, res) => {
     res.status(500).send("error");
   }
 });
-
-/**
- * @param {any} data
- * @param {any} userId
- * @param {any} movieId
- * @param {any} updateVariable
- * @return {any}
- */
-function getMatches(data) {
-  const matches = [];
-  const allLikes = [];
-  const matchMap = {};
-  if (Object.keys(data).length <=1) {
-    return matches;
-  }
-  for (const eachUser of Object.keys(data)) {
-    const likes = data[eachUser]["swipes"];
-    for (const movieId in likes) {
-      if (likes[movieId]) {
-        allLikes.push(movieId);
-      }
-    }
-  }
-  for (const mediaId of allLikes) {
-    if (!matchMap[mediaId]) {
-      matchMap[mediaId] = 1;
-    } else {
-      matchMap[mediaId] += 1;
-    }
-    if (matchMap[mediaId] == Object.keys(data).length && Object.keys(data).length > 1) {
-      matches.push(mediaId);
-    }
-  }
-  return matches;
-}
 
 /**
  * @param  {string} sessionInfo
@@ -365,7 +313,7 @@ async function generateTVList(lang, genres, platform, region, sort, page) {
     const sessionDb = admin.firestore().collection("media").doc(id);
     const doc = await sessionDb.get();
     data[i]["title"] = data[i]["original_name"];
-    data[i]["poster"] =
+    data[i]["poster_path"] =
     "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
     data[i]["release_date"] = data[i]["first_air_date"];
     if (!doc.exists) {

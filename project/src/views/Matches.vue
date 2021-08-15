@@ -62,13 +62,13 @@ import store from "@/plugins/store/index.js";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
 import { ref, onValue, off } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
-import { notification } from "@/mixins/notification.js";
+import { notification, memberNotification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 
 export default {
   name: "Matches",
   store,
-  mixins: [notification, cleanup],
+  mixins: [notification, cleanup, memberNotification],
   data: () => ({
     signedIn: false,
     localMatchStore: [],
@@ -149,17 +149,42 @@ export default {
       onValue(dbRef, (snapshot) => {
         this.$store.state.loader = false;
         const data = snapshot.val();
-        const matchData = data.matches;
         if (!data) {
           this.leaveSession(true);
+          off(dbRef);
           return;
         }
         if (data.isValid != undefined && data.isValid != null) {
           if (!data.isValid) {
             this.leaveSession(true);
+            off(dbRef);
             return;
           }
         }
+        const userData = data.users;
+        const mySwipes = userData[this.getUserId]["swipes"] || {};
+        if (userData) {
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (!userData[iterator].swipes) {
+              userData[iterator]["swipes"] = {};
+            }
+            if (iterator !== this.getUserId) {
+              userDataArray.push({
+                userId: iterator,
+                value: Object.keys(userData[iterator].swipes).length,
+              });
+            } else {
+              this.$store.state.totalSwipes = Object.keys(mySwipes).length;
+            }
+            this.updatedMemberNotification(userData);
+          }
+          this.$store.state.usersData = userDataArray;
+        } else {
+          this.$store.state.usersData = [];
+        }
+
+        const matchData = this.computeMatches(userData);
         if (matchData) {
           const numMatch = matchData.length;
           this.$store.state.totalMatches = numMatch;

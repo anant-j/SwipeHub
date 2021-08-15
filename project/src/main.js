@@ -77,6 +77,36 @@ Vue.mixin({
     },
   },
   methods: {
+    computeMatches(userData) {
+      const matches = [];
+      const allLikes = [];
+      const matchMap = {};
+      if (Object.keys(userData).length <= 1) {
+        return matches;
+      }
+      for (const eachUser of Object.keys(userData)) {
+        const likes = userData[eachUser]["swipes"];
+        for (const movieId in likes) {
+          if (likes[movieId]) {
+            allLikes.push(movieId);
+          }
+        }
+      }
+      for (const mediaId of allLikes) {
+        if (!matchMap[mediaId]) {
+          matchMap[mediaId] = 1;
+        } else {
+          matchMap[mediaId] += 1;
+        }
+        if (
+          matchMap[mediaId] == Object.keys(userData).length &&
+          Object.keys(userData).length > 1
+        ) {
+          matches.push(mediaId);
+        }
+      }
+      return matches;
+    },
     delay(ms) {
       return new Promise((res) => setTimeout(res, ms));
     },

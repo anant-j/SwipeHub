@@ -77,15 +77,15 @@
 <script>
 import store from "@/plugins/store/index.js";
 import { sessionDb, auth, eventLogger } from "@/firebase_config.js";
-import { ref, get, child } from "firebase/database";
+import { ref, onValue, off } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
-import { notification } from "@/mixins/notification.js";
+import { notification, memberNotification } from "@/mixins/notification.js";
 import { cleanup } from "@/mixins/utilities.js";
 
 export default {
   name: "History",
   store,
-  mixins: [notification, cleanup],
+  mixins: [notification, cleanup, memberNotification],
   data: () => ({
     signedIn: false,
     localSwipeStore: [],
@@ -110,6 +110,8 @@ export default {
   destroyed() {
     if (this.signedIn) {
       signOut(auth);
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
+      off(dbRef);
     }
   },
   watch: {
@@ -160,56 +162,91 @@ export default {
         });
     },
     async getSwipeData() {
-      const dbRef = ref(
-        sessionDb,
-        `${this.getSessionId}/users/${this.getUserId}`
-      );
-      get(child(dbRef, `swipes`))
-        .then((snapshot) => {
-          this.$store.state.loader = false;
-          if (snapshot.exists()) {
-            const swipeData = snapshot.val();
-            const numSwipes = Object.keys(swipeData).length;
-            this.$store.state.totalSwipes = numSwipes;
-            this.$store.state.swipeData = [];
-            for (const movieId of Object.keys(swipeData)) {
-              if (this.$store.state.movieData[movieId]) {
-                const tempMovieData = {
-                  movieId: movieId,
-                  title: this.$store.state.movieData[movieId].title,
-                  posterURL: this.getImageURL(
-                    movieId,
-                    this.$store.state.movieData[movieId].poster_path
-                  ).url,
-                  description: this.$store.state.movieData[movieId].overview,
-                  release: this.$store.state.movieData[movieId].release_date,
-                  liked: swipeData[movieId],
-                };
-                this.$store.state.swipeData.push(tempMovieData);
-              } else {
-                this.getMovieData(movieId).then((movieData) => {
-                  this.$store.state.movieData[movieId] = movieData;
-                  const tempMovieData = {
-                    movieId: movieId,
-                    title: movieData.title,
-                    posterURL: this.getImageURL(movieId, movieData.poster_path)
-                      .url,
-                    description: movieData.overview,
-                    release: movieData.release_date,
-                    liked: swipeData[movieId],
-                  };
-                  this.$store.state.swipeData.push(tempMovieData);
-                });
-              }
-            }
-            if (this.searchField == "") {
-              this.localSwipeStore = this.$store.state.swipeData;
-            }
+      const dbRef = ref(sessionDb, `${this.getSessionId}/sessionActivity`);
+      onValue(dbRef, (snapshot) => {
+        this.$store.state.loader = false;
+        const data = snapshot.val();
+        if (!data) {
+          this.leaveSession(true);
+          off(dbRef);
+          return;
+        }
+        if (data.isValid != undefined && data.isValid != null) {
+          if (!data.isValid) {
+            this.leaveSession(true);
+            off(dbRef);
+            return;
           }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+        }
+        const userData = data.users;
+        const matches = this.computeMatches(userData);
+        if (matches) {
+          const numMatch = matches.length;
+          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
+            this.$store.state.totalMatches = numMatch;
+            this.showAlert(`temp`, "s", 4800, "matchesAlert");
+          }
+          this.$store.state.totalMatches = numMatch;
+        } else {
+          this.$store.state.totalMatches = 0;
+        }
+        const mySwipes = userData[this.getUserId]["swipes"] || {};
+        if (userData) {
+          const userDataArray = [];
+          for (const iterator of Object.keys(userData)) {
+            if (!userData[iterator].swipes) {
+              userData[iterator]["swipes"] = {};
+            }
+            if (iterator !== this.getUserId) {
+              userDataArray.push({
+                userId: iterator,
+                value: Object.keys(userData[iterator].swipes).length,
+              });
+            } else {
+              this.$store.state.totalSwipes = Object.keys(mySwipes).length;
+            }
+            this.updatedMemberNotification(userData);
+          }
+          this.$store.state.usersData = userDataArray;
+        } else {
+          this.$store.state.usersData = [];
+        }
+
+        const swipeData = mySwipes;
+        this.$store.state.swipeData = [];
+        for (const movieId of Object.keys(swipeData)) {
+          if (this.$store.state.movieData[movieId]) {
+            const tempMovieData = {
+              movieId: movieId,
+              title: this.$store.state.movieData[movieId].title,
+              posterURL: this.getImageURL(
+                movieId,
+                this.$store.state.movieData[movieId].poster_path
+              ).url,
+              description: this.$store.state.movieData[movieId].overview,
+              release: this.$store.state.movieData[movieId].release_date,
+              liked: swipeData[movieId],
+            };
+            this.$store.state.swipeData.push(tempMovieData);
+          } else {
+            this.getMovieData(movieId).then((movieData) => {
+              this.$store.state.movieData[movieId] = movieData;
+              const tempMovieData = {
+                movieId: movieId,
+                title: movieData.title,
+                posterURL: this.getImageURL(movieId, movieData.poster_path).url,
+                description: movieData.overview,
+                release: movieData.release_date,
+                liked: swipeData[movieId],
+              };
+              this.$store.state.swipeData.push(tempMovieData);
+            });
+          }
+        }
+        if (this.searchField == "") {
+          this.localSwipeStore = this.$store.state.swipeData;
+        }
+      });
     },
   },
 };

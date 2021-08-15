@@ -124,11 +124,11 @@
     </Tinder>
     <div class="btns">
       <img src="@/assets/nope.png" @click="decide('nope')" />
-      <!-- <img
+      <img
         src="@/assets/rewind.png"
         v-if="rewindAllow"
         @click="decide('rewind')"
-      /> -->
+      />
       <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
       <img src="@/assets/help.png" @click="cardClicked()" />
       <img src="@/assets/like.png" @click="decide('like')" />
@@ -143,6 +143,7 @@ import { ref, onValue, off, set } from "firebase/database";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { notification, memberNotification } from "@/mixins/notification.js";
 import { cleanup, mediaTools } from "@/mixins/utilities.js";
+import { requestSubsequentCards } from "@/firebase_config.js";
 
 export default {
   name: "Session",
@@ -152,8 +153,8 @@ export default {
     showInfo: false,
     rewindAllow: false,
     superAllowed: false,
+    subsequentAllowed: true,
     keyAllowed: true,
-    superThreshold: 5,
     queue: [],
     shown: new Set(),
     activeDescriptionModal: false,
@@ -281,20 +282,20 @@ export default {
           }
         }
         const userData = data.users;
-        const mySwipes = userData[this.getUserId].swipes || 0;
+        const mySwipes = userData[this.getUserId]["swipes"] || {};
         if (userData) {
           const userDataArray = [];
           for (const iterator of Object.keys(userData)) {
             if (!userData[iterator].swipes) {
-              userData[iterator]["swipes"] = 0;
+              userData[iterator]["swipes"] = {};
             }
             if (iterator !== this.getUserId) {
               userDataArray.push({
                 userId: iterator,
-                value: userData[iterator].swipes,
+                value: Object.keys(userData[iterator].swipes).length,
               });
             } else {
-              this.$store.state.totalSwipes = mySwipes;
+              this.$store.state.totalSwipes = Object.keys(mySwipes).length;
             }
             this.updatedMemberNotification(userData);
           }
@@ -303,7 +304,7 @@ export default {
           this.$store.state.usersData = [];
         }
 
-        const matches = data.matches;
+        const matches = this.computeMatches(userData);
         if (matches) {
           const numMatch = matches.length;
           if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
@@ -314,22 +315,27 @@ export default {
         } else {
           this.$store.state.totalMatches = 0;
         }
-
         const allMovies = data.mediaOrder;
         if (allMovies) {
-          const movieOrder = allMovies.slice(mySwipes, allMovies.length);
-          for (const id of movieOrder) {
-            if (id == -1 || id == "null") {
-              this.addCard("null");
-            }
-            if (!this.$store.state.movieData[id]) {
-              this.getMovieData(id).then((movieData) => {
-                this.$store.state.movieData[id] = movieData;
+          for (const id of allMovies) {
+            if (!Object.keys(mySwipes).includes(id)) {
+              if (id == -1 || id == "null") {
+                this.addCard("null");
+              }
+              if (!this.$store.state.movieData[id]) {
+                this.getMovieData(id).then((movieData) => {
+                  this.$store.state.movieData[id] = movieData;
+                  this.addCard(id);
+                });
+              } else {
                 this.addCard(id);
-              });
+              }
             } else {
-              this.addCard(id);
+              this.removeCard(id);
             }
+          }
+          if (allMovies.includes("null")) {
+            this.subsequentAllowed = false;
           }
         }
       });
@@ -354,6 +360,15 @@ export default {
       this.shown.add(-1);
       return;
     },
+    removeCard(id) {
+      const index = this.queue.findIndex(
+        (item) => item.id.split("?id=")[1] === id
+      );
+      if (index > -1) {
+        this.queue.splice(index, 1);
+      }
+      return;
+    },
     addCard(id) {
       this.$store.state.loader = false;
       if (id == -1 || id == "null" || id == null) {
@@ -373,11 +388,14 @@ export default {
       this.shown.add(id);
     },
     onSubmit(choice) {
-      this.rewindAllow = true;
+      // this.rewindAllow = true;
       this.showInfo = false;
       this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
+      if (this.queue.length == 9 && this.subsequentAllowed) {
+        requestSubsequentCards();
+      }
       if (id == "-1") {
         if (choice.type === "nope") {
           this.$router.push({ name: "History" });
@@ -392,7 +410,7 @@ export default {
     swipe(id, type) {
       const dbRef = ref(
         sessionDb,
-        `${this.getSessionId}/users/${this.getUserId}/swipes/${id}`
+        `${this.getSessionId}/sessionActivity/users/${this.getUserId}/swipes/${id}`
       );
       if (type === "like") {
         set(dbRef, true);
@@ -402,14 +420,15 @@ export default {
       return;
     },
     async decide(choice) {
-      // if (choice === "rewind") {
-      //   if (this.$store.state.swipeHistory.length && this.rewindAllow) {
-      //     this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
-      //     this.rewindAllow = false;
-      //   }
-      // } else {
       try {
-        this.$refs.tinder.decide(choice);
+        if (choice === "rewind") {
+          if (this.$store.state.swipeHistory.length && this.rewindAllow) {
+            this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
+            this.rewindAllow = false;
+          }
+        } else {
+          this.$refs.tinder.decide(choice);
+        }
       } catch (error) {
         this.$store.state.loader = true;
         await this.delay(5000);
