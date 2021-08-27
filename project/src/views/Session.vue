@@ -74,7 +74,7 @@
       @hide="activeDescriptionModal = false"
       hide-header-close
       centered
-      :title="`Synopsis: ${getTitle}`"
+      :title="`${getTitle}`"
       ok-only
       ok-title="Done"
       style="padding: 0; margin: 0"
@@ -415,7 +415,6 @@ export default {
     onSubmit(choice) {
       // this.rewindAllow = true;
       this.showInfo = false;
-      this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
       if (this.queue.length == 9 && this.subsequentAllowed) {
@@ -446,6 +445,13 @@ export default {
     },
     async decide(choice) {
       try {
+        if (this.activeDescriptionModal) {
+          const cardId = this.queue[0].id;
+          this.removeCard(cardId);
+          choice = { item: { id: cardId }, type: choice };
+          this.onSubmit(choice);
+          return;
+        }
         if (choice === "rewind") {
           if (this.$store.state.swipeHistory.length && this.rewindAllow) {
             this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
