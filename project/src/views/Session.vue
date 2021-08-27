@@ -9,37 +9,22 @@
       @submit="onSubmit"
     >
       <template slot-scope="scope">
-        <div
-          v-if="(!showInfo || queue[0].id !== scope.data.id) && photoAvailable"
-          class="pic"
-          v-on:dblclick="cardClicked()"
-          :style="{
-            'background-image': `url(${scope.data.id})`,
-          }"
-        />
-        <div
-          v-if="(showInfo || !photoAvailable) && queue[0].id === scope.data.id"
-          class="pic_wrap"
-          v-on:dblclick="cardClicked()"
-        >
+        <div class="pic_wrap" v-on:dblclick="cardClicked()">
           <div class="pic_content">
-            <p style="font-size: 23px">
-              <b>{{ getTitle }}</b>
+            <p class="titleP">
+              <b>{{ getShortTitle }}</b>
             </p>
-            <button
-              class="btn btn-primary"
-              @click="activeDescriptionModal = true"
-              v-if="getFontSize[0]"
-            >
-              View Synopsis
-            </button>
-            <p
+            <span class="releaseP" v-if="!isLastCard"
+              >Released : {{ getReleaseDate }}
+              <a class="iconP" @click="activeDescriptionModal = true">
+                <i class="fas fa-info-circle"></i> </a
+            ></span>
+            <!--<p
               :style="{ 'font-size': `${getFontSize[1]}` }"
               v-html="getDescription"
               v-else
-            ></p>
-            <hr />
-            <p v-if="!isLastCard">Released : {{ getReleaseDate }}</p>
+            ></p> -->
+
             <b-modal
               :visible="activeDescriptionModal"
               id="modal-center"
@@ -130,7 +115,7 @@
         @click="decide('rewind')"
       />
       <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
-      <img src="@/assets/help.png" @click="cardClicked()" />
+      <!-- <img src="@/assets/help.png" @click="cardClicked()" /> -->
       <img src="@/assets/like.png" @click="decide('like')" />
     </div>
   </div>
@@ -210,9 +195,20 @@ export default {
       const movieName = this.$store.state.movieData[movieId].title;
       return movieName;
     },
+    getShortTitle() {
+      let final = "";
+      const originalTitle = this.getTitle;
+      if (originalTitle.length >= 25) {
+        final = originalTitle.substring(0, 25) + "...";
+      } else {
+        final = originalTitle;
+      }
+      return final;
+    },
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
+      console.log(this.$store.state.movieData[movieId]);
       const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
@@ -446,7 +442,8 @@ export default {
       return;
     },
     cardClicked() {
-      this.showInfo = !this.showInfo;
+      // this.showInfo = !this.showInfo;
+      this.activeDescriptionModal = true;
     },
     keyDownListener: function (evt) {
       if (
@@ -477,7 +474,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 body,
 #app,
 template {
@@ -507,7 +504,7 @@ body {
   margin: auto;
   height: 69vh;
   width: 46vh;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .nope-pointer,
@@ -547,20 +544,6 @@ body {
   height: 78px;
 }
 
-.pic {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  animation: blurOut ease 1s;
-  -webkit-animation: blurOut ease 1s;
-  -moz-animation: blurOut ease 1s;
-  -o-animation: blurOut ease 1s;
-  -ms-animation: blurOut ease 1s;
-  /* box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15); */
-}
-
 .pic_wrap {
   height: 100%;
   width: 100%;
@@ -572,8 +555,6 @@ body {
   right: 0px;
   bottom: 0px;
   left: 0px;
-  opacity: 0.75;
-  filter: blur(3px);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -581,23 +562,45 @@ body {
 
 .pic_content {
   position: absolute;
+  bottom: -1px;
+  height: 75px;
   width: 100%;
-  height: 100%;
-  padding-top: 20px;
-  /* word-break: break-all; */
   padding-left: 20px;
   padding-right: 20px;
-  justify-content: center;
-  align-items: center;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px) grayscale(50);
   z-index: 100;
-  text-align: center;
-  animation: fadeIn ease 1s;
+  /* justify-content: center; */
+  /* align-items: center; */
+  /* text-align: center; */
+  /* animation: fadeIn ease 1s;
   -webkit-animation: fadeIn ease 1s;
   -moz-animation: fadeIn ease 1s;
   -o-animation: fadeIn ease 1s;
-  -ms-animation: fadeIn ease 1s;
+  -ms-animation: fadeIn ease 1s; */
+}
+
+.titleP {
+  margin-top: 10px !important;
+  /* padding-top: 15px !important; */
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+  font-size: 17px;
+}
+
+.releaseP {
+  font-size: 15px;
+}
+
+.iconP {
+  float: right !important;
+  font-size: 30px;
+  color: white !important;
+  padding: none;
+  margin: none;
+  margin-top: -10px !important;
+  cursor: pointer;
 }
 
 .btns {
