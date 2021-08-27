@@ -34,6 +34,7 @@ Vue.mixin({
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
     noImageUrl: "https://i.imgur.com/Sql8s2M.png",
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
+    TMDBUrl: "https://image.tmdb.org/t/p/original/",
   }),
   computed: {
     getSessionId() {
@@ -144,6 +145,9 @@ Vue.mixin({
           valid: false,
           url: `${this.noCardUrl}?id=${id}`,
         };
+      }
+      if (imgUrl.startsWith("/")) {
+        return this.getImageURL(id, this.TMDBUrl + imgUrl);
       }
       return { type: "regular", valid: true, url: `${imgUrl}?id=${id}` };
     },

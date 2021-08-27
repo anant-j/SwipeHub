@@ -1,5 +1,15 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
+    <transition name="fade">
+      <img
+        v-lazy="{
+          src: getBackDrop,
+          loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+        }"
+        v-if="activeDescriptionModal"
+        class="backgroundImage"
+      />
+    </transition>
     <Tinder
       ref="tinder"
       key-name="id"
@@ -7,6 +17,7 @@
       :offset-y="-15"
       :allowSuper="superAllowed"
       @submit="onSubmit"
+      v-if="!activeDescriptionModal"
     >
       <template slot-scope="scope">
         <div class="pic_wrap" v-on:dblclick="cardClicked()">
@@ -19,64 +30,6 @@
               <a class="iconP" @click="activeDescriptionModal = true">
                 <i class="fas fa-info-circle"></i> </a
             ></span>
-            <!--<p
-              :style="{ 'font-size': `${getFontSize[1]}` }"
-              v-html="getDescription"
-              v-else
-            ></p> -->
-
-            <b-modal
-              :visible="activeDescriptionModal"
-              id="modal-center"
-              @hide="activeDescriptionModal = false"
-              hide-header-close
-              centered
-              :title="`Synopsis: ${getTitle}`"
-              ok-only
-              ok-title="Done"
-              style="padding: 0; margin: 0"
-            >
-              <div class="my-4 text-center" style="padding: 0; margin: 0">
-                <p
-                  style="
-                    height: 27vh;
-                    padding: 20px;
-                    padding-top: 0px;
-                    margin-top: 0px;
-                    overflow-y: scroll;
-                  "
-                >
-                  {{ getDescription }}
-                </p>
-                <b>Released : {{ getReleaseDate }}</b>
-                <br />
-                <br />
-                <img
-                  style="
-                    height: 50px;
-                    border: 1px solid black;
-                    border-radius: 100px;
-                    cursor: pointer;
-                    margin-right: 10px;
-                    margin-bottom: 0px;
-                  "
-                  src="@/assets/nope.png"
-                  @click="decide('nope')"
-                />
-                <img
-                  style="
-                    height: 50px;
-                    border: 1px solid black;
-                    border-radius: 100px;
-                    cursor: pointer;
-                    margin-left: 10px;
-                    margin-bottom: 0px;
-                  "
-                  src="@/assets/like.png"
-                  @click="decide('like')"
-                />
-              </div>
-            </b-modal>
           </div>
           <div
             class="pic_img"
@@ -107,17 +60,73 @@
         src="@/assets/rewind.png"
       />
     </Tinder>
-    <div class="btns">
-      <img src="@/assets/nope.png" @click="decide('nope')" />
-      <img
-        src="@/assets/rewind.png"
-        v-if="rewindAllow"
-        @click="decide('rewind')"
-      />
-      <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
-      <!-- <img src="@/assets/help.png" @click="cardClicked()" /> -->
-      <img src="@/assets/like.png" @click="decide('like')" />
-    </div>
+    <b-modal
+      :visible="activeDescriptionModal"
+      @hide="activeDescriptionModal = false"
+      hide-header-close
+      centered
+      :title="`Synopsis: ${getTitle}`"
+      ok-only
+      ok-title="Done"
+      style="padding: 0; margin: 0"
+      class="modalb"
+    >
+      <div
+        class="my-4 text-center"
+        style="padding: 0; margin: 0; color: white !important"
+      >
+        <p
+          style="
+            font-size: 17px;
+            height: 27vh;
+            padding: 20px;
+            padding-top: 0px;
+            margin-top: 0px;
+            overflow-y: auto;
+          "
+        >
+          {{ getDescription }}
+        </p>
+        <b>Released : {{ getReleaseDate }}</b>
+        <br />
+        <br />
+        <img
+          style="
+            height: 50px;
+            border-radius: 100px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 0px;
+          "
+          src="@/assets/nope.png"
+          @click="decide('nope')"
+        />
+        <img
+          style="
+            height: 50px;
+            border-radius: 100px;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-bottom: 0px;
+          "
+          src="@/assets/like.png"
+          @click="decide('like')"
+        />
+      </div>
+    </b-modal>
+    <transition name="fade">
+      <div class="btns" v-if="!activeDescriptionModal">
+        <img src="@/assets/nope.png" @click="decide('nope')" />
+        <img
+          src="@/assets/rewind.png"
+          v-if="rewindAllow"
+          @click="decide('rewind')"
+        />
+        <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
+        <!-- <img src="@/assets/help.png" @click="cardClicked()" /> -->
+        <img src="@/assets/like.png" @click="decide('like')" />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -205,25 +214,34 @@ export default {
       }
       return final;
     },
+    getBackDrop() {
+      if (this.queue.length > 0) {
+        const inputId = this.queue[0].id;
+        const movieId = inputId.split("?id=")[1];
+        const backdrop = this.$store.state.movieData[movieId].backdrop_path;
+        return this.getImageURL(movieId, backdrop).url;
+      }
+      return "";
+    },
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
       const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
-    getFontSize() {
-      const descLength = this.getDescription.length;
-      let res = 0;
-      let showIcon = false;
-      if (descLength <= 300) {
-        res = 18;
-      } else if (descLength > 300 && descLength <= 500) {
-        res = 15;
-      } else {
-        showIcon = true;
-      }
-      return [showIcon, `${res}px`];
-    },
+    // getFontSize() {
+    //   const descLength = this.getDescription.length;
+    //   let res = 0;
+    //   let showIcon = false;
+    //   if (descLength <= 300) {
+    //     res = 18;
+    //   } else if (descLength > 300 && descLength <= 500) {
+    //     res = 15;
+    //   } else {
+    //     showIcon = true;
+    //   }
+    //   return [showIcon, `${res}px`];
+    // },
     getReleaseDate() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
@@ -474,6 +492,54 @@ export default {
 </script>
 
 <style scoped>
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent gray;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 20px;
+  border: 1px solid white;
+}
+
+/deep/ .modal-content {
+  color: white !important;
+  /* background: rgba(255, 255, 255, 0.75) !important; */
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+/deep/ .modal-backdrop {
+  color: white !important;
+  background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.modalb {
+  color: white !important;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.backgroundImage {
+  position: absolute;
+  width: 100vw;
+  height: 90vh;
+  /* size: contain !important; */
+  object-fit: cover !important;
+}
 body,
 #app,
 template {
