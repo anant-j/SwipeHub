@@ -417,6 +417,7 @@ export default {
       this.showInfo = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
+      this.activeDescriptionModal = false;
       if (this.queue.length == 9 && this.subsequentAllowed) {
         requestSubsequentCards();
       }
