@@ -1,4 +1,5 @@
 const storage = window.localStorage;
+import { categories } from "@/assets/data.js";
 import { leave } from "@/firebase_config.js";
 import { eventLogger } from "@/firebase_config";
 
@@ -57,6 +58,14 @@ export const cleanup = {
 
 export const mediaTools = {
   methods: {
+    getGenreFromId(id) {
+      for (const eachCategory of categories) {
+        if (eachCategory.id === id) {
+          return eachCategory.name;
+        }
+      }
+      return null;
+    },
     getIdfromURL(inputUrl) {
       const movieId = inputUrl.split("?id=")[1];
       return movieId;

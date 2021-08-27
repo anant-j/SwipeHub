@@ -22,14 +22,23 @@
       <template slot-scope="scope">
         <div class="pic_wrap" v-on:dblclick="cardClicked()">
           <div class="pic_content">
+            <a class="iconP" @click="activeDescriptionModal = true">
+              <i class="fas fa-info-circle"></i>
+            </a>
             <p class="titleP">
-              <b>{{ getShortTitle }}</b>
+              <b>{{ getTitle }}</b>
             </p>
-            <span class="releaseP" v-if="!isLastCard"
-              >Released : {{ getReleaseDate }}
-              <a class="iconP" @click="activeDescriptionModal = true">
-                <i class="fas fa-info-circle"></i> </a
-            ></span>
+            <div class="mt-2 mb-3">
+              <span v-for="(genre, index) in getGenres" :key="index">
+                <b-badge
+                  pill
+                  class="badgeStyle"
+                  v-if="getGenreFromId(genre) != null"
+                >
+                  {{ getGenreFromId(genre) }} </b-badge
+                >&nbsp;
+              </span>
+            </div>
           </div>
           <div
             class="pic_img"
@@ -70,48 +79,62 @@
       ok-title="Done"
       style="padding: 0; margin: 0"
       class="modalb"
+      v-if="this.queue.length > 0"
     >
-      <div
-        class="my-4 text-center"
-        style="padding: 0; margin: 0; color: white !important"
-      >
+      <div class="my-4">
         <p
           style="
             font-size: 17px;
-            height: 27vh;
-            padding: 20px;
-            padding-top: 0px;
-            margin-top: 0px;
+            height: 25vh;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: -10px;
+            margin-top: -10px;
             overflow-y: auto;
           "
         >
           {{ getDescription }}
         </p>
-        <b>Released : {{ getReleaseDate }}</b>
+        <div style="padding-left: 10px; padding-right: 10px">
+          <b>Categories : </b>
+          <span v-for="(genre, index) in getGenres" :key="index">
+            <b-badge
+              pill
+              class="badgeStyle"
+              v-if="getGenreFromId(genre) != null"
+            >
+              {{ getGenreFromId(genre) }} </b-badge
+            >&nbsp;
+          </span>
+          <br />
+          <b>Released : {{ getReleaseDate }}</b>
+        </div>
         <br />
         <br />
-        <img
-          style="
-            height: 50px;
-            border-radius: 100px;
-            cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 0px;
-          "
-          src="@/assets/nope.png"
-          @click="decide('nope')"
-        />
-        <img
-          style="
-            height: 50px;
-            border-radius: 100px;
-            cursor: pointer;
-            margin-left: 10px;
-            margin-bottom: 0px;
-          "
-          src="@/assets/like.png"
-          @click="decide('like')"
-        />
+        <div class="text-center">
+          <img
+            style="
+              height: 50px;
+              border-radius: 100px;
+              cursor: pointer;
+              margin-right: 10px;
+              margin-bottom: 0px;
+            "
+            src="@/assets/nope.png"
+            @click="decide('nope')"
+          />
+          <img
+            style="
+              height: 50px;
+              border-radius: 100px;
+              cursor: pointer;
+              margin-left: 10px;
+              margin-bottom: 0px;
+            "
+            src="@/assets/like.png"
+            @click="decide('like')"
+          />
+        </div>
       </div>
     </b-modal>
     <transition name="fade">
@@ -204,15 +227,11 @@ export default {
       const movieName = this.$store.state.movieData[movieId].title;
       return movieName;
     },
-    getShortTitle() {
-      let final = "";
-      const originalTitle = this.getTitle;
-      if (originalTitle.length >= 25) {
-        final = originalTitle.substring(0, 25) + "...";
-      } else {
-        final = originalTitle;
-      }
-      return final;
+    getGenres() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const genres = this.$store.state.movieData[movieId].genre_ids;
+      return genres;
     },
     getBackDrop() {
       if (this.queue.length > 0) {
@@ -229,19 +248,6 @@ export default {
       const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
-    // getFontSize() {
-    //   const descLength = this.getDescription.length;
-    //   let res = 0;
-    //   let showIcon = false;
-    //   if (descLength <= 300) {
-    //     res = 18;
-    //   } else if (descLength > 300 && descLength <= 500) {
-    //     res = 15;
-    //   } else {
-    //     showIcon = true;
-    //   }
-    //   return [showIcon, `${res}px`];
-    // },
     getReleaseDate() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
@@ -512,14 +518,22 @@ export default {
   border: 1px solid white;
 }
 
+.badgeStyle {
+  font-size: 13.5px;
+  font-weight: 500;
+  background: rgba(23, 162, 184, 0.5);
+  margin-bottom: 5px;
+}
+
 /deep/ .modal-content {
-  color: white !important;
-  /* background: rgba(255, 255, 255, 0.75) !important; */
-  background: rgba(0, 0, 0, 0.65) !important;
+  color: white;
+  /* background: rgba(0, 0, 0, 0.65) !important; */
+  background: rgba(0, 0, 0, 0.65);
 }
 /deep/ .modal-backdrop {
-  color: white !important;
-  background-color: rgba(0, 0, 0, 0) !important;
+  color: white;
+  /* background-color: rgba(0, 0, 0, 0) !important; */
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .modalb {
@@ -629,7 +643,7 @@ body {
   position: absolute;
   bottom: -1px;
   min-height: 75px;
-  max-height: 100px;
+  max-height: 50%;
   width: 100%;
   padding-left: 20px;
   padding-right: 20px;
@@ -661,7 +675,7 @@ body {
   color: white !important;
   padding: none;
   margin: none;
-  margin-top: -10px !important;
+  /* margin-top: -50px !important; */
   cursor: pointer;
 }
 
