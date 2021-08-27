@@ -208,7 +208,6 @@ export default {
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
-      console.log(this.$store.state.movieData[movieId]);
       const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
     },
@@ -563,7 +562,8 @@ body {
 .pic_content {
   position: absolute;
   bottom: -1px;
-  height: 75px;
+  min-height: 75px;
+  max-height: 100px;
   width: 100%;
   padding-left: 20px;
   padding-right: 20px;
@@ -574,14 +574,10 @@ body {
   /* justify-content: center; */
   /* align-items: center; */
   /* text-align: center; */
-  /* animation: fadeIn ease 1s;
-  -webkit-animation: fadeIn ease 1s;
-  -moz-animation: fadeIn ease 1s;
-  -o-animation: fadeIn ease 1s;
-  -ms-animation: fadeIn ease 1s; */
 }
 
 .titleP {
+  width: 80%;
   margin-top: 10px !important;
   /* padding-top: 15px !important; */
   margin-bottom: 0px !important;
@@ -636,96 +632,6 @@ body {
 
 .btns img:nth-last-child(1) {
   margin-right: 0;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-moz-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-webkit-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-o-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-ms-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
 }
 
 @media only screen and (max-width: 600px) {
