@@ -73,6 +73,7 @@
       :visible="activeDescriptionModal"
       @hide="activeDescriptionModal = false"
       hide-header-close
+      no-close-on-backdrop
       centered
       :title="`${getTitle}`"
       ok-only
@@ -137,6 +138,82 @@
         </div>
       </div>
     </b-modal>
+    <button
+      class="btn btn-primary"
+      style="position: absolute; right: 0px; top: 30px"
+      @click="activeSidebar = true"
+      v-if="!activeSidebar && !activeDescriptionModal"
+    >
+      <!-- <span>
+        S<br />
+        e<br />
+        s<br />
+        s<br />
+        i<br />
+        o<br />
+        n
+        <br /><br />
+        I <br />
+        n <br />
+        f <br />
+        o <br />
+      </span>
+      <br /> -->
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <b-sidebar
+      :visible="activeSidebar"
+      @hidden="activeSidebar = false"
+      id="sidebar-right"
+      title="Sidebar"
+      v-bind:sidebar-class="{ sidebarTransparentBack: activeDescriptionModal }"
+      right
+      shadow
+      bg-variant="dark"
+      text-variant="light"
+      no-header
+      ><hr style="margin-top: 0px" />
+      <div class="row">
+        <b-button
+          variant="primary"
+          style="width: 40px; height: 40px; margin-left: 20px"
+          @click="activeSidebar = false"
+          v-if="!activeDescriptionModal"
+          ><i class="fas fa-times"></i
+        ></b-button>
+
+        <h2
+          class="col"
+          style="float: right !important; width: auto; margin-left: 30px"
+        >
+          SwipeHub
+        </h2>
+      </div>
+      <div class="whiteColor px-3 py-2">
+        <a
+          v-if="this.$store.state.totalMatches > 0"
+          class="whiteColor dropdown-item"
+          id="swipePlaceHolder"
+          >Matches :
+          {{ this.$store.state.totalMatches }}
+        </a>
+        <hr class="dropdown-divider" />
+        <a class="whiteColor dropdown-item" id="swipePlaceHolder"
+          >Your Swipes : {{ $store.state.totalSwipes }}</a
+        >
+        <hr class="dropdown-divider" />
+        <div
+          class="whiteColor"
+          v-for="item in this.$store.state.usersData"
+          :key="item.userId"
+        >
+          <a class="whiteColor dropdown-item"
+            >{{ item.userId }} : {{ item.value }}</a
+          >
+          <hr class="whiteColor dropdown-divider" />
+        </div>
+      </div>
+    </b-sidebar>
     <transition name="fade">
       <div class="btns" v-if="!activeDescriptionModal">
         <img src="@/assets/nope.png" @click="decide('nope')" />
@@ -175,6 +252,7 @@ export default {
     queue: [],
     shown: new Set(),
     activeDescriptionModal: false,
+    activeSidebar: true,
     signedIn: false,
   }),
   mounted() {
@@ -546,6 +624,25 @@ export default {
 .modalb {
   color: white !important;
 }
+
+/deep/ .b-sidebar {
+  position: fixed;
+  padding-top: 55.5px !important;
+}
+
+/deep/ .sidebarTransparentBack {
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  color: white !important;
+}
+
+.whiteColor {
+  color: white !important;
+}
+
+a:hover {
+  background-color: black !important;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
@@ -688,6 +785,7 @@ body {
 
 .btns {
   position: relative;
+  width: 100vw;
   left: 0;
   right: 0;
   top: 80vh;
