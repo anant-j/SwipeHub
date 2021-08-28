@@ -1,12 +1,11 @@
 <template>
   <div>
-    <button
-      class="btn btn-primary"
-      style="position: absolute; right: 0px; top: 67px"
-      @click="showSidebar()"
+    <div
       v-if="!isSideBarOpen && !isCardDescriptionActive"
+      style="position: absolute; right: 0px; top: 67px"
     >
-      <!-- <span>
+      <button class="btn btn-primary" @click="showSidebar()">
+        <!-- <span>
         S<br />
         e<br />
         s<br />
@@ -21,8 +20,30 @@
         o <br />
       </span>
       <br /> -->
-      <i class="fas fa-chevron-left"></i>
-    </button>
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <br /><br />
+      <button
+        class="btn btn-danger usersIcon"
+        v-if="this.$store.state.usersData.length > 0"
+        @click="showSidebar()"
+      >
+        <i class="fas fa-users"></i>
+        <span class="badge">{{ this.$store.state.usersData.length + 1 }}</span>
+      </button>
+      <br /><br />
+      <button
+        class="btn btn-info matchesIcon"
+        v-if="
+          this.$store.state.totalMatches > 0 &&
+          this.$store.state.activePage != 2
+        "
+        @click="$router.push({ name: 'Matches' })"
+      >
+        <p class="matchesP">M<br />a<br />t<br />c<br />h<br />e<br />s</p>
+        <span class="badge">{{ this.$store.state.totalMatches }}</span>
+      </button>
+    </div>
     <b-sidebar
       :visible="isSideBarOpen"
       @hidden="hideSidebar()"
@@ -65,6 +86,10 @@
         </p>
       </div>
       <div class="whiteColor px-1 py-1">
+        <hr
+          class="dropdown-divider"
+          v-if="this.$store.state.totalMatches > 0"
+        />
         <a
           v-if="this.$store.state.totalMatches > 0"
           class="whiteColor dropdown-item"
@@ -102,6 +127,45 @@ export default {
 </script>
 
 <style scoped>
+.matchesIcon {
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.matchesIcon .badge {
+  position: absolute;
+  float: center;
+  top: 120px;
+  left: -10px;
+  border-radius: 25%;
+  background: red;
+  color: white;
+}
+
+.matchesP {
+  line-height: 20px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.usersIcon {
+  color: white;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.usersIcon .badge {
+  position: absolute;
+  float: center;
+  top: 53px;
+  left: -10px;
+  border-radius: 25%;
+  background: blue;
+  color: white;
+}
+
 /deep/ .b-sidebar {
   position: fixed;
   padding-top: 55.5px !important;
