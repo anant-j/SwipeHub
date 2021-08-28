@@ -322,7 +322,7 @@ async function generateTVList(lang, genres, platform, region, sort, page) {
     const id = data[i].id.toString();
     const sessionDb = admin.firestore().collection("media").doc(id);
     const doc = await sessionDb.get();
-    data[i]["title"] = data[i]["original_name"];
+    data[i]["title"] = data[i]["name"];
     data[i]["poster_path"] =
     "https://image.tmdb.org/t/p/original" + data[i]["poster_path"];
     data[i]["release_date"] = data[i]["first_air_date"];
