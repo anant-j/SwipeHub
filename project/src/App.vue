@@ -7,6 +7,10 @@
     <Navbar />
     <Loader v-if="this.$store.state.loader" />
     <ShareScreen />
+    <Sidebar
+      v-if="sessionDataPresent && this.$store.state.activePage > 0"
+      style="z-index: 1000; position: relative"
+    />
     <br />
     <br />
     <div style="position: relative">
@@ -18,6 +22,7 @@
 <script>
 import Loader from "@/components/Loader.vue";
 import Navbar from "@/components/Navbar.vue";
+import Sidebar from "@/components/Sidebar.vue";
 import ShareScreen from "@/components/ShareScreen.vue";
 import store from "@/plugins/store/index.js";
 import { eventLogger } from "@/firebase_config.js";
@@ -27,6 +32,7 @@ export default {
   components: {
     Loader,
     Navbar,
+    Sidebar,
     ShareScreen,
   },
   store,

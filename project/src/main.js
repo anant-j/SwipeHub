@@ -76,8 +76,32 @@ Vue.mixin({
       }
       return false;
     },
+    isCardDescriptionActive() {
+      return (
+        this.$store.state.activeDescriptionModal &&
+        this.$store.state.activePage == 1
+      );
+    },
+    isSideBarOpen() {
+      return this.$store.state.activeSidebar;
+    },
   },
   methods: {
+    hideInfoModal() {
+      this.$store.state.activeDescriptionModal = false;
+    },
+    showInfoModal() {
+      this.$store.state.activeDescriptionModal = true;
+    },
+    hideSidebar() {
+      this.$store.state.activeSidebar = false;
+    },
+    showSidebar() {
+      this.$store.state.activeSidebar = true;
+    },
+    toggleSidebar() {
+      this.$store.state.activeSidebar = !this.$store.state.activeSidebar;
+    },
     computeMatches(userData) {
       const matches = [];
       const allLikes = [];

@@ -18,6 +18,8 @@ export const cleanup = {
         isCreator: false,
         activePage: 0,
         activeShareModal: false,
+        activeDescriptionModal: false,
+        activeSidebar: false,
         sessionState: 0,
         movieData: {},
         totalSwipes: 0,

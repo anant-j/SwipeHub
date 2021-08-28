@@ -6,7 +6,7 @@
           src: getBackDrop,
           loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
         }"
-        v-if="activeDescriptionModal"
+        v-if="isCardDescriptionActive"
         class="backgroundImage"
       />
     </transition>
@@ -17,12 +17,12 @@
       :offset-y="-15"
       :allowSuper="superAllowed"
       @submit="onSubmit"
-      v-if="!activeDescriptionModal"
+      v-if="!isCardDescriptionActive"
     >
       <template slot-scope="scope">
         <div class="pic_wrap" v-on:dblclick="cardClicked()">
           <div class="pic_content">
-            <a class="iconP" @click="activeDescriptionModal = true">
+            <a class="iconP" @click="showInfoModal()">
               <i class="fas fa-info-circle"></i>
             </a>
             <p class="titleP">
@@ -70,8 +70,8 @@
       />
     </Tinder>
     <b-modal
-      :visible="activeDescriptionModal"
-      @hide="activeDescriptionModal = false"
+      :visible="isCardDescriptionActive"
+      @hide="hideInfoModal()"
       hide-header-close
       no-close-on-backdrop
       centered
@@ -88,16 +88,16 @@
           size="sm"
           variant="primary"
           style="float: right"
-          @click="activeSidebar = !activeSidebar"
+          @click="toggleSidebar()"
         >
           <i
-            v-show="activeSidebar"
+            v-show="isSideBarOpen"
             class="fas fa-chevron-right"
             title="Close Sidebar"
             key="rightArrow"
           />
           <i
-            v-show="!activeSidebar"
+            v-show="!isSideBarOpen"
             class="fas fa-chevron-left"
             title="Open Sidebar"
             key="leftArrow"
@@ -167,93 +167,14 @@
         <b-button
           variant="primary"
           style="float: right"
-          @click="activeDescriptionModal = false"
+          @click="hideInfoModal()"
         >
-          Close Info
+          Done
         </b-button>
       </template>
     </b-modal>
-    <button
-      class="btn btn-primary"
-      style="position: absolute; right: 0px; top: 30px"
-      @click="activeSidebar = true"
-      v-if="!activeSidebar && !activeDescriptionModal"
-    >
-      <!-- <span>
-        S<br />
-        e<br />
-        s<br />
-        s<br />
-        i<br />
-        o<br />
-        n
-        <br /><br />
-        I <br />
-        n <br />
-        f <br />
-        o <br />
-      </span>
-      <br /> -->
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <b-sidebar
-      :visible="activeSidebar"
-      @hidden="activeSidebar = false"
-      id="sidebar-right"
-      title="Sidebar"
-      v-bind:sidebar-class="{ sidebarTransparentBack: activeDescriptionModal }"
-      right
-      shadow
-      bg-variant="dark"
-      text-variant="light"
-      no-header
-      ><hr style="margin-top: 0px" />
-      <div class="row mb-0">
-        <b-button
-          variant="primary"
-          style="width: 40px; height: 40px; margin-left: 20px"
-          @click="activeSidebar = false"
-          v-if="!activeDescriptionModal"
-        >
-          <i class="fas fa-chevron-right"></i
-        ></b-button>
-
-        <p
-          class="col"
-          style="float: right !important; width: auto; margin-left: 30px"
-        >
-          <span><b>Session Id:</b> {{ getSessionId }}</span
-          ><br />
-          <span><b>My User Id:</b> {{ getUserId }}</span>
-        </p>
-      </div>
-      <div class="whiteColor px-1 py-1">
-        <a
-          v-if="this.$store.state.totalMatches > 0"
-          class="whiteColor dropdown-item"
-          id="swipePlaceHolder"
-          >Matches :
-          {{ this.$store.state.totalMatches }}
-        </a>
-        <hr class="dropdown-divider" />
-        <a class="whiteColor dropdown-item" id="swipePlaceHolder"
-          >My Swipes : {{ $store.state.totalSwipes }}</a
-        >
-        <hr class="dropdown-divider" />
-        <div
-          class="whiteColor"
-          v-for="item in this.$store.state.usersData"
-          :key="item.userId"
-        >
-          <a class="whiteColor dropdown-item"
-            >{{ item.userId }} : {{ item.value }}</a
-          >
-          <hr class="whiteColor dropdown-divider" />
-        </div>
-      </div>
-    </b-sidebar>
     <transition name="fade">
-      <div class="btns" v-if="!activeDescriptionModal">
+      <div class="btns" v-if="!isCardDescriptionActive">
         <img src="@/assets/nope.png" @click="decide('nope')" />
         <img
           src="@/assets/rewind.png"
@@ -289,8 +210,6 @@ export default {
     keyAllowed: true,
     queue: [],
     shown: new Set(),
-    activeDescriptionModal: false,
-    activeSidebar: true,
     signedIn: false,
   }),
   mounted() {
@@ -460,10 +379,10 @@ export default {
         const matches = this.computeMatches(userData);
         if (matches) {
           const numMatch = matches.length;
-          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.$store.state.totalMatches = numMatch;
-            this.showAlert(`temp`, "s", 4800, "matchesAlert");
-          }
+          // if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
+          //   this.$store.state.totalMatches = numMatch;
+          //   this.showAlert(`temp`, "s", 4800, "matchesAlert");
+          // }
           this.$store.state.totalMatches = numMatch;
         } else {
           this.$store.state.totalMatches = 0;
@@ -545,7 +464,7 @@ export default {
       this.showInfo = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
-      this.activeDescriptionModal = false;
+      this.hideInfoModal();
       if (this.queue.length == 9 && this.subsequentAllowed) {
         requestSubsequentCards();
       }
@@ -574,7 +493,7 @@ export default {
     },
     async decide(choice) {
       try {
-        if (this.activeDescriptionModal) {
+        if (this.isCardDescriptionActive) {
           const cardId = this.queue[0].id;
           this.removeCard(cardId);
           choice = { item: { id: cardId }, type: choice };
@@ -600,8 +519,7 @@ export default {
       return;
     },
     cardClicked() {
-      // this.showInfo = !this.showInfo;
-      this.activeDescriptionModal = true;
+      this.showInfoModal();
     },
     keyDownListener: function (evt) {
       if (
@@ -673,24 +591,6 @@ export default {
 
 .modalb {
   color: white !important;
-}
-
-/deep/ .b-sidebar {
-  position: fixed;
-  padding-top: 55.5px !important;
-}
-
-/deep/ .sidebarTransparentBack {
-  background-color: rgba(0, 0, 0, 0.65) !important;
-  color: white !important;
-}
-
-.whiteColor {
-  color: white !important;
-}
-
-a:hover {
-  background-color: black !important;
 }
 
 .fade-enter-active,
