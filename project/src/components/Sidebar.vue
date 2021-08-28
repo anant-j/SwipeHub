@@ -2,7 +2,7 @@
   <div>
     <button
       class="btn btn-primary"
-      style="position: absolute; right: 0px; top: 70px"
+      style="position: absolute; right: 0px; top: 67px"
       @click="showSidebar()"
       v-if="!isSideBarOpen && !isCardDescriptionActive"
     >
@@ -36,7 +36,16 @@
       no-header
       no-close-on-route-change
       ><hr style="margin-top: 0px" />
-      <div class="row mb-0">
+      <div
+        class="row"
+        style="
+          margin-top: -5px;
+          margin-bottom: -20px;
+          padding: 5px;
+          padding-bottom: 0px;
+          padding-top: 0px;
+        "
+      >
         <b-button
           variant="primary"
           style="width: 40px; height: 40px; margin-left: 20px"
