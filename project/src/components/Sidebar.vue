@@ -27,10 +27,14 @@
         class="btn btn-danger usersIcon"
         v-if="this.$store.state.usersData.length > 0"
         @click="showSidebar()"
+        id="usersIconButton"
       >
         <i class="fas fa-users"></i>
         <span class="badge">{{ this.$store.state.usersData.length + 1 }}</span>
       </button>
+      <b-tooltip target="usersIconButton" noninteractive placement="left">
+        {{ this.$store.state.usersData.length + 1 }} users in session
+      </b-tooltip>
       <br /><br />
       <button
         class="btn btn-info matchesIcon"
@@ -40,7 +44,12 @@
         "
         @click="$router.push({ name: 'Matches' })"
       >
-        <p class="matchesP">M<br />a<br />t<br />c<br />h<br />e<br />s</p>
+        <p class="matchesP" v-if="this.$store.state.totalMatches == 1">
+          M<br />a<br />t<br />c<br />h
+        </p>
+        <p class="matchesP" v-else>
+          M<br />a<br />t<br />c<br />h<br />e<br />s
+        </p>
         <span class="badge">{{ this.$store.state.totalMatches }}</span>
       </button>
     </div>
@@ -94,11 +103,17 @@
           v-if="this.$store.state.totalMatches > 0"
           class="whiteColor dropdown-item"
           id="swipePlaceHolder"
+          style="cursor: pointer"
+          @click="$router.push({ name: 'Matches' })"
           >Matches :
           {{ this.$store.state.totalMatches }}
         </a>
         <hr class="dropdown-divider" />
-        <a class="whiteColor dropdown-item" id="swipePlaceHolder"
+        <a
+          class="whiteColor dropdown-item"
+          id="swipePlaceHolder"
+          style="cursor: pointer"
+          @click="$router.push({ name: 'History' })"
           >My Swipes : {{ $store.state.totalSwipes }}</a
         >
         <hr class="dropdown-divider" />
@@ -108,7 +123,7 @@
           :key="item.userId"
         >
           <a class="whiteColor dropdown-item"
-            >{{ item.userId }} : {{ item.value }}</a
+            >{{ item.userId }}'s Swipes : {{ item.value }}</a
           >
           <hr class="whiteColor dropdown-divider" />
         </div>
@@ -164,6 +179,10 @@ export default {
   border-radius: 25%;
   background: blue;
   color: white;
+}
+
+.usersIcon:hover {
+  color: black !important;
 }
 
 /deep/ .b-sidebar {
