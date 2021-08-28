@@ -14,7 +14,7 @@ import VueLazyload from "vue-lazyload";
 import { movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
 import "@fortawesome/fontawesome-free/css/all.css";
-import "@fortawesome/fontawesome-free/js/all.js";
+// import "@fortawesome/fontawesome-free/js/all.js";
 
 document.title = "SwipeHub";
 let host = "https://" + window.location.hostname;

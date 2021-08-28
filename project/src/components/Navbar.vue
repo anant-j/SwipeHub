@@ -67,60 +67,6 @@
             >
               <a class="nav-link" id="matchTab">Share Joinable Link</a>
             </li>
-            <li class="nav-item dropdown" v-if="this.$store.state.activePage">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Session Info
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="navbarDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" id="userIdPlaceholder"
-                    >User Id: {{ getUserId }}</a
-                  >
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    id="sessionIdPlaceholder"
-                    @click="copyToClipboard('sessionId')"
-                    >Session Id: {{ getSessionId }}</a
-                  >
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a class="dropdown-item" id="swipePlaceHolder"
-                    >My Swipes : {{ $store.state.totalSwipes }}</a
-                  >
-                </li>
-                <div
-                  v-for="item in this.$store.state.usersData"
-                  :key="item.userId"
-                >
-                  <li>
-                    <hr class="dropdown-divider" />
-                  </li>
-                  <li>
-                    <a class="dropdown-item"
-                      >{{ item.userId }} : {{ item.value }}</a
-                    >
-                  </li>
-                </div>
-              </ul>
-            </li>
             <li
               class="nav-item"
               @click="leaveSession()"

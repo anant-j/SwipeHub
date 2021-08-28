@@ -82,6 +82,28 @@
       class="modalb"
       v-if="this.queue.length > 0"
     >
+      <template #modal-header>
+        <h4>{{ getTitle }}</h4>
+        <b-button
+          size="sm"
+          variant="primary"
+          style="float: right"
+          @click="activeSidebar = !activeSidebar"
+        >
+          <i
+            v-show="activeSidebar"
+            class="fas fa-chevron-right"
+            title="Close Sidebar"
+            key="rightArrow"
+          />
+          <i
+            v-show="!activeSidebar"
+            class="fas fa-chevron-left"
+            title="Open Sidebar"
+            key="leftArrow"
+          />
+        </b-button>
+      </template>
       <div class="my-4">
         <p
           style="
@@ -109,6 +131,10 @@
           </span>
           <br />
           <b>Released : {{ getReleaseDate }}</b>
+          <br />
+          <span v-if="getOriginalTitle"
+            ><b>Also known as: {{ getOriginalTitle }}</b></span
+          >
         </div>
         <br />
         <br />
@@ -137,6 +163,15 @@
           />
         </div>
       </div>
+      <template #modal-footer>
+        <b-button
+          variant="primary"
+          style="float: right"
+          @click="activeDescriptionModal = false"
+        >
+          Close Info
+        </b-button>
+      </template>
     </b-modal>
     <button
       class="btn btn-primary"
@@ -173,23 +208,26 @@
       text-variant="light"
       no-header
       ><hr style="margin-top: 0px" />
-      <div class="row">
+      <div class="row mb-0">
         <b-button
           variant="primary"
           style="width: 40px; height: 40px; margin-left: 20px"
           @click="activeSidebar = false"
           v-if="!activeDescriptionModal"
-          ><i class="fas fa-times"></i
+        >
+          <i class="fas fa-chevron-right"></i
         ></b-button>
 
-        <h2
+        <p
           class="col"
           style="float: right !important; width: auto; margin-left: 30px"
         >
-          SwipeHub
-        </h2>
+          <span><b>Session Id:</b> {{ getSessionId }}</span
+          ><br />
+          <span><b>My User Id:</b> {{ getUserId }}</span>
+        </p>
       </div>
-      <div class="whiteColor px-3 py-2">
+      <div class="whiteColor px-1 py-1">
         <a
           v-if="this.$store.state.totalMatches > 0"
           class="whiteColor dropdown-item"
@@ -199,7 +237,7 @@
         </a>
         <hr class="dropdown-divider" />
         <a class="whiteColor dropdown-item" id="swipePlaceHolder"
-          >Your Swipes : {{ $store.state.totalSwipes }}</a
+          >My Swipes : {{ $store.state.totalSwipes }}</a
         >
         <hr class="dropdown-divider" />
         <div
@@ -332,6 +370,18 @@ export default {
       const movieReleaseDate =
         this.$store.state.movieData[movieId].release_date;
       return movieReleaseDate;
+    },
+    getOriginalTitle() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const title = this.$store.state.movieData[movieId].title;
+      const originalTitle =
+        this.$store.state.movieData[movieId].original_title ||
+        this.$store.state.movieData[movieId].original_name;
+      if (title != originalTitle) {
+        return originalTitle;
+      }
+      return null;
     },
   },
   methods: {
@@ -781,6 +831,11 @@ body {
   margin: none;
   /* margin-top: -50px !important; */
   cursor: pointer;
+}
+
+.iconP:hover {
+  color: rgb(13, 110, 253) !important;
+  background-color: transparent !important;
 }
 
 .btns {
