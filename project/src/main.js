@@ -132,7 +132,7 @@ Vue.mixin({
       }
       return matches;
     },
-    delay(ms) {
+    timedDelay(ms) {
       return new Promise((res) => setTimeout(res, ms));
     },
     signInFail() {

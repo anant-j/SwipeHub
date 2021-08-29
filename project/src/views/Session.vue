@@ -135,6 +135,27 @@
           <span v-if="getOriginalTitle"
             ><b>Also known as: {{ getOriginalTitle }}</b></span
           >
+          <span v-if="getPlatforms">
+            <br />
+            <b>Available on : </b>
+            <span v-for="platform in getPlatforms" :key="platform">
+              <img
+                :id="`imageTarget${platform}`"
+                style="height: 30px; margin-right: 10px"
+                :src="getPlatformDetails(platform).image"
+                v-if="getPlatformDetails(platform).valid"
+              />
+              <b-tooltip
+                :target="`imageTarget${platform}`"
+                noninteractive
+                placement="up"
+                v-if="getPlatformDetails(platform).valid"
+              >
+                {{ getPlatformDetails(platform).name }}
+              </b-tooltip></span
+            >
+            <!-- this.getPlatformImage(platform) -->
+          </span>
         </div>
         <br />
         <br />
@@ -164,6 +185,13 @@
         </div>
       </div>
       <template #modal-footer>
+        <a
+          class="btn btn-danger"
+          :href="getTrailerUrl"
+          target="_blank"
+          v-if="getTrailerUrl != null"
+          ><i class="fab fa-youtube fa-lg"></i> Watch Trailer</a
+        >
         <b-button
           variant="primary"
           style="float: right"
@@ -211,6 +239,7 @@ export default {
     queue: [],
     shown: new Set(),
     signedIn: false,
+    sessionCountry: null,
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -261,6 +290,25 @@ export default {
       const movieId = inputId.split("?id=")[1];
       const movieName = this.$store.state.movieData[movieId].title;
       return movieName;
+    },
+    getPlatforms() {
+      if (!this.sessionCountry) {
+        return null;
+      }
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      let provider =
+        this.$store.state.movieData[movieId].providers[this.sessionCountry];
+      return provider || null;
+    },
+    getTrailerUrl() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      let trailer = this.$store.state.movieData[movieId].trailerURL;
+      if (trailer == "") {
+        return null;
+      }
+      return trailer || null;
     },
     getGenres() {
       const inputId = this.queue[0].id;
@@ -346,6 +394,9 @@ export default {
             off(dbRef);
             return;
           }
+        }
+        if (data.region) {
+          this.sessionCountry = data.region;
         }
         const allUserData = data.users;
         const userData = {};
@@ -510,7 +561,7 @@ export default {
         }
       } catch (error) {
         this.$store.state.loader = true;
-        await this.delay(5000);
+        await this.timedDelay(5000);
         if (this.$store.state.loader == true) {
           this.$store.state.loader == false;
           this.addLastCard();

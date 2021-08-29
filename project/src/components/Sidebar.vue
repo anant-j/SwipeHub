@@ -32,7 +32,12 @@
         <i class="fas fa-users"></i>
         <span class="badge">{{ this.$store.state.usersData.length + 1 }}</span>
       </button>
-      <b-tooltip target="usersIconButton" noninteractive placement="left">
+      <b-tooltip
+        target="usersIconButton"
+        v-if="this.$store.state.usersData.length > 0"
+        noninteractive
+        placement="left"
+      >
         {{ this.$store.state.usersData.length + 1 }} users in session
       </b-tooltip>
       <br /><br />

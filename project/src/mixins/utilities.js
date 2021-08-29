@@ -2,7 +2,7 @@ const storage = window.localStorage;
 import { categories } from "@/assets/data.js";
 import { leave } from "@/firebase_config.js";
 import { eventLogger } from "@/firebase_config";
-
+import { platforms } from "@/assets/data.js";
 export const cleanup = {
   methods: {
     clearSessionHard() {
@@ -71,6 +71,19 @@ export const mediaTools = {
     getIdfromURL(inputUrl) {
       const movieId = inputUrl.split("?id=")[1];
       return movieId;
+    },
+    getPlatformDetails(platform) {
+      for (const eachPlatform of platforms) {
+        if (eachPlatform.id === platform) {
+          return {
+            valid: true,
+            image: eachPlatform.logo,
+            name: eachPlatform.name,
+          };
+        } else {
+          return { valid: false, image: "", name: "" };
+        }
+      }
     },
   },
 };

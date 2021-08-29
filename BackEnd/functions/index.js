@@ -73,6 +73,7 @@ exports.registerTenant = functions.https.onCall(async (data, context) => {
         sessionActivity: {
           contentOrder: [],
           isValid: true,
+          region: region,
           users:
       {
         [username]: {
@@ -290,13 +291,62 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
     const id = data[i].id.toString();
     const sessionDb = admin.firestore().collection("media").doc(id);
     const doc = await sessionDb.get();
-    data[i]["poster_path"] = `https://image.tmdb.org/t/p/original${data[i].poster_path}`;
     if (!doc.exists) {
+      const deepURL = `https://api.themoviedb.org/3/movie/${data[i].id}?api_key=${apiToken}&append_to_response=videos,watch/providers`;
+      const deepSearchResp = await axios.get(deepURL);
+      const newData = deepSearchResp.data;
+      const oldGenre = newData.genres;
+      const newGenre = [];
+      for (let i = 0; i < oldGenre.length; i++) {
+        newGenre.push(oldGenre[i].id);
+      }
+      newData["genre_ids"]= newGenre;
+      const allVideos = newData.videos.results;
+      let videoUrl = "";
+      for (let i = 0; i < allVideos.length; i++) {
+        if (allVideos[i].official==true && allVideos[i].site=="YouTube" && allVideos[i].type=="Trailer") {
+          videoUrl = `https://www.youtube.com/watch?v=${allVideos[i].key}`;
+        }
+      }
+      newData["trailerURL"] = videoUrl;
+      const allProviders= newData["watch/providers"].results;
+      const providers = {};
+      for (const i of Object.keys(allProviders)) {
+        providers[i] = new Set();
+        if (allProviders[i]["buy"]) {
+          for (let index = 0; index < allProviders[i]["buy"].length; index++) {
+            const element = allProviders[i]["buy"][index];
+            providers[i].add(element.provider_id);
+          }
+        }
+        if (allProviders[i]["rent"]) {
+          for (let index = 0; index < allProviders[i]["rent"].length; index++) {
+            const element = allProviders[i]["rent"][index];
+            providers[i].add(element.provider_id);
+          }
+        }
+        if (allProviders[i]["flatrate"]) {
+          for (let index = 0; index < allProviders[i]["flatrate"].length; index++) {
+            const element = allProviders[i]["flatrate"][index];
+            providers[i].add(element.provider_id);
+          }
+        }
+        providers[i] = [...providers[i]];
+      }
+      newData["providers"] = providers;
+      delete newData["watch/providers"];
+      delete newData.video;
+      delete newData.genres;
+      delete newData.adult;
+      delete newData.vote_average;
+      delete newData.vote_count;
+      delete newData.popularity;
+      delete newData.videos;
       await admin
           .firestore()
           .collection("media")
           .doc(id)
-          .set(data[i]);
+          .set(newData);
     }
     res.push(id);
   }
