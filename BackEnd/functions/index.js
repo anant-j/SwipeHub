@@ -312,26 +312,31 @@ async function generateMovieList(lang, genres, platform, region, sort, page) {
       const allProviders= newData["watch/providers"].results;
       const providers = {};
       for (const i of Object.keys(allProviders)) {
-        providers[i] = new Set();
+        providers[i] = {};
         if (allProviders[i]["buy"]) {
           for (let index = 0; index < allProviders[i]["buy"].length; index++) {
-            const element = allProviders[i]["buy"][index];
-            providers[i].add(element.provider_id);
+            const element = allProviders[i]["buy"][index].provider_id;
+            providers[i][element] = {};
+            providers[i][element]["logo"] = `https://image.tmdb.org/t/p/original/${allProviders[i]["buy"][index].logo_path}`;
+            providers[i][element]["name"] = `${allProviders[i]["buy"][index].provider_name}`;
           }
         }
         if (allProviders[i]["rent"]) {
           for (let index = 0; index < allProviders[i]["rent"].length; index++) {
-            const element = allProviders[i]["rent"][index];
-            providers[i].add(element.provider_id);
+            const element = allProviders[i]["rent"][index].provider_id;
+            providers[i][element] = {};
+            providers[i][element]["logo"] = `https://image.tmdb.org/t/p/original/${allProviders[i]["rent"][index].logo_path}`;
+            providers[i][element]["name"] = `${allProviders[i]["rent"][index].provider_name}`;
           }
         }
         if (allProviders[i]["flatrate"]) {
           for (let index = 0; index < allProviders[i]["flatrate"].length; index++) {
-            const element = allProviders[i]["flatrate"][index];
-            providers[i].add(element.provider_id);
+            const element = allProviders[i]["flatrate"][index].provider_id;
+            providers[i][element] = {};
+            providers[i][element]["logo"] = `https://image.tmdb.org/t/p/original/${allProviders[i]["flatrate"][index].logo_path}`;
+            providers[i][element]["name"] = `${allProviders[i]["flatrate"][index].provider_name}`;
           }
         }
-        providers[i] = [...providers[i]];
       }
       newData["providers"] = providers;
       delete newData["watch/providers"];

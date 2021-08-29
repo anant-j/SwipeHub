@@ -81,26 +81,28 @@
                 <multiselect
                   v-model="platform"
                   :options="tempPlatformOptions"
-                  placeholder="Select one"
+                  placeholder="Select Platforms"
                   :allow-empty="false"
                   label="name"
                   :searchable="true"
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
+                  :multiple="true"
                 >
-                  <template slot="singleLabel"
+                  <template slot="option" slot-scope="tempPlatformOptions"
                     ><img
                       class="option__image"
                       height="20px"
-                      :src="platform.logo"
-                      :alt="platform.name"
-                    /><span class="option__desc"
+                      :src="tempPlatformOptions.option.logo"
+                      :alt="tempPlatformOptions.option.name"
+                    />
+                    <span class="option__desc"
                       ><span class="option__title">
-                        {{ platform.name }}</span
+                        {{ tempPlatformOptions.option.name }}</span
                       ></span
-                    ></template
-                  >
+                    >
+                  </template>
                 </multiselect>
                 <br />
               </div>
@@ -115,8 +117,6 @@
               track-by="name"
               :options="categoryOptions"
               :multiple="true"
-              :taggable="true"
-              @tag="addTag"
             >
             </multiselect>
           </div>
@@ -214,7 +214,7 @@ export default {
       submitButtonEnabled: true,
       language: data.defaultLanguage,
       languageOptions: data.languages,
-      platform: data.defaultPlatform,
+      platform: [data.defaultPlatform],
       platformOptions: data.platforms,
       tempPlatformOptions: data.platforms,
       country: data.defaultCountry,
@@ -302,19 +302,11 @@ export default {
       }
       this.createSession();
     },
-    addTag(newTag) {
-      const tag = {
-        name: newTag,
-        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
-      };
-      this.categoryOptions.push(tag);
-      this.category.push(tag);
-    },
     createSession() {
       this.$store.state.loader = true;
       const username = this.username;
       const language = this.language.id;
-      const platform = this.platform.id;
+      const platform = this.platform;
       const country = this.country.id;
       const categories = this.category;
       const type = this.contentType.name === "Movie";
@@ -326,12 +318,21 @@ export default {
         }
         categoryList = categoryList.substring(0, categoryList.length - 1);
       }
+      let platformList = "";
+      if (platform !== null && platform.length > 1) {
+        for (const selectedPlatform of platform) {
+          platformList += selectedPlatform.id.toString() + "|";
+        }
+        platformList = platformList.substring(0, platformList.length - 1);
+      } else {
+        platformList = platform[0].id.toString();
+      }
       JWTService({
         requestType: "create",
         username: username,
         categories: categoryList,
         language: language,
-        platform: platform,
+        platform: platformList,
         region: country,
         type: type,
         order: order,

@@ -138,20 +138,19 @@
           <span v-if="getPlatforms">
             <br />
             <b>Available on : </b>
-            <span v-for="platform in getPlatforms" :key="platform">
+            <span v-for="(platform, index) in getPlatforms" :key="index">
               <img
-                :id="`imageTarget${platform}`"
+                :id="`imageTarget${index}`"
                 style="height: 30px; margin-right: 10px"
-                :src="getPlatformDetails(platform).image"
-                v-if="getPlatformDetails(platform).valid"
+                :src="platform.logo"
+                v-if="platform.logo != null"
               />
               <b-tooltip
-                :target="`imageTarget${platform}`"
+                :target="`imageTarget${index}`"
                 noninteractive
-                placement="up"
-                v-if="getPlatformDetails(platform).valid"
+                v-if="platform.logo != null"
               >
-                {{ getPlatformDetails(platform).name }}
+                {{ platform.name }}
               </b-tooltip></span
             >
             <!-- this.getPlatformImage(platform) -->
@@ -297,9 +296,15 @@ export default {
       }
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
+      if (
+        !this.$store.state.movieData ||
+        !this.$store.state.movieData[movieId]
+      ) {
+        return null;
+      }
       let provider =
         this.$store.state.movieData[movieId].providers[this.sessionCountry];
-      return provider || null;
+      return provider;
     },
     getTrailerUrl() {
       const inputId = this.queue[0].id;
