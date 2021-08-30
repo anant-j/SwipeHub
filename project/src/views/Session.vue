@@ -6,7 +6,7 @@
           src: getBackDrop,
           loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
         }"
-        v-if="isCardDescriptionActive"
+        v-if="isCardDescriptionActive && getBackDrop"
         class="backgroundImage"
       />
     </transition>
@@ -20,7 +20,20 @@
       v-if="!isCardDescriptionActive"
     >
       <template slot-scope="scope">
-        <div class="pic_wrap" v-on:dblclick="cardClicked()">
+        <div style="height: 100%; width: 100%" v-on:dblclick="cardClicked()">
+          <!-- <div
+            class="pic_img"
+            :style="{
+              'background-image': `url(${scope.data.id})`,
+            }"
+          ></div> -->
+          <img
+            class="pic_img"
+            v-lazy="{
+              src: scope.data.id,
+              loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+            }"
+          />
           <div class="pic_content">
             <a class="iconP" @click="showInfoModal()">
               <i class="fas fa-info-circle"></i>
@@ -40,12 +53,6 @@
               </span>
             </div>
           </div>
-          <div
-            class="pic_img"
-            :style="{
-              'background-image': `url(${scope.data.id})`,
-            }"
-          ></div>
         </div>
       </template>
       <img
@@ -135,7 +142,7 @@
           <span v-if="getOriginalTitle"
             ><b>Also known as: {{ getOriginalTitle }}</b></span
           >
-          <span v-if="getPlatforms">
+          <span v-if="getPlatforms != null">
             <br />
             <b>Available on : </b>
             <span v-for="(platform, index) in getPlatforms" :key="index">
@@ -185,6 +192,17 @@
       </div>
       <template #modal-footer>
         <a
+          class="btn btn-primary mb-0 mt-0 ml-0 mr-0 pl-0 pr-0 pb-0 pt-0"
+          :href="getIMDB"
+          target="_blank"
+          v-if="getIMDB != null"
+          style=""
+        >
+          <i
+            class="fab fa-imdb fa-2x mb-0 mt-0 ml-0 mr-0 pl-0 pr-0 pb-0 pt-0"
+          ></i>
+        </a>
+        <a
           class="btn btn-danger"
           :href="getTrailerUrl"
           target="_blank"
@@ -192,8 +210,8 @@
           ><i class="fab fa-youtube fa-lg"></i> Watch Trailer</a
         >
         <b-button
-          variant="primary"
-          style="float: right"
+          variant="warning"
+          style="float: right; color: white"
           @click="hideInfoModal()"
         >
           Done
@@ -295,15 +313,22 @@ export default {
         return null;
       }
       const inputId = this.queue[0].id;
+      if (!inputId) {
+        return null;
+      }
       const movieId = inputId.split("?id=")[1];
       if (
+        !movieId ||
+        !this.$store.state ||
         !this.$store.state.movieData ||
-        !this.$store.state.movieData[movieId]
+        !this.$store.state.movieData[movieId] ||
+        !this.$store.state.movieData[movieId].providers
       ) {
         return null;
       }
       let provider =
         this.$store.state.movieData[movieId].providers[this.sessionCountry];
+      console.log(provider);
       return provider;
     },
     getTrailerUrl() {
@@ -326,9 +351,21 @@ export default {
         const inputId = this.queue[0].id;
         const movieId = inputId.split("?id=")[1];
         const backdrop = this.$store.state.movieData[movieId].backdrop_path;
-        return this.getImageURL(movieId, backdrop).url;
+        if (backdrop) {
+          return this.getImageURL(movieId, backdrop).url;
+        }
+        return null;
       }
-      return "";
+      return null;
+    },
+    getIMDB() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const imdbURL = this.$store.state.movieData[movieId].imdb_id;
+      if (imdbURL && imdbURL != "") {
+        return `https://www.imdb.com/title/${imdbURL}`;
+      }
+      return imdbURL || null;
     },
     getDescription() {
       const inputId = this.queue[0].id;
@@ -733,25 +770,19 @@ body {
   height: 78px;
 }
 
-.pic_wrap {
+.pic_img {
   height: 100%;
   width: 100%;
-}
-
-.pic_img {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  background-size: contain;
+  /* background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
+  object-fit: contain !important;
+  object-position: center !important;
 }
 
 .pic_content {
   position: absolute;
-  bottom: -1px;
+  bottom: -5px !important;
   min-height: 75px;
   max-height: 50%;
   width: 100%;
