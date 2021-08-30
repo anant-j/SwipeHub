@@ -62,13 +62,14 @@
                 <multiselect
                   v-model="language"
                   :options="languageOptions"
-                  placeholder="Select one"
+                  placeholder="Select Languages"
                   :allow-empty="false"
                   label="name"
                   :searchable="true"
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
+                  :multiple="true"
                 ></multiselect>
                 <br />
               </div>
@@ -117,6 +118,8 @@
               track-by="name"
               :options="categoryOptions"
               :multiple="true"
+              selectLabel=""
+              deselectLabel=""
             >
             </multiselect>
           </div>
@@ -212,7 +215,7 @@ export default {
       submitButton: "Next",
       backButton: "Back",
       submitButtonEnabled: true,
-      language: data.defaultLanguage,
+      language: [data.defaultLanguage],
       languageOptions: data.languages,
       platform: [data.defaultPlatform],
       platformOptions: data.platforms,
@@ -305,7 +308,7 @@ export default {
     createSession() {
       this.$store.state.loader = true;
       const username = this.username;
-      const language = this.language.id;
+      const language = this.language;
       const platform = this.platform;
       const country = this.country.id;
       const categories = this.category;
@@ -327,11 +330,20 @@ export default {
       } else {
         platformList = platform[0].id.toString();
       }
+      let languageList = "";
+      if (language !== null && language.length > 1) {
+        for (const selectedLanguage of language) {
+          languageList += selectedLanguage.id.toString() + "|";
+        }
+        languageList = languageList.substring(0, languageList.length - 1);
+      } else {
+        languageList = language[0].id.toString();
+      }
       JWTService({
         requestType: "create",
         username: username,
         categories: categoryList,
-        language: language,
+        language: languageList,
         platform: platformList,
         region: country,
         type: type,
