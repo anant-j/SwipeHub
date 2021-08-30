@@ -328,7 +328,6 @@ export default {
       }
       let provider =
         this.$store.state.movieData[movieId].providers[this.sessionCountry];
-      console.log(provider);
       return provider;
     },
     getTrailerUrl() {
