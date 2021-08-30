@@ -283,7 +283,7 @@ async function sendErrorNotification(caller, error) {
 async function generateMovieList(lang, genres, platform, region, sort, page) {
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}`;
   const resp = await axios.get(
-      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_ott_providers=${platform}&ott_region=${region}&page=${page}`,
+      `${url}&with_original_language=${lang}&with_genres=${genres}&sort_by=${sort}&with_watch_providers=${platform}&watch_region=${region}&page=${page}`,
   );
   const data = resp.data.results;
   const res = [];
