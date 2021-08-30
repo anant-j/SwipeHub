@@ -49,7 +49,7 @@
                   selectLabel=""
                   deselectLabel=""
                 >
-                  <!-- <template slot="singleLabel" slot-scope="countryOptions"
+                  <template slot="singleLabel" slot-scope="countryOptions"
                     ><img
                       class="option__image"
                       :src="getCountryLogo(countryOptions.option.id)"
@@ -59,7 +59,7 @@
                         {{ countryOptions.option.name }}</span
                       ></span
                     ></template
-                  > -->
+                  >
                   <template slot="option" slot-scope="countryOptions"
                     ><img
                       class="option__image"
