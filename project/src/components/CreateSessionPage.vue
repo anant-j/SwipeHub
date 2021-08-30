@@ -48,7 +48,31 @@
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
-                ></multiselect>
+                >
+                  <!-- <template slot="singleLabel" slot-scope="countryOptions"
+                    ><img
+                      class="option__image"
+                      :src="getCountryLogo(countryOptions.option.id)"
+                      :alt="countryOptions.option.name"
+                    /><span class="option__desc"
+                      ><span class="option__title">
+                        {{ countryOptions.option.name }}</span
+                      ></span
+                    ></template
+                  > -->
+                  <template slot="option" slot-scope="countryOptions"
+                    ><img
+                      class="option__image"
+                      v-lazy="getCountryLogo(countryOptions.option.id)"
+                      :alt="countryOptions.option.name"
+                    />
+                    <span class="option__desc"
+                      ><span class="option__title">
+                        {{ countryOptions.option.name }}</span
+                      ></span
+                    >
+                  </template>
+                </multiselect>
                 <br />
               </div>
             </b-col>
@@ -94,8 +118,7 @@
                   <template slot="option" slot-scope="tempPlatformOptions"
                     ><img
                       class="option__image"
-                      height="20px"
-                      :src="tempPlatformOptions.option.logo"
+                      v-lazy="tempPlatformOptions.option.logo"
                       :alt="tempPlatformOptions.option.name"
                     />
                     <span class="option__desc"
@@ -215,9 +238,9 @@ export default {
       submitButton: "Next",
       backButton: "Back",
       submitButtonEnabled: true,
-      language: [data.defaultLanguage],
+      language: data.defaultLanguage,
       languageOptions: data.languages,
-      platform: [data.defaultPlatform],
+      platform: data.defaultPlatform,
       platformOptions: data.platforms,
       tempPlatformOptions: data.platforms,
       country: data.defaultCountry,
@@ -261,6 +284,9 @@ export default {
     },
   },
   methods: {
+    getCountryLogo(code) {
+      return `https://www.countryflags.io/${code}/flat/64.png`;
+    },
     validateState(state) {
       if (state == "username") {
         this.usernameBlurred = true;
@@ -310,10 +336,11 @@ export default {
       const username = this.username;
       const language = this.language;
       const platform = this.platform;
-      const country = this.country.id;
+      const selectedCountry = this.country.id;
       const categories = this.category;
       const type = this.contentType.name === "Movie";
       const order = this.sortType.value;
+      console.log(categories, selectedCountry, platform, language);
       let categoryList = "";
       if (categories !== null) {
         for (const category of categories) {
@@ -322,22 +349,22 @@ export default {
         categoryList = categoryList.substring(0, categoryList.length - 1);
       }
       let platformList = "";
-      if (platform !== null && platform.length > 1) {
+      if (Array.isArray(platform)) {
         for (const selectedPlatform of platform) {
           platformList += selectedPlatform.id.toString() + "|";
         }
         platformList = platformList.substring(0, platformList.length - 1);
-      } else {
-        platformList = platform[0].id.toString();
+      } else if (platform != null) {
+        platformList = platform.id.toString();
       }
       let languageList = "";
-      if (language !== null && language.length > 1) {
+      if (Array.isArray(language)) {
         for (const selectedLanguage of language) {
           languageList += selectedLanguage.id.toString() + "|";
         }
         languageList = languageList.substring(0, languageList.length - 1);
-      } else {
-        languageList = language[0].id.toString();
+      } else if (language != null) {
+        languageList = language.id.toString();
       }
       JWTService({
         requestType: "create",
@@ -345,7 +372,7 @@ export default {
         categories: categoryList,
         language: languageList,
         platform: platformList,
-        region: country,
+        region: selectedCountry,
         type: type,
         order: order,
       })
@@ -371,6 +398,14 @@ export default {
   height: 85vh;
   /* text-align: center; */
   align-items: center;
+}
+
+.option__image {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  max-height: 20px;
 }
 
 .button-center {
