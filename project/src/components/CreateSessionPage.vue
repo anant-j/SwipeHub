@@ -48,7 +48,31 @@
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
-                ></multiselect>
+                >
+                  <template slot="singleLabel" slot-scope="countryOptions"
+                    ><img
+                      class="option__image"
+                      :src="getCountryLogo(countryOptions.option.id)"
+                      :alt="countryOptions.option.name"
+                    /><span class="option__desc"
+                      ><span class="option__title">
+                        {{ countryOptions.option.name }}</span
+                      ></span
+                    ></template
+                  >
+                  <template slot="option" slot-scope="countryOptions"
+                    ><img
+                      class="option__image"
+                      v-lazy="getCountryLogo(countryOptions.option.id)"
+                      :alt="countryOptions.option.name"
+                    />
+                    <span class="option__desc"
+                      ><span class="option__title">
+                        {{ countryOptions.option.name }}</span
+                      ></span
+                    >
+                  </template>
+                </multiselect>
                 <br />
               </div>
             </b-col>
@@ -62,13 +86,14 @@
                 <multiselect
                   v-model="language"
                   :options="languageOptions"
-                  placeholder="Select one"
+                  placeholder="Select Languages"
                   :allow-empty="false"
                   label="name"
                   :searchable="true"
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
+                  :multiple="true"
                 ></multiselect>
                 <br />
               </div>
@@ -81,26 +106,27 @@
                 <multiselect
                   v-model="platform"
                   :options="tempPlatformOptions"
-                  placeholder="Select one"
+                  placeholder="Select Platforms"
                   :allow-empty="false"
                   label="name"
                   :searchable="true"
                   track-by="name"
                   selectLabel=""
                   deselectLabel=""
+                  :multiple="true"
                 >
-                  <template slot="singleLabel"
+                  <template slot="option" slot-scope="tempPlatformOptions"
                     ><img
                       class="option__image"
-                      height="20px"
-                      :src="platform.logo"
-                      :alt="platform.name"
-                    /><span class="option__desc"
+                      v-lazy="tempPlatformOptions.option.logo"
+                      :alt="tempPlatformOptions.option.name"
+                    />
+                    <span class="option__desc"
                       ><span class="option__title">
-                        {{ platform.name }}</span
+                        {{ tempPlatformOptions.option.name }}</span
                       ></span
-                    ></template
-                  >
+                    >
+                  </template>
                 </multiselect>
                 <br />
               </div>
@@ -115,8 +141,8 @@
               track-by="name"
               :options="categoryOptions"
               :multiple="true"
-              :taggable="true"
-              @tag="addTag"
+              selectLabel=""
+              deselectLabel=""
             >
             </multiselect>
           </div>
@@ -258,6 +284,9 @@ export default {
     },
   },
   methods: {
+    getCountryLogo(code) {
+      return `https://www.countryflags.io/${code}/flat/64.png`;
+    },
     validateState(state) {
       if (state == "username") {
         this.usernameBlurred = true;
@@ -302,23 +331,16 @@ export default {
       }
       this.createSession();
     },
-    addTag(newTag) {
-      const tag = {
-        name: newTag,
-        code: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000),
-      };
-      this.categoryOptions.push(tag);
-      this.category.push(tag);
-    },
     createSession() {
       this.$store.state.loader = true;
       const username = this.username;
-      const language = this.language.id;
-      const platform = this.platform.id;
-      const country = this.country.id;
+      const language = this.language;
+      const platform = this.platform;
+      const selectedCountry = this.country.id;
       const categories = this.category;
       const type = this.contentType.name === "Movie";
       const order = this.sortType.value;
+      console.log(categories, selectedCountry, platform, language);
       let categoryList = "";
       if (categories !== null) {
         for (const category of categories) {
@@ -326,13 +348,31 @@ export default {
         }
         categoryList = categoryList.substring(0, categoryList.length - 1);
       }
+      let platformList = "";
+      if (Array.isArray(platform)) {
+        for (const selectedPlatform of platform) {
+          platformList += selectedPlatform.id.toString() + "|";
+        }
+        platformList = platformList.substring(0, platformList.length - 1);
+      } else if (platform != null) {
+        platformList = platform.id.toString();
+      }
+      let languageList = "";
+      if (Array.isArray(language)) {
+        for (const selectedLanguage of language) {
+          languageList += selectedLanguage.id.toString() + "|";
+        }
+        languageList = languageList.substring(0, languageList.length - 1);
+      } else if (language != null) {
+        languageList = language.id.toString();
+      }
       JWTService({
         requestType: "create",
         username: username,
         categories: categoryList,
-        language: language,
-        platform: platform,
-        region: country,
+        language: languageList,
+        platform: platformList,
+        region: selectedCountry,
         type: type,
         order: order,
       })
@@ -358,6 +398,14 @@ export default {
   height: 85vh;
   /* text-align: center; */
   align-items: center;
+}
+
+.option__image {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  max-height: 20px;
 }
 
 .button-center {

@@ -1,5 +1,15 @@
 <template>
   <div id="session" v-if="!this.$store.state.loader">
+    <transition name="fade">
+      <img
+        v-lazy="{
+          src: getBackDrop,
+          loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+        }"
+        v-if="isCardDescriptionActive && getBackDrop"
+        class="backgroundImage"
+      />
+    </transition>
     <Tinder
       ref="tinder"
       key-name="id"
@@ -7,98 +17,42 @@
       :offset-y="-15"
       :allowSuper="superAllowed"
       @submit="onSubmit"
+      v-if="!isCardDescriptionActive"
     >
       <template slot-scope="scope">
-        <div
-          v-if="(!showInfo || queue[0].id !== scope.data.id) && photoAvailable"
-          class="pic"
-          v-on:dblclick="cardClicked()"
-          :style="{
-            'background-image': `url(${scope.data.id})`,
-          }"
-        />
-        <div
-          v-if="(showInfo || !photoAvailable) && queue[0].id === scope.data.id"
-          class="pic_wrap"
-          v-on:dblclick="cardClicked()"
-        >
-          <div class="pic_content">
-            <p style="font-size: 23px">
-              <b>{{ getTitle }}</b>
-            </p>
-            <button
-              class="btn btn-primary"
-              @click="activeDescriptionModal = true"
-              v-if="getFontSize[0]"
-            >
-              View Synopsis
-            </button>
-            <p
-              :style="{ 'font-size': `${getFontSize[1]}` }"
-              v-html="getDescription"
-              v-else
-            ></p>
-            <hr />
-            <p v-if="!isLastCard">Released : {{ getReleaseDate }}</p>
-            <b-modal
-              :visible="activeDescriptionModal"
-              id="modal-center"
-              @hide="activeDescriptionModal = false"
-              hide-header-close
-              centered
-              :title="`Synopsis: ${getTitle}`"
-              ok-only
-              ok-title="Done"
-              style="padding: 0; margin: 0"
-            >
-              <div class="my-4 text-center" style="padding: 0; margin: 0">
-                <p
-                  style="
-                    height: 27vh;
-                    padding: 20px;
-                    padding-top: 0px;
-                    margin-top: 0px;
-                    overflow-y: scroll;
-                  "
-                >
-                  {{ getDescription }}
-                </p>
-                <b>Released : {{ getReleaseDate }}</b>
-                <br />
-                <br />
-                <img
-                  style="
-                    height: 50px;
-                    border: 1px solid black;
-                    border-radius: 100px;
-                    cursor: pointer;
-                    margin-right: 10px;
-                    margin-bottom: 0px;
-                  "
-                  src="@/assets/nope.png"
-                  @click="decide('nope')"
-                />
-                <img
-                  style="
-                    height: 50px;
-                    border: 1px solid black;
-                    border-radius: 100px;
-                    cursor: pointer;
-                    margin-left: 10px;
-                    margin-bottom: 0px;
-                  "
-                  src="@/assets/like.png"
-                  @click="decide('like')"
-                />
-              </div>
-            </b-modal>
-          </div>
-          <div
+        <div style="height: 100%; width: 100%" v-on:dblclick="cardClicked()">
+          <!-- <div
             class="pic_img"
             :style="{
               'background-image': `url(${scope.data.id})`,
             }"
-          ></div>
+          ></div> -->
+          <img
+            class="pic_img"
+            v-lazy="{
+              src: scope.data.id,
+              loading: 'https://i.giphy.com/media/N256GFy1u6M6Y/giphy.webp',
+            }"
+          />
+          <div class="pic_content">
+            <a class="iconP" @click="showInfoModal()">
+              <i class="fas fa-info-circle"></i>
+            </a>
+            <p class="titleP">
+              <b>{{ getTitle }}</b>
+            </p>
+            <div class="mt-2 mb-3">
+              <span v-for="(genre, index) in getGenres" :key="index">
+                <b-badge
+                  pill
+                  class="badgeStyle"
+                  v-if="getGenreFromId(genre) != null"
+                >
+                  {{ getGenreFromId(genre) }} </b-badge
+                >&nbsp;
+              </span>
+            </div>
+          </div>
         </div>
       </template>
       <img
@@ -122,17 +76,161 @@
         src="@/assets/rewind.png"
       />
     </Tinder>
-    <div class="btns">
-      <img src="@/assets/nope.png" @click="decide('nope')" />
-      <img
-        src="@/assets/rewind.png"
-        v-if="rewindAllow"
-        @click="decide('rewind')"
-      />
-      <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
-      <img src="@/assets/help.png" @click="cardClicked()" />
-      <img src="@/assets/like.png" @click="decide('like')" />
-    </div>
+    <b-modal
+      :visible="isCardDescriptionActive"
+      @hide="hideInfoModal()"
+      hide-header-close
+      no-close-on-backdrop
+      centered
+      :title="`${getTitle}`"
+      ok-only
+      ok-title="Done"
+      style="padding: 0; margin: 0"
+      class="modalb"
+      v-if="this.queue.length > 0"
+    >
+      <template #modal-header>
+        <h4>{{ getTitle }}</h4>
+        <b-button
+          size="sm"
+          variant="primary"
+          style="float: right"
+          @click="toggleSidebar()"
+        >
+          <i
+            v-show="isSideBarOpen"
+            class="fas fa-chevron-right"
+            title="Close Sidebar"
+            key="rightArrow"
+          />
+          <i
+            v-show="!isSideBarOpen"
+            class="fas fa-chevron-left"
+            title="Open Sidebar"
+            key="leftArrow"
+          />
+        </b-button>
+      </template>
+      <div class="my-4">
+        <p
+          style="
+            font-size: 17px;
+            height: 25vh;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: -10px;
+            margin-top: -10px;
+            overflow-y: auto;
+          "
+        >
+          {{ getDescription }}
+        </p>
+        <div style="padding-left: 10px; padding-right: 10px">
+          <b>Categories : </b>
+          <span v-for="(genre, index) in getGenres" :key="index">
+            <b-badge
+              pill
+              class="badgeStyle"
+              v-if="getGenreFromId(genre) != null"
+            >
+              {{ getGenreFromId(genre) }} </b-badge
+            >&nbsp;
+          </span>
+          <br />
+          <b>Released : {{ getReleaseDate }}</b>
+          <br />
+          <span v-if="getOriginalTitle"
+            ><b>Also known as: {{ getOriginalTitle }}</b></span
+          >
+          <span v-if="getPlatforms != null">
+            <br />
+            <b>Available on : </b>
+            <span v-for="(platform, index) in getPlatforms" :key="index">
+              <img
+                :id="`imageTarget${index}`"
+                style="height: 30px; margin-right: 10px"
+                :src="platform.logo"
+                v-if="platform.logo != null"
+              />
+              <b-tooltip
+                :target="`imageTarget${index}`"
+                noninteractive
+                v-if="platform.logo != null"
+              >
+                {{ platform.name }}
+              </b-tooltip></span
+            >
+            <!-- this.getPlatformImage(platform) -->
+          </span>
+        </div>
+        <br />
+        <br />
+        <div class="text-center">
+          <img
+            style="
+              height: 50px;
+              border-radius: 100px;
+              cursor: pointer;
+              margin-right: 10px;
+              margin-bottom: 0px;
+            "
+            src="@/assets/nope.png"
+            @click="decide('nope')"
+          />
+          <img
+            style="
+              height: 50px;
+              border-radius: 100px;
+              cursor: pointer;
+              margin-left: 10px;
+              margin-bottom: 0px;
+            "
+            src="@/assets/like.png"
+            @click="decide('like')"
+          />
+        </div>
+      </div>
+      <template #modal-footer>
+        <a
+          class="btn btn-primary mb-0 mt-0 ml-0 mr-0 pl-0 pr-0 pb-0 pt-0"
+          :href="getIMDB"
+          target="_blank"
+          v-if="getIMDB != null"
+          style=""
+        >
+          <i
+            class="fab fa-imdb fa-2x mb-0 mt-0 ml-0 mr-0 pl-0 pr-0 pb-0 pt-0"
+          ></i>
+        </a>
+        <a
+          class="btn btn-danger"
+          :href="getTrailerUrl"
+          target="_blank"
+          v-if="getTrailerUrl != null"
+          ><i class="fab fa-youtube fa-lg"></i> Watch Trailer</a
+        >
+        <b-button
+          variant="warning"
+          style="float: right; color: white"
+          @click="hideInfoModal()"
+        >
+          Done
+        </b-button>
+      </template>
+    </b-modal>
+    <transition name="fade">
+      <div class="btns" v-if="!isCardDescriptionActive">
+        <img src="@/assets/nope.png" @click="decide('nope')" />
+        <img
+          src="@/assets/rewind.png"
+          v-if="rewindAllow"
+          @click="decide('rewind')"
+        />
+        <!-- <img src="@/assets/super-like.png" @click="decide('super')" /> -->
+        <!-- <img src="@/assets/help.png" @click="cardClicked()" /> -->
+        <img src="@/assets/like.png" @click="decide('like')" />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -157,8 +255,8 @@ export default {
     keyAllowed: true,
     queue: [],
     shown: new Set(),
-    activeDescriptionModal: false,
     signedIn: false,
+    sessionCountry: null,
   }),
   mounted() {
     if (!this.sessionDataPresent) {
@@ -210,24 +308,69 @@ export default {
       const movieName = this.$store.state.movieData[movieId].title;
       return movieName;
     },
+    getPlatforms() {
+      if (!this.sessionCountry) {
+        return null;
+      }
+      const inputId = this.queue[0].id;
+      if (!inputId) {
+        return null;
+      }
+      const movieId = inputId.split("?id=")[1];
+      if (
+        !movieId ||
+        !this.$store.state ||
+        !this.$store.state.movieData ||
+        !this.$store.state.movieData[movieId] ||
+        !this.$store.state.movieData[movieId].providers
+      ) {
+        return null;
+      }
+      let provider =
+        this.$store.state.movieData[movieId].providers[this.sessionCountry];
+      return provider;
+    },
+    getTrailerUrl() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      let trailer = this.$store.state.movieData[movieId].trailerURL;
+      if (trailer == "") {
+        return null;
+      }
+      return trailer || null;
+    },
+    getGenres() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const genres = this.$store.state.movieData[movieId].genre_ids;
+      return genres;
+    },
+    getBackDrop() {
+      if (this.queue.length > 0) {
+        const inputId = this.queue[0].id;
+        const movieId = inputId.split("?id=")[1];
+        const backdrop = this.$store.state.movieData[movieId].backdrop_path;
+        if (backdrop) {
+          return this.getImageURL(movieId, backdrop).url;
+        }
+        return null;
+      }
+      return null;
+    },
+    getIMDB() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const imdbURL = this.$store.state.movieData[movieId].imdb_id;
+      if (imdbURL && imdbURL != "") {
+        return `https://www.imdb.com/title/${imdbURL}`;
+      }
+      return imdbURL || null;
+    },
     getDescription() {
       const inputId = this.queue[0].id;
       const movieId = inputId.split("?id=")[1];
       const movieDescription = this.$store.state.movieData[movieId].overview;
       return movieDescription;
-    },
-    getFontSize() {
-      const descLength = this.getDescription.length;
-      let res = 0;
-      let showIcon = false;
-      if (descLength <= 300) {
-        res = 18;
-      } else if (descLength > 300 && descLength <= 500) {
-        res = 15;
-      } else {
-        showIcon = true;
-      }
-      return [showIcon, `${res}px`];
     },
     getReleaseDate() {
       const inputId = this.queue[0].id;
@@ -235,6 +378,18 @@ export default {
       const movieReleaseDate =
         this.$store.state.movieData[movieId].release_date;
       return movieReleaseDate;
+    },
+    getOriginalTitle() {
+      const inputId = this.queue[0].id;
+      const movieId = inputId.split("?id=")[1];
+      const title = this.$store.state.movieData[movieId].title;
+      const originalTitle =
+        this.$store.state.movieData[movieId].original_title ||
+        this.$store.state.movieData[movieId].original_name;
+      if (title != originalTitle) {
+        return originalTitle;
+      }
+      return null;
     },
   },
   methods: {
@@ -281,6 +436,9 @@ export default {
             return;
           }
         }
+        if (data.region) {
+          this.sessionCountry = data.region;
+        }
         const allUserData = data.users;
         const userData = {};
         for (const iterator of Object.keys(allUserData)) {
@@ -313,10 +471,10 @@ export default {
         const matches = this.computeMatches(userData);
         if (matches) {
           const numMatch = matches.length;
-          if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
-            this.$store.state.totalMatches = numMatch;
-            this.showAlert(`temp`, "s", 4800, "matchesAlert");
-          }
+          // if (this.$store.state.totalMatches !== numMatch && numMatch > 0) {
+          //   this.$store.state.totalMatches = numMatch;
+          //   this.showAlert(`temp`, "s", 4800, "matchesAlert");
+          // }
           this.$store.state.totalMatches = numMatch;
         } else {
           this.$store.state.totalMatches = 0;
@@ -396,9 +554,9 @@ export default {
     onSubmit(choice) {
       // this.rewindAllow = true;
       this.showInfo = false;
-      this.activeDescriptionModal = false;
       this.$store.state.totalSwipes += 1;
       const id = this.getIdfromURL(choice.item.id);
+      this.hideInfoModal();
       if (this.queue.length == 9 && this.subsequentAllowed) {
         requestSubsequentCards();
       }
@@ -427,6 +585,13 @@ export default {
     },
     async decide(choice) {
       try {
+        if (this.isCardDescriptionActive) {
+          const cardId = this.queue[0].id;
+          this.removeCard(cardId);
+          choice = { item: { id: cardId }, type: choice };
+          this.onSubmit(choice);
+          return;
+        }
         if (choice === "rewind") {
           if (this.$store.state.swipeHistory.length && this.rewindAllow) {
             this.$refs.tinder.rewind([this.$store.state.swipeHistory.pop()]);
@@ -437,7 +602,7 @@ export default {
         }
       } catch (error) {
         this.$store.state.loader = true;
-        await this.delay(5000);
+        await this.timedDelay(5000);
         if (this.$store.state.loader == true) {
           this.$store.state.loader == false;
           this.addLastCard();
@@ -446,7 +611,7 @@ export default {
       return;
     },
     cardClicked() {
-      this.showInfo = !this.showInfo;
+      this.showInfoModal();
     },
     keyDownListener: function (evt) {
       if (
@@ -477,7 +642,64 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent gray;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 20px;
+  border: 1px solid white;
+}
+
+.badgeStyle {
+  font-size: 13.5px;
+  font-weight: 500;
+  background: rgba(23, 162, 184, 0.5);
+  margin-bottom: 5px;
+}
+
+/deep/ .modal-content {
+  color: white;
+  /* background: rgba(0, 0, 0, 0.65) !important; */
+  background: rgba(0, 0, 0, 0.65);
+}
+/deep/ .modal-backdrop {
+  color: white;
+  /* background-color: rgba(0, 0, 0, 0) !important; */
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.modalb {
+  color: white !important;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.backgroundImage {
+  position: absolute;
+  width: 100vw;
+  height: 90vh;
+  /* size: contain !important; */
+  object-fit: cover !important;
+}
 body,
 #app,
 template {
@@ -507,7 +729,7 @@ body {
   margin: auto;
   height: 69vh;
   width: 46vh;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .nope-pointer,
@@ -547,61 +769,64 @@ body {
   height: 78px;
 }
 
-.pic {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  animation: blurOut ease 1s;
-  -webkit-animation: blurOut ease 1s;
-  -moz-animation: blurOut ease 1s;
-  -o-animation: blurOut ease 1s;
-  -ms-animation: blurOut ease 1s;
-  /* box-shadow: 0 4px 9px rgba(0, 0, 0, 0.15); */
-}
-
-.pic_wrap {
-  height: 100%;
-  width: 100%;
-}
-
 .pic_img {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  opacity: 0.75;
-  filter: blur(3px);
-  background-size: contain;
+  height: 100%;
+  width: 100%;
+  /* background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
+  object-fit: contain !important;
+  object-position: center !important;
 }
 
 .pic_content {
   position: absolute;
+  bottom: -5px !important;
+  min-height: 75px;
+  max-height: 50%;
   width: 100%;
-  height: 100%;
-  padding-top: 20px;
-  /* word-break: break-all; */
   padding-left: 20px;
   padding-right: 20px;
-  justify-content: center;
-  align-items: center;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px) grayscale(50);
   z-index: 100;
-  text-align: center;
-  animation: fadeIn ease 1s;
-  -webkit-animation: fadeIn ease 1s;
-  -moz-animation: fadeIn ease 1s;
-  -o-animation: fadeIn ease 1s;
-  -ms-animation: fadeIn ease 1s;
+  /* justify-content: center; */
+  /* align-items: center; */
+  /* text-align: center; */
+}
+
+.titleP {
+  width: 80%;
+  margin-top: 10px !important;
+  /* padding-top: 15px !important; */
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
+  font-size: 17px;
+}
+
+.releaseP {
+  font-size: 15px;
+}
+
+.iconP {
+  float: right !important;
+  font-size: 30px;
+  color: white !important;
+  padding: none;
+  margin: none;
+  /* margin-top: -50px !important; */
+  cursor: pointer;
+}
+
+.iconP:hover {
+  color: rgb(13, 110, 253) !important;
+  background-color: transparent !important;
 }
 
 .btns {
   position: relative;
+  width: 100vw;
   left: 0;
   right: 0;
   top: 80vh;
@@ -633,96 +858,6 @@ body {
 
 .btns img:nth-last-child(1) {
   margin-right: 0;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-moz-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-webkit-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-o-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
-}
-
-@-ms-keyframes blurOut {
-  0% {
-    filter: blur(3px);
-  }
-  100% {
-    filter: blur(0px);
-  }
 }
 
 @media only screen and (max-width: 600px) {

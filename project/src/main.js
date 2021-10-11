@@ -14,7 +14,7 @@ import VueLazyload from "vue-lazyload";
 import { movieDb } from "@/firebase_config.js";
 import { doc, getDoc } from "firebase/firestore";
 import "@fortawesome/fontawesome-free/css/all.css";
-import "@fortawesome/fontawesome-free/js/all.js";
+// import "@fortawesome/fontawesome-free/js/all.js";
 
 document.title = "SwipeHub";
 let host = "https://" + window.location.hostname;
@@ -34,6 +34,7 @@ Vue.mixin({
     noCardUrl: "https://i.imgur.com/8MfHjli.png",
     noImageUrl: "https://i.imgur.com/Sql8s2M.png",
     TMDBNull: "https://image.tmdb.org/t/p/originalnull",
+    TMDBUrl: "https://image.tmdb.org/t/p/original/",
   }),
   computed: {
     getSessionId() {
@@ -75,8 +76,32 @@ Vue.mixin({
       }
       return false;
     },
+    isCardDescriptionActive() {
+      return (
+        this.$store.state.activeDescriptionModal &&
+        this.$store.state.activePage == 1
+      );
+    },
+    isSideBarOpen() {
+      return this.$store.state.activeSidebar;
+    },
   },
   methods: {
+    hideInfoModal() {
+      this.$store.state.activeDescriptionModal = false;
+    },
+    showInfoModal() {
+      this.$store.state.activeDescriptionModal = true;
+    },
+    hideSidebar() {
+      this.$store.state.activeSidebar = false;
+    },
+    showSidebar() {
+      this.$store.state.activeSidebar = true;
+    },
+    toggleSidebar() {
+      this.$store.state.activeSidebar = !this.$store.state.activeSidebar;
+    },
     computeMatches(userData) {
       const matches = [];
       const allLikes = [];
@@ -107,7 +132,7 @@ Vue.mixin({
       }
       return matches;
     },
-    delay(ms) {
+    timedDelay(ms) {
       return new Promise((res) => setTimeout(res, ms));
     },
     signInFail() {
@@ -144,6 +169,9 @@ Vue.mixin({
           valid: false,
           url: `${this.noCardUrl}?id=${id}`,
         };
+      }
+      if (imgUrl.startsWith("/")) {
+        return this.getImageURL(id, this.TMDBUrl + imgUrl);
       }
       return { type: "regular", valid: true, url: `${imgUrl}?id=${id}` };
     },
