@@ -285,7 +285,8 @@ export default {
   },
   methods: {
     getCountryLogo(code) {
-      return `https://www.countryflags.io/${code}/flat/64.png`;
+      // return `https://www.countryflags.io/${code}/flat/64.png`;
+      return `https://flagcdn.com/h60/${code.toLowerCase()}.jpg`;
     },
     validateState(state) {
       if (state == "username") {
